@@ -1,0 +1,26 @@
+---
+
+- name: Configure DNS servers using raw
+  raw: |
+    echo "{% for ns in dns_servers %}nameserver {{ ns }}\n{% endfor %}" > /etc/resolv.conf
+  when: os_family == "Proxmox"
+
+- name: Configure DNS servers
+  copy:
+    dest: /etc/resolv.conf
+    content: |
+      {% for ns in dns_servers %}
+      nameserver {{ ns }}
+      {% endfor %}
+  when: os_family == "Debian"
+
+- name: Test DNS connectivity
+  raw: ping -c 1 8.8.8.8
+  register: ping_result
+  ignore_errors: true
+  changed_when: false
+
+- name: Fail if DNS or network is not reachable
+  fail:
+    msg: "DNS or network not working on {{ inventory_hostname }}"
+  when: ping_result.rc != 0

@@ -1,0 +1,27 @@
+---
+
+- name: Remove packages
+  apt:
+    name: "{{ packages | difference(['python3', 'python3-apt']) }}"
+    state: absent
+    purge: true
+  when: 
+    - os_family in ["Debian", "Proxmox"]
+    - packages | difference(['python3', 'python3-apt']) | length > 0
+
+- name: Stop and disable Docker service
+  service:
+    name: docker
+    state: stopped
+    enabled: false
+  when: "'docker-ce' in packages"
+
+- name: Completely remove Python and dependencies (only if listed)
+  raw: |
+    apt-get update -y
+    apt-get purge -y {% if 'python3' in package_list %}python3 {% endif %}{% if 'python3-apt' in package_list %}python3-apt{% endif %}
+    apt-get autoremove -y
+  when:
+    - os_family in ["Debian", "Proxmox"]
+    - "'python3' in package_list or 'python3-apt' in package_list"
+  changed_when: false

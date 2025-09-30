@@ -1,0 +1,23 @@
+---
+
+- name: Upgrade all packages
+  apt:
+    upgrade: true
+    update_cache: true
+  when: os_family in ["Debian", "Proxmox"]
+
+- name: Install packages 
+  apt:
+    name: "{{ packages | difference(['python3', 'python3-apt']) }}"
+    state: present
+    update_cache: true
+  when: 
+    - os_family in ["Debian", "Proxmox"]
+    - packages | difference(['python3', 'python3-apt']) | length > 0
+
+- name: Ensure Docker service is running
+  service:
+    name: docker
+    state: started
+    enabled: true
+  when: "'docker-ce' in packages"

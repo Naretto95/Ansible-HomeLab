@@ -1,0 +1,15 @@
+---
+
+- name: Install required packages
+  hosts: cluster
+  gather_facts: false
+  roles:
+    - dns_setup
+    - packages
+
+- name: Applying basic configuration
+  hosts: cluster
+  roles:
+    - power_policy
+    - gpu_manager
+

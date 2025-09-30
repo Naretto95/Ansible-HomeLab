@@ -1,0 +1,26 @@
+---
+
+- name: Ensure container base folder exists
+  file:
+    path: "{{ base_directory }}/{{ container.name }}"
+    state: directory
+
+- name: Create volume folders inside container folder
+  file:
+    path: "{{ base_directory }}/{{ container.name }}/{{ (item.split(':')[0] | basename) }}"
+    state: directory
+  loop: "{{ container.volumes | default([]) }}"
+
+- name: Render docker-compose.yml from Jinja2 template
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ base_directory }}/{{ container.name }}/docker-compose.yml"
+  vars:
+    docker_services:
+      - "{{ container }}"
+
+- name: Launch container using docker-compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ base_directory }}/{{ container.name }}"
+    state: present
+  become: true

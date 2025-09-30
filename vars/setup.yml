@@ -1,0 +1,62 @@
+---
+
+gitlab_url: http://localhost/ 
+gitlab_token_name: "homelab-token"
+gitlab_token: "MySecretToken123!"
+
+github_username: "naretto95"
+
+project_name: "ansible-homelab"
+
+debian_repos:
+  - repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }} {{ ansible_facts['distribution_release'] }} stable"
+    gpg_key: "https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}/gpg"
+    filename: "docker"
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-compose
+
+docker_services:
+  - name: gitlab
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: always
+    hostname: gitlab.local
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.local'
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2222:22"
+    volumes:
+      - ./config:/etc/gitlab
+      - ./logs:/var/log/gitlab
+      - ./data:/var/opt/gitlab
+    networks:
+      - gitlab_net
+
+  - name: gitlab-runner
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+    docker_image: "alpine:latest"
+    executor: "docker"
+    tags: "ci,automation,ansible"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config:/etc/gitlab-runner
+    networks:
+      - gitlab_net
+
+docker_networks:
+  gitlab_net:
+    external: true

@@ -1,0 +1,25 @@
+---
+
+- name: Detect CPU frequency driver
+  ansible.builtin.command:
+    cmd: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_driver
+  register: cpu_driver
+  changed_when: false
+
+- name: Create CPU power management systemd service
+  ansible.builtin.template:
+    src: cpu_power.service.j2
+    dest: /etc/systemd/system/{{ service_name }}
+  when: "'pstate' in cpu_driver.stdout"
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  when: "'pstate' in cpu_driver.stdout"
+
+- name: Enable and start CPU power management service
+  ansible.builtin.systemd:
+    name: "{{ service_name }}"
+    enabled: yes
+    state: started
+  when: "'pstate' in cpu_driver.stdout"
