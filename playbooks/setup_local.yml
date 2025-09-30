@@ -1,0 +1,20 @@
+- name: Generating basic setup
+  hosts: localhost
+  tasks:
+  
+    - name: Disable all MOTD scripts if folder exists
+      file:
+        path: "{{ item }}"
+        mode: '0644'
+      loop: "{{ lookup('fileglob','/etc/update-motd.d/*', wantlist=True) }}"
+      ignore_errors: true
+
+    - name: Install Ansible collections from requirements.yml
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install -r requirements.yml
+
+- name: Creating dockers
+  hosts: localhost
+  roles:
+    - install_docker
+    - deploy_docker_containers
