@@ -1,0 +1,16 @@
+---
+
+- name: Detect Debian/Proxmox using /etc/debian_version
+  raw: |
+    if [ -f /etc/pve/.version ]; then
+      echo Proxmox
+    elif [ -f /etc/debian_version ]; then
+      echo Debian
+    else
+      echo Other
+    fi
+  register: os_name
+  changed_when: false
+
+- set_fact:
+    os_family: "{{ os_name.stdout | trim }}"

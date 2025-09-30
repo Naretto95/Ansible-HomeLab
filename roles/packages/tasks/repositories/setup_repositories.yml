@@ -1,0 +1,20 @@
+---
+
+- name: Debian repositories GPG keys
+  apt_key:
+    url: "{{ item.gpg_key }}"
+    state: "{{ repos_state | default('present') }}"
+  loop: "{{ debian_repos }}"
+  when: 
+    - os_family in ["Debian", "Proxmox"]
+    - debian_repos is defined
+
+- name: Debian repositories
+  apt_repository:
+    repo: "{{ item.repo }}"
+    filename: "{{ item.filename | default(omit) }}"
+    state: "{{ repos_state | default('present') }}"
+  loop: "{{ debian_repos }}"
+  when: 
+    - os_family in ["Debian", "Proxmox"]
+    - debian_repos is defined

@@ -1,0 +1,18 @@
+---
+
+- name: Check if container project folder exists
+  stat:
+    path: "{{ base_directory }}/{{ container.name }}"
+  register: container_dir
+
+- name: Stop and remove container using docker-compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ base_directory }}/{{ container.name }}"
+    state: absent
+  become: true
+  when: container_dir.stat.isdir | default(false)
+
+- name: Remove container base folder
+  file:
+    path: "{{ base_directory }}/{{ container.name }}"
+    state: absent

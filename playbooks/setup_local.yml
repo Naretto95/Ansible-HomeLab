@@ -1,0 +1,26 @@
+---
+
+- name: Generating basic setup
+  hosts: localhost
+  vars_files:
+    - ../vars/setup.yml
+  roles:
+    - disable_motd
+    - ansible_collections
+
+- name: Creating dockers
+  hosts: localhost
+  become: true
+  vars_files:
+    - ../vars/setup.yml
+  roles:
+    - packages
+    - docker_containers
+
+- name: Config gitlab
+  hosts: localhost
+  vars_files:
+    - ../vars/setup.yml
+  roles:
+    - install_gitlab
+  when: container_state is undefined

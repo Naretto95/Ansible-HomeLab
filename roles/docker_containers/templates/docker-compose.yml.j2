@@ -1,0 +1,44 @@
+services:
+{% for service in docker_services %}
+  {{ service.name }}:
+    image: {{ service.image }}
+    container_name: {{ service.container_name }}
+    restart: {{ service.restart }}
+{% if service.hostname is defined %}
+    hostname: {{ service.hostname }}
+{% endif %}
+{% if service.environment is defined %}
+    environment:
+{% for key, value in service.environment.items() %}
+      {{ key }}: |-
+            {{ value | indent(8) }}
+{% endfor %}
+{% endif %}
+{% if service.ports is defined %}
+    ports:
+{% for port in service.ports %}
+      - "{{ port }}"
+{% endfor %}
+{% endif %}
+{% if service.volumes is defined %}
+    volumes:
+{% for volume in service.volumes %}
+      - {{ volume }}
+{% endfor %}
+{% endif %}
+{% if service.networks is defined %}
+    networks:
+{% for net in service.networks %}
+      - {{ net }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% if docker_networks is defined %}
+networks:
+{% for net, net_config in docker_networks.items() %}
+  {{ net }}:
+{% for key, value in net_config.items() %}
+    {{ key }}: {{ value }}
+{% endfor %}
+{% endfor %}
+{% endif %}
