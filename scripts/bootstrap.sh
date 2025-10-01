@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# --- Variables ---
-PLAYBOOK="../playbooks/site.yml"
-INVENTORY="../inventory/hosts.ini"
+# --- Variables ---*
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLAYBOOK="$SCRIPT_DIR/../playbooks/setup_local.yml"
+INVENTORY="$SCRIPT_DIR/../inventory/hosts.ini"
 
 # --- Detect OS & Install Ansible ---
 echo "[INFO] Detecting operating system..."

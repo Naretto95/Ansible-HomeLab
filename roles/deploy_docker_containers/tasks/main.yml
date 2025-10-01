@@ -1,33 +1,5 @@
-- name: Create container folders in user's home with associated volumes
-  block:
-    - name: Ensure container base folder exists
-      file:
-        path: "{{ base_directory }}/{{ item.name }}"
-        state: directory
-
-    - name: Create volume folders inside container folder
-      file:
-        path: "{{ base_directory }}/{{ item.name }}/{{ (vol.split(':')[0] | basename) }}"
-        state: directory
-      loop: "{{ item.volumes | default([]) }}"
-      loop_control:
-        label: "{{ item }}"
-
-    - name: Render docker-compose.yml from Jinja2 template
-      template:
-        src: docker-compose.yml.j2
-        dest: "{{ base_directory }}/{{ item.name }}/docker-compose.yml"
-      vars:
-        # Pass only the current container and its networks for rendering
-        docker_services: 
-          - "{{ item }}"
-
-    - name: Launch container using docker-compose
-      community.docker.docker_compose:
-        project_src: "{{ base_directory }}/{{ item.name }}"
-        state: present
-      become: true
-
+- name: Create container folders in user's base directory with associated volumes
+  include_tasks: create_container.yml
   loop: "{{ docker_services }}"
   loop_control:
-    label: "{{ item.name }}"
+    loop_var: container

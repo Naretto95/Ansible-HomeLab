@@ -11,7 +11,7 @@ services:
     environment:
 {% for key, value in service.environment.items() %}
       {{ key }}: |-
-{{ value | indent(8) }}
+            {{ value | indent(8) }}
 {% endfor %}
 {% endif %}
 {% if service.ports is defined %}
