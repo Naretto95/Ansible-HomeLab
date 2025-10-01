@@ -63,4 +63,4 @@
 
     - name: Show GitLab initial root password
       debug:
-        msg: "gitlab initial root password : {{ gitlab_password.stdout }}"
+        msg: "{{ gitlab_password.stdout }}"
