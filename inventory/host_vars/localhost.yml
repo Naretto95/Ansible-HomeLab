@@ -34,4 +34,4 @@ docker_services:
 
 docker_networks:
   gitlab_net:
-    driver: bridge
+    external: true

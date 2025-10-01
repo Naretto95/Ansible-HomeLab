@@ -33,7 +33,7 @@ services:
 {% endfor %}
 {% endif %}
 {% endfor %}
-
+{% if docker_networks is defined %}
 networks:
 {% for net, net_config in docker_networks.items() %}
   {{ net }}:
@@ -41,3 +41,4 @@ networks:
     {{ key }}: {{ value }}
 {% endfor %}
 {% endfor %}
+{% endif %}
