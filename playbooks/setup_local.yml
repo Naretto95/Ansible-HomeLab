@@ -47,13 +47,7 @@
       community.docker.docker_container_exec:
         container: "{{ runner_container.name }}"
         command: >
-          {{ runner_container.name }} register \
-            --non-interactive \
-            --url http://{{ gitlab_container.hostname }}/ \
-            --registration-token {{ token_output.stdout }} \
-            --executor {{ runner_container.executor }} \
-            --description "{{ runner_container.name }}" \
-            --tag-list "{{ runner_container.tags }}"
+          gitlab-runner register --non-interactive --url http://{{ gitlab_container.hostname }}/ --registration-token {{ token_output.stdout }} --executor {{ runner_container.executor }} --description "{{ runner_container.name }}" --tag-list "{{ runner_container.tags }}"
       register: runner_register_output
 
     - name: Show registration output
