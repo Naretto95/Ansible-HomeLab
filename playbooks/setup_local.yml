@@ -38,7 +38,7 @@
       shell: |
         gitlab-runner register \
           --non-interactive \
-          --url {{ gitlab_contianer. }} \
+          --url http://{{ gitlab_continer.hostname }}/ \
           --registration-token {{ token_output.stdout }} \
           --executor {{ runner_container.executor }} \
           --description "{{ runner_container.name }}" \
