@@ -18,3 +18,46 @@
   roles:
     - install_docker
     - deploy_docker_containers
+
+- name: Config gitlab
+  hosts: localhost
+  tasks:
+
+    - name: Get gitlab container info
+      set_fact:
+        gitlab_container: "{{ docker_services | selectattr('name', 'equalto', 'gitlab') | first }}"
+        runner_container: "{{ docker_services | selectattr('name', 'equalto', 'gitlab-runner') | first }}"
+
+    - name: Get instance runner token from GitLab Rails console
+      shell: |
+        docker exec -i {{ gitlab_container.name }} gitlab-rails runner "puts Gitlab::CurrentSettings.runners_registration_token"
+      when: token_type == "instance"
+      register: token_output
+
+    - name: Register GitLab runner
+      shell: |
+        gitlab-runner register \
+          --non-interactive \
+          --url {{ gitlab_contianer. }} \
+          --registration-token {{ token_output.stdout }} \
+          --executor {{ runner_container.executor }} \
+          --description "{{ runner_container.name }}" \
+          --tag-list "{{ runner_container.tags }}"
+      args:
+        warn: false
+      register: runner_register_output
+
+    - name: Show registration output
+      debug:
+        var: runner_register_output.stdout
+
+    - name: Get GitLab initial root password
+      become: true
+      ansible.builtin.command:
+        cmd: "docker exec {{ gitlab_container.name }} grep 'Password:' /etc/gitlab/initial_root_password"
+      register: gitlab_password
+      changed_when: false
+
+    - name: Show GitLab initial root password
+      debug:
+        msg: "gitlab initial root password : {{ gitlab_password.stdout }}"

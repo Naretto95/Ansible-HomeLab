@@ -24,6 +24,8 @@ docker_services:
     image: gitlab/gitlab-runner:latest
     container_name: gitlab-runner
     restart: always
+    executor: "docker"                 # Executor type: shell, docker, etc.
+    tags: "ci,automation,ansible"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./config:/etc/gitlab-runner
