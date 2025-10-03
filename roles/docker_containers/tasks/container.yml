@@ -1,3 +1,5 @@
+---
+
 - block:
     - name: Ensure container base folder exists
       file:

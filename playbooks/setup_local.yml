@@ -1,3 +1,5 @@
+---
+
 - name: Generating basic setup
   hosts: localhost
   tasks:
@@ -12,6 +14,7 @@
     - name: Install Ansible collections from requirements.yml
       ansible.builtin.command:
         cmd: ansible-galaxy collection install -r ../requirements.yml
+      changed_when: false
 
 - name: Creating dockers
   hosts: localhost
@@ -22,6 +25,11 @@
 
 - name: Config gitlab
   hosts: localhost
+  vars:
+    gitlab_url: http://localhost/ 
+    gitlab_token_name: "ansible-token"
+    gitlab_token: "MySecretToken123!"
+    gitlab_project_name: "ansible-project"
   tasks:
     - block:
       - name: Get gitlab container info
@@ -41,25 +49,94 @@
         shell: |
           docker exec -i {{ gitlab_container.name }} gitlab-rails runner "puts Gitlab::CurrentSettings.runners_registration_token"
         register: token_output
+        changed_when: false
 
       - name: Register GitLab runner
         community.docker.docker_container_exec:
           container: "{{ runner_container.name }}"
           command: >
             gitlab-runner register --non-interactive --url http://{{ gitlab_container.hostname }}/ --registration-token {{ token_output.stdout }} --docker-image {{ runner_container.docker_image }} --executor {{ runner_container.executor }} --description "{{ runner_container.name }}" --tag-list "{{ runner_container.tags }}"
-        register: runner_register_output
+        changed_when: false
 
       - name: Disable GitLab user signups
         community.docker.docker_container_exec:
           container: "{{ gitlab_container.name }}"
           command: >
             gitlab-rails runner "ApplicationSetting.current.update!(signup_enabled: false)"
+        changed_when: false
+
+      - name: Generate GitLab root personal access token
+        shell: |
+          docker exec -i {{ gitlab_container.name }} gitlab-rails runner "
+          user = User.find_by_username('root')
+          token = user.personal_access_tokens.find_by(name: '{{ gitlab_token }}')
+          unless token
+            token = user.personal_access_tokens.create!(
+              scopes: [:api, :read_user, :write_repository],
+              name: '{{ gitlab_token }}',
+              expires_at: 1.year.from_now
+            )
+            token.set_token('{{ gitlab_token }}')
+            token.save!
+          end
+          puts token.token
+          "
+        changed_when: false
+
+      - name: Check if GitLab project exists
+        uri:
+          url: "{{ gitlab_url }}/api/v4/projects?search={{ gitlab_project_name }}"
+          method: GET
+          headers:
+            PRIVATE-TOKEN: "{{ gitlab_token }}"
+        register: project_search
+
+      - name: Create GitLab project if not found
+        uri:
+          url: "{{ gitlab_url }}/api/v4/projects"
+          method: POST
+          headers:
+            PRIVATE-TOKEN: "{{ gitlab_token }}"
+          body_format: json
+          body:
+            name: "{{ gitlab_project_name }}"
+            visibility: "private"
+          status_code: 201
+        when: project_search.json | length == 0
+        register: project_create
+
+      - name: Get project info
+        uri:
+          url: "{{ gitlab_url }}/api/v4/projects?search={{ gitlab_project_name }}"
+          method: GET
+          headers:
+            PRIVATE-TOKEN: "{{ gitlab_token }}"
+        register: project_info
+
+      - name: Set Git repository URL fact
+        set_fact:
+          git_repo_url: "{{ project_info.json[0].http_url_to_repo | regex_replace('http://', 'http://root:' + gitlab_token + '@') | regex_replace('gitlab.local','localhost') }}"
+
+      - name: Push local Ansible project to GitLab
+        shell: |
+          cd "{{ playbook_dir | dirname }}"
+          git init
+          git config user.email "ansible@deploy.com"
+          git config user.name "Ansible CI"
+          git checkout -b main
+          git remote remove origin || true
+          git remote add origin "{{ git_repo_url }}"
+          git add .
+          git commit -m "Initial commit" || true
+          git push -u origin main
+        changed_when: false
 
       - name: Get GitLab initial root password
         become: true
         ansible.builtin.command:
           cmd: "docker exec {{ gitlab_container.name }} grep 'Password:' /etc/gitlab/initial_root_password"
         register: gitlab_password
+        changed_when: false
         failed_when: false
 
       - name: Show GitLab initial root password
