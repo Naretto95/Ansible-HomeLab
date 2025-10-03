@@ -8,7 +8,6 @@
         path: "{{ item }}"
         mode: '0644'
       loop: "{{ lookup('fileglob','/etc/update-motd.d/*', wantlist=True) }}"
-      ignore_errors: true
 
     - name: Install Ansible collections from requirements.yml
       ansible.builtin.command:
@@ -47,20 +46,27 @@
       community.docker.docker_container_exec:
         container: "{{ runner_container.name }}"
         command: >
-          gitlab-runner register --non-interactive --url http://{{ gitlab_container.hostname }}/ --registration-token {{ token_output.stdout }} --executor {{ runner_container.executor }} --description "{{ runner_container.name }}" --tag-list "{{ runner_container.tags }}"
+          gitlab-runner register --non-interactive --url http://{{ gitlab_container.hostname }}/ --registration-token {{ token_output.stdout }} --docker-image {{ runner_container.docker_image }} --executor {{ runner_container.executor }} --description "{{ runner_container.name }}" --tag-list "{{ runner_container.tags }}"
       register: runner_register_output
 
     - name: Show registration output
       debug:
         var: runner_register_output.stdout
 
+    - name: Disable GitLab user signups
+      community.docker.docker_container_exec:
+        container: "{{ gitlab_container.name }}"
+        command: >
+          gitlab-rails runner "ApplicationSetting.current.update!(signup_enabled: false)"
+
     - name: Get GitLab initial root password
       become: true
       ansible.builtin.command:
         cmd: "docker exec {{ gitlab_container.name }} grep 'Password:' /etc/gitlab/initial_root_password"
       register: gitlab_password
-      changed_when: false
+      failed_when: false
 
     - name: Show GitLab initial root password
       debug:
         msg: "{{ gitlab_password.stdout }}"
+      when: gitlab_password.rc == 0
