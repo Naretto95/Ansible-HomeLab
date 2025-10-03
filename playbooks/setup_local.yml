@@ -18,55 +18,53 @@
   become: true
   roles:
     - install_docker
-    - deploy_docker_containers
+    - docker_containers
 
 - name: Config gitlab
   hosts: localhost
   tasks:
+    - block:
+      - name: Get gitlab container info
+        set_fact:
+          gitlab_container: "{{ docker_services | selectattr('name', 'equalto', 'gitlab') | first }}"
+          runner_container: "{{ docker_services | selectattr('name', 'equalto', 'gitlab-runner') | first }}"
 
-    - name: Get gitlab container info
-      set_fact:
-        gitlab_container: "{{ docker_services | selectattr('name', 'equalto', 'gitlab') | first }}"
-        runner_container: "{{ docker_services | selectattr('name', 'equalto', 'gitlab-runner') | first }}"
+      - name: Wait for GitLab container to be healthy
+        community.docker.docker_container_info:
+          name: "{{ gitlab_container.name }}"
+        register: gitlab_info
+        retries: 30
+        delay: 10
+        until: gitlab_info.container.State.Health.Status == "healthy"
 
-    - name: Wait for GitLab container to be healthy
-      community.docker.docker_container_info:
-        name: "{{ gitlab_container.name }}"
-      register: gitlab_info
-      retries: 30
-      delay: 10
-      until: gitlab_info.container.State.Health.Status == "healthy"
+      - name: Get instance runner token from GitLab Rails console
+        shell: |
+          docker exec -i {{ gitlab_container.name }} gitlab-rails runner "puts Gitlab::CurrentSettings.runners_registration_token"
+        register: token_output
 
-    - name: Get instance runner token from GitLab Rails console
-      shell: |
-        docker exec -i {{ gitlab_container.name }} gitlab-rails runner "puts Gitlab::CurrentSettings.runners_registration_token"
-      register: token_output
+      - name: Register GitLab runner
+        community.docker.docker_container_exec:
+          container: "{{ runner_container.name }}"
+          command: >
+            gitlab-runner register --non-interactive --url http://{{ gitlab_container.hostname }}/ --registration-token {{ token_output.stdout }} --docker-image {{ runner_container.docker_image }} --executor {{ runner_container.executor }} --description "{{ runner_container.name }}" --tag-list "{{ runner_container.tags }}"
+        register: runner_register_output
 
-    - name: Register GitLab runner
-      community.docker.docker_container_exec:
-        container: "{{ runner_container.name }}"
-        command: >
-          gitlab-runner register --non-interactive --url http://{{ gitlab_container.hostname }}/ --registration-token {{ token_output.stdout }} --docker-image {{ runner_container.docker_image }} --executor {{ runner_container.executor }} --description "{{ runner_container.name }}" --tag-list "{{ runner_container.tags }}"
-      register: runner_register_output
+      - name: Disable GitLab user signups
+        community.docker.docker_container_exec:
+          container: "{{ gitlab_container.name }}"
+          command: >
+            gitlab-rails runner "ApplicationSetting.current.update!(signup_enabled: false)"
 
-    - name: Show registration output
-      debug:
-        var: runner_register_output.stdout
+      - name: Get GitLab initial root password
+        become: true
+        ansible.builtin.command:
+          cmd: "docker exec {{ gitlab_container.name }} grep 'Password:' /etc/gitlab/initial_root_password"
+        register: gitlab_password
+        failed_when: false
 
-    - name: Disable GitLab user signups
-      community.docker.docker_container_exec:
-        container: "{{ gitlab_container.name }}"
-        command: >
-          gitlab-rails runner "ApplicationSetting.current.update!(signup_enabled: false)"
+      - name: Show GitLab initial root password
+        debug:
+          msg: "{{ gitlab_password.stdout }}"
+        when: gitlab_password.rc == 0
 
-    - name: Get GitLab initial root password
-      become: true
-      ansible.builtin.command:
-        cmd: "docker exec {{ gitlab_container.name }} grep 'Password:' /etc/gitlab/initial_root_password"
-      register: gitlab_password
-      failed_when: false
-
-    - name: Show GitLab initial root password
-      debug:
-        msg: "{{ gitlab_password.stdout }}"
-      when: gitlab_password.rc == 0
+      when: container_state is undefined
