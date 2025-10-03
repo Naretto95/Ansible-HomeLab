@@ -66,5 +66,4 @@
         debug:
           msg: "{{ gitlab_password.stdout }}"
         when: gitlab_password.rc == 0
-
       when: container_state is undefined
