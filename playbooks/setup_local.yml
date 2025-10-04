@@ -2,6 +2,8 @@
 
 - name: Generating basic setup
   hosts: localhost
+  vars_files:
+    - ../vars/setup.yml
   tasks:
   
     - name: Disable all MOTD scripts if folder exists
@@ -19,17 +21,16 @@
 - name: Creating dockers
   hosts: localhost
   become: true
+  vars_files:
+    - ../vars/setup.yml
   roles:
     - install_docker
     - docker_containers
 
 - name: Config gitlab
   hosts: localhost
-  vars:
-    gitlab_url: http://localhost/ 
-    gitlab_token_name: "ansible-token"
-    gitlab_token: "MySecretToken123!"
-    gitlab_project_name: "ansible-project"
+  vars_files:
+    - ../vars/setup.yml
   tasks:
     - block:
       - name: Get gitlab container info
@@ -130,6 +131,15 @@
           git commit -m "Initial commit" || true
           git push -u origin main
         changed_when: false
+      
+      - name: Delete GitLab root personal access token
+        shell: |
+          docker exec -i {{ gitlab_container.name }} gitlab-rails runner "
+            user = User.find_by_username('root')
+            token = user.personal_access_tokens.find_by(name: '{{ gitlab_token }}')
+            token.destroy! if token
+          "
+        changed_when: true
 
       - name: Get GitLab initial root password
         become: true
