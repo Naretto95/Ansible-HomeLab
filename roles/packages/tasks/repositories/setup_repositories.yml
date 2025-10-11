@@ -1,18 +1,5 @@
 ---
 
-- name: Remove subscription nag
-  ansible.builtin.replace:
-    path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
-    regexp: "data\\.status\\.toLowerCase\\(\\) !== 'active'"
-    replace: 'false /* subscription nag disabled */'
-  when: os_family == "Proxmox"
-
-- name: Remove Proxmox enterprise .sources file
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/pve-enterprise.sources
-    state: absent
-  when: os_family == "Proxmox"
-
 - name: Debian repositories GPG keys
   apt_key:
     url: "{{ item.gpg_key }}"

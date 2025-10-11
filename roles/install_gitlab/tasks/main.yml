@@ -124,12 +124,12 @@
       PRIVATE-TOKEN: "{{ gitlab_token }}"
     body_format: json
     body:
-      url: "https://github.com/{{ github_username }}/{{ github_repo }}.git"
+      url: "https://github.com/{{ github_username }}/{{ project_name }}.git"
       enabled: true
       mirror_direction: "push"
       only_protected_branches: false
     status_code: 201, 200
-  when: existing_mirrors.json | selectattr('url','equalto',"https://github.com/{{ github_username }}/{{ github_repo }}.git") | list | length == 0
+  when: existing_mirrors.json | selectattr('url','equalto',"https://github.com/{{ github_username }}/{{ project_name }}.git") | list | length == 0
 
 - name: Delete GitLab root personal access token
   shell: |

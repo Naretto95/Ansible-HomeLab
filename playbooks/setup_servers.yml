@@ -6,6 +6,7 @@
   roles:
     - dns_setup
     - packages
+    - proxmox_customizations
 
 - name: Applying basic configuration
   hosts: cluster
