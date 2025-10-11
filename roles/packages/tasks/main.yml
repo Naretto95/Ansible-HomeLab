@@ -16,7 +16,6 @@
 
 - name: Setup repositories
   include_tasks: repositories/setup_repositories.yml
-  when: repos_state | default('present') == 'present'
 
 - name: Install packages
   include_tasks: packages/install_packages.yml
