@@ -1,7 +1,7 @@
 ---
 
 - name: Create cluster if not already present
-  command: pvecm create {{ cluster_name }}
+  ansible.builtin.command: pvecm create {{ cluster_name }}
   when: "'Name: ' + cluster_name not in cluster_status.stdout"
   changed_when: false
 

@@ -18,7 +18,6 @@
   delegate_to: "{{ master_host }}"
 
 - name: Join cluster if not already joined
-  command: >
-    pvecm add {{ master_ip }} --use_ssh 1
+  ansible.builtin.command: pvecm add {{ master_ip }} --use_ssh 1
   when: "'Name: ' + cluster_name not in cluster_status.stdout"
   changed_when: false

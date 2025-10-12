@@ -1,7 +1,7 @@
 ---
 
 - name: Gather cluster status
-  command: pvecm status
+  ansible.builtin.command: pvecm status
   register: cluster_status
   ignore_errors: true
   changed_when: false

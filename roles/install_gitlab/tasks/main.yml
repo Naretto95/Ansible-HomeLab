@@ -28,14 +28,14 @@
 - name: Register GitLab runner
   community.docker.docker_container_exec:
     container: "{{ runner_container.name }}"
-    command: >
+    ansible.builtin.command: >
       gitlab-runner register --non-interactive --url http://{{ gitlab_container.hostname }}/ --registration-token {{ token_output.stdout }} --docker-image {{ runner_container.docker_image }} --executor {{ runner_container.executor }} --description "{{ runner_container.name }}" --tag-list "{{ runner_container.tags }}"
   changed_when: false
 
 - name: Disable GitLab user signups
   community.docker.docker_container_exec:
     container: "{{ gitlab_container.name }}"
-    command: >
+    ansible.builtin.command: >
       gitlab-rails runner "ApplicationSetting.current.update!(signup_enabled: false)"
   changed_when: false
 
@@ -142,8 +142,7 @@
 
 - name: Get GitLab initial root password
   become: true
-  ansible.builtin.command:
-    cmd: "docker exec {{ gitlab_container.name }} grep 'Password:' /etc/gitlab/initial_root_password"
+  ansible.builtin.command: "docker exec {{ gitlab_container.name }} grep 'Password:' /etc/gitlab/initial_root_password"
   register: gitlab_password
   changed_when: false
   failed_when: false
