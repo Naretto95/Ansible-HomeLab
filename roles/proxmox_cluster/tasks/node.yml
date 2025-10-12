@@ -1,0 +1,11 @@
+---
+
+- name: Get master IP dynamically
+  set_fact:
+    master_ip: "{{ hostvars | dict2items | selectattr('value.cluster_master', 'equalto', true) | map(attribute='value.ansible_host') | list | first }}"
+
+- name: Join cluster if not already joined
+  command: >
+    pvecm add {{ master_ip }} --use_ssh 1
+  when: "'Name: ' + cluster_name not in cluster_status.stdout"
+  changed_when: false

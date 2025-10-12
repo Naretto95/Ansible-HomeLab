@@ -1,0 +1,14 @@
+---
+
+- name: Create cluster if not already present
+  command: pvecm create {{ cluster_name }}
+  when: "'Name: ' + cluster_name not in cluster_status.stdout"
+  changed_when: false
+
+- name: Set expected votes to 1 for 2-node cluster
+  lineinfile:
+    path: /etc/pve/corosync.conf
+    regexp: '^.*expected_votes:.*$'
+    line: 'expected_votes: 1'
+  notify: restart corosync
+  when: "'expected_votes' not in cluster_status.stdout"

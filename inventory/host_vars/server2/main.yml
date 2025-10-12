@@ -2,4 +2,5 @@
 
 ansible_host: 192.168.1.2
 
-unmount_gpu: false
+unmount_gpu: falser
+cluster_master: true

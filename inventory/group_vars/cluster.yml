@@ -1,8 +1,9 @@
 ---
 
+cluster_name: homelab-cluster
+
 ansible_user: root
 
-host_os: proxmox
 scaling_governor: powersave
 EPP: balance_power
 
