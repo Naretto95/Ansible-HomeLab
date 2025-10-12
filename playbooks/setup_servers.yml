@@ -6,11 +6,12 @@
   roles:
     - dns_setup
     - packages
-    - proxmox_customizations
 
 - name: Applying basic configuration
   hosts: cluster
   roles:
     - power_policy
     - gpu_manager
+    - proxmox_customizations
+    - proxmox_cluster
 
