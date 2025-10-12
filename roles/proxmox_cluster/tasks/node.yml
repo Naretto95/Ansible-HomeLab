@@ -2,7 +2,20 @@
 
 - name: Get master IP dynamically
   set_fact:
-    master_ip: "{{ hostvars | dict2items | selectattr('value.cluster_master', 'equalto', true) | map(attribute='value.ansible_host') | list | first }}"
+    master_ip: "{{ groups['cluster'] | map('extract', hostvars) | selectattr('cluster_master', 'equalto', true) | map(attribute='ansible_host') | first }}"
+    master_host: "{{ groups['cluster'] | map('extract', hostvars) | selectattr('cluster_master', 'equalto', true) | map(attribute='ansible_host') | first }}"
+
+- name: Generate SSH key on joining node
+  ansible.builtin.openssh_keypair:
+    path: /root/.ssh/id_rsa
+    type: ed25519
+  register: node_ssh_key
+
+- name: Add joining node key to master
+  authorized_key:
+    user: root
+    key: "{{ node_ssh_key.public_key }}"
+  delegate_to: "{{ master_host }}"
 
 - name: Join cluster if not already joined
   command: >
