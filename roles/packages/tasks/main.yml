@@ -19,8 +19,8 @@
 
 - name: Install packages
   include_tasks: packages/install_packages.yml
-  when: packages_state | default('present') == 'present'
+  when: packages_state == 'present'
 
 - name: Remove packages
   include_tasks: packages/remove_packages.yml
-  when: packages_state | default('present') == 'absent'
+  when: packages_state == 'absent'

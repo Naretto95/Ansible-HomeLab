@@ -10,20 +10,20 @@
   community.docker.docker_network:
     name: "{{ item.key }}"
     driver: bridge
-    state: "{{ container_state | default('present') }}"
+    state: "{{ container_state }}"
   loop: "{{ docker_networks | dict2items }}"
   when: docker_networks is defined
 
 - name: Create containers in user's base directory
   include_tasks: install_container.yml
-  loop: "{{ docker_services | default([]) }}"
+  loop: "{{ docker_services }}"
   loop_control:
     loop_var: container
-  when: container_state | default('present') == 'present'
+  when: container_state == 'present'
 
 - name: Remove containers in user's base directory
   include_tasks: destroy_container.yml
-  loop: "{{ docker_services | default([]) }}"
+  loop: "{{ docker_services }}"
   loop_control:
     loop_var: container
-  when: container_state | default('present') == 'absent'
+  when: container_state == 'absent'

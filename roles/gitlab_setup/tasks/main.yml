@@ -116,7 +116,7 @@
   changed_when: false
   register: existing_mirrors
 
-- name: Configure GitLab push mirror to GitHub
+- name: Configure GitLab pull mirror to GitHub
   uri:
     url: "{{ gitlab_url }}/api/v4/projects/{{ project_info.json[0].id }}/remote_mirrors"
     method: POST
@@ -126,7 +126,7 @@
     body:
       url: "https://github.com/{{ github_username }}/{{ project_name }}.git"
       enabled: true
-      mirror_direction: "push"
+      mirror_direction: "pull"
       only_protected_branches: false
     status_code: 201, 200
   when: existing_mirrors.json | selectattr('url','equalto',"https://github.com/{{ github_username }}/{{ project_name }}.git") | list | length == 0

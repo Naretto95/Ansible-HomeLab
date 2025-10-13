@@ -8,8 +8,8 @@
 
 - name: Include master tasks
   include_tasks: master.yml
-  when: cluster_master | default(false) | bool
+  when: cluster_master | bool
 
 - name: Include node tasks
   include_tasks: node.yml
-  when: not (cluster_master | default(false) | bool)
+  when: not (cluster_master | bool)

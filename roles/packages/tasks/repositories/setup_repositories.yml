@@ -3,7 +3,7 @@
 - name: Debian repositories GPG keys
   apt_key:
     url: "{{ item.gpg_key }}"
-    state: "{{ repos_state | default('present') }}"
+    state: "{{ repos_state }}"
   loop: "{{ debian_repos }}"
   when: 
     - os_family in ["Debian", "Proxmox"]
@@ -13,7 +13,7 @@
   apt_repository:
     repo: "{{ item.repo }}"
     filename: "{{ item.filename | default(omit) }}"
-    state: "{{ repos_state | default('present') }}"
+    state: "{{ repos_state }}"
     mode: deb822
     update_cache: true
   loop: "{{ debian_repos }}"
