@@ -6,7 +6,7 @@ GITHUB_REPO="https://github.com/{{ github_username }}/{{ project_name }}.git"
 GITLAB_REPO="{{ git_repo_ssh }}"
 WORKDIR="/tmp/github_gitlab_mirror"
 
-export GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_deploy_key -o StrictHostKeyChecking=yes"1~export GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_deploy_key -o StrictHostKeyChecking=yes"
+export GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_deploy_key -o StrictHostKeyChecking=yes -p 2222"
 
 # Ensure GitLab host is trusted
 mkdir -p ~/.ssh
