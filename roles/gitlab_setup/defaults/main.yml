@@ -1,6 +1,5 @@
 ---
 
 mirror_script_directory: "{{ ansible_env.HOME }}"
-gitlab_url: http://localhost/ 
 gitlab_token_name: "homelab-token"
 gitlab_token: "MySecretToken123!"

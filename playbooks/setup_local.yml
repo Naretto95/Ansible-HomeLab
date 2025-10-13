@@ -22,5 +22,5 @@
   vars_files:
     - ../vars/setup.yml
   roles:
-    - gitlab_setup
-  when: container_state is undefined
+    - role: gitlab_setup
+      when: container_state is undefined

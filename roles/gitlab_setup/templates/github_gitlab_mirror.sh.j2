@@ -3,8 +3,14 @@
 set -e
 
 GITHUB_REPO="https://github.com/{{ github_username }}/{{ project_name }}.git"
-GITLAB_REPO="{{ git_repo_url }}"
+GITLAB_REPO="{{ git_repo_ssh }}"
 WORKDIR="/tmp/github_gitlab_mirror"
+
+export GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_deploy_key -o StrictHostKeyChecking=yes"1~export GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_deploy_key -o StrictHostKeyChecking=yes"
+
+# Ensure GitLab host is trusted
+mkdir -p ~/.ssh
+ssh-keyscan -H localhost >> ~/.ssh/known_hosts 2>/dev/null
 
 echo "[INFO] Starting GitHub → GitLab mirror at $(date)"
 rm -rf "$WORKDIR"
