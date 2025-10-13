@@ -57,14 +57,14 @@
     "
   changed_when: false
 
-- name: Check if GitLab project exists
+- name: Get project info
   uri:
     url: "{{ gitlab_url }}/api/v4/projects?search={{ project_name }}"
     method: GET
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"
   changed_when: false
-  register: project_search
+  register: project_info
 
 - name: Create GitLab project if not found
   uri:
@@ -77,21 +77,13 @@
       name: "{{ project_name }}"
       visibility: "private"
     status_code: 201
-  when: project_search.json | length == 0
+  when: project_info.json | length == 0
   register: project_create
-
-- name: Get project info
-  uri:
-    url: "{{ gitlab_url }}/api/v4/projects?search={{ project_name }}"
-    method: GET
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_token }}"
-  changed_when: false
-  register: project_info
 
 - name: Set Git repository URL fact
   set_fact:
-    git_repo_url: "{{ project_info.json[0].http_url_to_repo | regex_replace('http://', 'http://root:' + gitlab_token + '@') | regex_replace('gitlab.local','localhost') }}"
+    git_repo_url_token: "{{ project_info.json[0].http_url_to_repo | regex_replace('http://', 'http://root:' + gitlab_token + '@') | regex_replace('gitlab.local','localhost') }}"
+    git_repo_url: "{{ project_info.json[0].http_url_to_repo | regex_replace('gitlab.local','localhost') }}"
 
 - name: Push local Ansible project to GitLab
   shell: |
@@ -101,35 +93,55 @@
     git config user.name "Ansible CI"
     git checkout -b main
     git remote remove origin || true
-    git remote add origin "{{ git_repo_url }}"
+    git remote add origin "{{ git_repo_url_token }}"
     git add .
     git commit -m "Initial commit" || true
     git push -u origin main
   changed_when: false
 
-- name: Check existing mirrors
-  uri:
-    url: "{{ gitlab_url }}/api/v4/projects/{{ project_info.json[0].id }}/remote_mirrors"
-    method: GET
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_token }}"
-  changed_when: false
-  register: existing_mirrors
+- name: Deploy mirror script
+  ansible.builtin.template:
+    src: github_gitlab_mirror.sh.j2
+    dest: "{{ mirror_script_directory }}/github_gitlab_mirror.sh"
 
-- name: Configure GitLab pull mirror to GitHub
-  uri:
-    url: "{{ gitlab_url }}/api/v4/projects/{{ project_info.json[0].id }}/remote_mirrors"
-    method: POST
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_token }}"
-    body_format: json
-    body:
-      url: "https://github.com/{{ github_username }}/{{ project_name }}.git"
-      enabled: true
-      mirror_direction: "pull"
-      only_protected_branches: false
-    status_code: 201, 200
-  when: existing_mirrors.json | selectattr('url','equalto',"https://github.com/{{ github_username }}/{{ project_name }}.git") | list | length == 0
+- name: Create systemd service file
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/github_gitlab_mirror.service
+    content: |
+      [Unit]
+      Description=GitHub → GitLab mirror job
+      After=network-online.target
+
+      [Service]
+      Type=oneshot
+      ExecStart={{ mirror_script_directory }}/github_gitlab_mirror.sh
+      TimeoutStartSec=300
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: Reload systemd
+
+- name: Create systemd timer file
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/github_gitlab_mirror.timer
+    content: |
+      [Unit]
+      Description=Run GitHub → GitLab mirror every minute
+
+      [Timer]
+      OnBootSec=30s
+      OnUnitActiveSec=60s
+      Unit=github_gitlab_mirror.service
+
+      [Install]
+      WantedBy=timers.target
+  notify: Reload systemd
+
+- name: Enable and start mirror timer
+  ansible.builtin.systemd:
+    name: github_gitlab_mirror.timer
+    enabled: true
+    state: started
 
 - name: Delete GitLab root personal access token
   shell: |

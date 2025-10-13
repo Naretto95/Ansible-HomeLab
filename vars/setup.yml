@@ -1,9 +1,5 @@
 ---
 
-gitlab_url: http://localhost/ 
-gitlab_token_name: "homelab-token"
-gitlab_token: "MySecretToken123!"
-
 github_username: "naretto95"
 
 project_name: "ansible-homelab"

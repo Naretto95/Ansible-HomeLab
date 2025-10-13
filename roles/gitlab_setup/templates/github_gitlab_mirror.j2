@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+
+GITHUB_REPO="https://github.com/{{ github_username }}/{{ project_name }}.git"
+GITLAB_REPO="{{ git_repo_url }}"
+WORKDIR="/tmp/github_gitlab_mirror"
+
+echo "[INFO] Starting GitHub → GitLab mirror at $(date)"
+rm -rf "$WORKDIR"
+mkdir -p "$WORKDIR"
+cd "$WORKDIR"
+
+echo "[INFO] Cloning GitHub repository..."
+git clone --mirror "$GITHUB_REPO" .
+
+echo "[INFO] Pushing to GitLab..."
+git push --mirror "$GITLAB_REPO"
+
+echo "[INFO] Mirror complete at $(date)"
