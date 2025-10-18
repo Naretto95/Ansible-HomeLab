@@ -2,8 +2,6 @@
 
 cluster_name: homelab-cluster
 
-ansible_user: root
-
 scaling_governor: powersave
 EPP: balance_power
 

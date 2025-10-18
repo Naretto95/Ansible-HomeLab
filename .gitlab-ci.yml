@@ -1,0 +1,15 @@
+stages:
+  - deploy_infra
+
+deploy_infra:
+  stage: deploy_infra
+  image: python:3.11-slim
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y --no-install-recommends sshpass git
+    - pip install --no-cache-dir ansible
+  script:
+    - echo "[INFO] Starting Ansible playbook"
+    - ansible-playbook -i inventory/hosts.ini playbooks/setup_servers.yml
+  only:
+    - main
