@@ -44,7 +44,7 @@ docker_services:
     image: gitlab/gitlab-runner:latest
     container_name: gitlab-runner
     restart: always
-    docker_image: "alpine:latest"
+    docker_image: "python:3.11-slim"
     executor: "docker"
     tags: "ci,automation,ansible"
     volumes:
