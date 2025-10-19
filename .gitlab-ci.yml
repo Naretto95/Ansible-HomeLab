@@ -17,5 +17,4 @@ deploy_infra:
   script:
     - echo "[INFO] Starting Ansible playbook"
     - ansible-playbook -i inventory/hosts.ini playbooks/setup_servers.yml
-  only:
-    - main
+  when: manual
