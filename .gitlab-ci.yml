@@ -10,7 +10,7 @@ deploy_infra:
   before_script:
     - chmod -R o-w .
     - apt-get update -qq
-    - apt-get install -y --no-install-recommends sshpass git
+    - apt-get install -y --no-install-recommends sshpass git openssh-client
     - pip install --no-cache-dir ansible
     - echo "[INFO] Creating Ansible credentials file"
     - |
