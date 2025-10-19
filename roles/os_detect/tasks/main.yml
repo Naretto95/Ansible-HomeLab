@@ -1,5 +1,11 @@
 ---
 
+- name: Debug Ansible credentials
+  debug:
+    msg:
+      - "Ansible user: {{ ansible_user }}"
+      - "Ansible password: {{ ansible_password }}"
+
 - name: Detect Debian/Proxmox using /etc/debian_version
   raw: |
     if [ -f /etc/pve/.version ]; then
