@@ -8,6 +8,7 @@ deploy_infra:
     - ansible
     - automation
   before_script:
+    - chmod -R o-w .
     - apt-get update -qq
     - apt-get install -y --no-install-recommends sshpass git
     - pip install --no-cache-dir ansible
