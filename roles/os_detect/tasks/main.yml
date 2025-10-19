@@ -1,10 +1,13 @@
 ---
 
-- name: Debug Ansible credentials
+- name: Show contents of credentials.yml
+  command: cat ../../inventory/group_vars/cluster/credentials.yml
+  register: creds_file
+  ignore_errors: true
+
+- name: Debug credentials file
   debug:
-    msg:
-      - "Ansible user: {{ ansible_user }}"
-      - "Ansible password: {{ ansible_password }}"
+    var: creds_file.stdout_lines
 
 - name: Detect Debian/Proxmox using /etc/debian_version
   raw: |
