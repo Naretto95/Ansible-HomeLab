@@ -4,6 +4,9 @@ stages:
 deploy_infra:
   stage: deploy_infra
   image: python:3.11-slim
+  tags:
+    - ansible
+    - automation
   before_script:
     - apt-get update -qq
     - apt-get install -y --no-install-recommends sshpass git
