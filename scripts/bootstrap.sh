@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-chmod -R o-w .
+chmod -R o-w "$(dirname "$0")"
 # --- Variables ---*
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLAYBOOK="$SCRIPT_DIR/../playbooks/setup_local.yml"
