@@ -16,6 +16,7 @@ deploy_infra:
     - apt-get update -qq
     - apt-get install -y --no-install-recommends sshpass git openssh-client
     - pip install --no-cache-dir ansible
+    - chmod +x ./scripts/setup_credentials.sh
     - ./scripts/setup_credentials.sh
   script:
     - echo "[INFO] Starting Ansible playbook"
