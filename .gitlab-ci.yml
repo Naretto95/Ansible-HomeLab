@@ -1,3 +1,7 @@
+.default_schedule_rules: &schedule_rules
+  - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  - when: never
+
 stages:
   - deploy_infra
 
@@ -21,4 +25,5 @@ deploy_infra:
   script:
     - echo "[INFO] Starting Ansible playbook"
     - ansible-playbook -i inventory/hosts.ini playbooks/setup_servers.yml
-  when: manual
+  rules:
+    *schedule_rules
