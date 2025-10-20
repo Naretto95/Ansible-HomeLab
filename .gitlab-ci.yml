@@ -16,9 +16,7 @@ deploy_infra:
     - apt-get update -qq
     - apt-get install -y --no-install-recommends sshpass git openssh-client
     - pip install --no-cache-dir ansible
-    - echo "[INFO] Creating Ansible credentials file"
-    - echo "ansible_user: \"${ANSIBLE_USER}\"" > ./inventory/group_vars/cluster/credentials.yml
-    - echo "ansible_password: \"${ANSIBLE_PASSWORD}\"" >> ./inventory/group_vars/cluster/credentials.yml
+    - ./scripts/setup_credentials.sh
   script:
     - echo "[INFO] Starting Ansible playbook"
     - ansible-playbook -i inventory/hosts.ini playbooks/setup_servers.yml
