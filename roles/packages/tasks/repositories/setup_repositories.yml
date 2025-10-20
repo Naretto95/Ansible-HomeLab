@@ -1,11 +1,12 @@
 ---
 
-- name: Debian repositories GPG keys
-  apt_key:
+- name: Download GPG keys for repositories
+  ansible.builtin.get_url:
     url: "{{ item.gpg_key }}"
-    state: "{{ repos_state }}"
+    dest: "/usr/share/keyrings/{{ item.filename }}.gpg"
+    mode: '0644'
   loop: "{{ debian_repos }}"
-  when: 
+  when:
     - os_family in ["Debian", "Proxmox"]
     - debian_repos is defined
 
