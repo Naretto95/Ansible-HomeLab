@@ -10,7 +10,7 @@
     - os_family in ["Debian", "Proxmox"]
     - debian_repos is defined
 
-- name: Debian repositories
+- name: Add APT repositories
   apt_repository:
     repo: "{{ item.repo }}"
     filename: "{{ item.filename | default(omit) }}"
