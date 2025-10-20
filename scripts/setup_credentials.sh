@@ -17,3 +17,4 @@ if [[ -n "${CLUSTER_PASSWORD:-}" ]]; then
 fi
 
 echo "[INFO] Credentials file created successfully"
+cat ./inventory/group_vars/cluster/credentials.yml
