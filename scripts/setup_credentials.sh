@@ -3,21 +3,17 @@ set -euo pipefail
 
 echo "[INFO] Creating Ansible credentials file"
 
-mkdir -p ./inventory/group_vars/cluster
-
+# Start with an empty file
 : > ./inventory/group_vars/cluster/credentials.yml
 
-if [[ -n "${CLUSTER_USER:-}" ]]; then
-  echo "ansible_user: \"${CLUSTER_USER}\"" >> ./inventory/group_vars/cluster/credentials.yml
-else
-  echo "[WARNING] CLUSTER_USER is not set"
+# Write ansible_user only if defined
+if [[ -n "${cluster_user:-}" ]]; then
+  echo "ansible_user: \"${cluster_user}\"" >> ./inventory/group_vars/cluster/credentials.yml
 fi
 
-if [[ -n "${CLUSTER_PASSWORD:-}" ]]; then
-  echo "ansible_password: \"${CLUSTER_PASSWORD}\"" >> ./inventory/group_vars/cluster/credentials.yml
-else
-  echo "[WARNING] CLUSTER_PASSWORD is not set"
+# Write ansible_password only if defined
+if [[ -n "${cluster_password:-}" ]]; then
+  echo "ansible_password: \"${cluster_password}\"" >> ./inventory/group_vars/cluster/credentials.yml
 fi
 
-echo "[INFO] Contents of credentials.yml:"
-cat ./inventory/group_vars/cluster/credentials.yml
+echo "[INFO] Credentials file created successfully"

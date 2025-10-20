@@ -1,3 +1,8 @@
+---
+
+variables:
+  ANSIBLE_FORCE_COLOR: "true"
+
 .default_schedule_rules: &schedule_rules
   - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
   - when: never
