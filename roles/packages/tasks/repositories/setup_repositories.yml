@@ -13,9 +13,8 @@
 - name: Add APT repositories
   apt_repository:
     repo: "{{ item.repo }}"
-    filename: "{{ item.filename | default(omit) }}"
+    filename: "{{ item.filename }}"
     state: "{{ repos_state }}"
-    mode: deb822
     update_cache: true
   loop: "{{ debian_repos }}"
   when: 
@@ -39,8 +38,11 @@
 
 - name: Remove Proxmox enterprise .sources file
   ansible.builtin.file:
-    path: /etc/apt/sources.list.d/pve-enterprise.sources
+    path: "/etc/apt/sources.list.d/{{ item }}"
     state: absent
+  loop:
+    - pve-enterprise.sources
+    - ceph.sources
   when: 
     - os_family == "Proxmox"
     - debian_repos is defined
