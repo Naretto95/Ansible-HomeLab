@@ -2,7 +2,7 @@
 
 - name: Create cluster if not already present
   ansible.builtin.command: pvecm create {{ cluster_name }}
-  when: "'Name: ' + cluster_name not in cluster_status.stdout"
+  when: cluster_name not in cluster_status.stdout
   changed_when: false
 
 - name: Set expected votes to 1 for 2-node cluster
