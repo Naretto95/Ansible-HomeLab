@@ -5,8 +5,3 @@
     path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
     regexp: "data\\.status\\.toLowerCase\\(\\) !== 'active'"
     replace: 'false /* subscription nag disabled */'
-
-- name: Remove Proxmox enterprise .sources file
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/pve-enterprise.sources
-    state: absent

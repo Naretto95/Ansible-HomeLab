@@ -36,3 +36,11 @@
   when: 
     - os_family == "Proxmox"
     - debian_repos is defined
+
+- name: Remove Proxmox enterprise .sources file
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/pve-enterprise.sources
+    state: absent
+  when: 
+    - os_family == "Proxmox"
+    - debian_repos is defined
