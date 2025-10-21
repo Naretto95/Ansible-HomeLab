@@ -6,9 +6,6 @@
   changed_when: false
 
 - name: Set expected votes to 1 for 2-node cluster
-  lineinfile:
-    path: /etc/pve/corosync.conf
-    regexp: '^.*expected_votes:.*$'
-    line: 'expected_votes: 1'
-  notify: restart corosync
+  ansible.builtin.command: pvecm expected 1
   when: "'expected_votes' not in cluster_status.stdout"
+  notify: restart corosync
