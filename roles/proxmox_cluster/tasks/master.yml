@@ -1,11 +1,14 @@
 ---
 
+- name: Check if cluster config exists
+  stat:
+    path: /etc/pve/corosync.conf
+  register: corosync_conf
+
 - name: Create cluster if not already present
-  ansible.builtin.command: pvecm create {{ cluster_name }}
-  when: "'Name: ' + cluster_name not in cluster_status.stdout"
-  changed_when: false
+  command: pvecm create {{ cluster_name }}
+  when: not corosync_conf.stat.exists
 
 - name: Set expected votes to 1 for 2-node cluster
   ansible.builtin.command: pvecm expected 1
-  when: "'expected_votes' not in cluster_status.stdout"
   notify: restart corosync
