@@ -4,6 +4,7 @@
   stat:
     path: "/sys/bus/pci/devices/{{ gpu_device_id }}"
   register: gpu_device
+  when: unmount_gpu
 
 - name: Unmount GPU from PCI bus
   shell: "echo 1 > /sys/bus/pci/devices/{{ gpu_device_id }}/remove"
