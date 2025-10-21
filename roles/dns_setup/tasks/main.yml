@@ -3,6 +3,7 @@
 - name: Clear resolv.conf
   raw: "echo '' > /etc/resolv.conf"
   when: os_family == "Proxmox"
+  changed_when: false
 
 - name: Configure DNS servers using raw
   raw: |
@@ -10,6 +11,7 @@
     echo "nameserver {{ ns }}" >> /etc/resolv.conf
     {% endfor %}
   when: os_family == "Proxmox"
+  changed_when: false
 
 - name: Configure DNS servers
   copy:
