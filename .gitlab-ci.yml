@@ -25,6 +25,6 @@ deploy_infra:
     - ./scripts/setup_credentials.sh
   script:
     - echo "[INFO] Starting Ansible playbook"
-    - ansible-playbook -i inventory/hosts.ini playbooks/setup_servers.yml
+    - ansible-playbook -i inventory/hosts.ini playbooks/setup_servers.yml -v
   rules:
     *schedule_rules
