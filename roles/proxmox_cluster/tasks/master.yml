@@ -8,5 +8,4 @@
 - name: Set expected votes to 1 for 2-node cluster
   ansible.builtin.command: pvecm expected 1
   notify: restart corosync
-  when: "'expected_votes' not in cluster_status.stdout"
   changed_when: false
