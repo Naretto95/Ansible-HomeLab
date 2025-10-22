@@ -1,15 +1,15 @@
 ---
 
-- name: Gather cluster status
-  ansible.builtin.command: pvecm status
-  register: cluster_status
-  failed_when: cluster_status.rc != 0 and "is this node part of a cluster?" not in cluster_status.stderr
-  changed_when: false
+- name: Validate cluster_state
+  assert:
+    that:
+      - cluster_state in ['present', 'absent']
+    fail_msg: "cluster_state can only be 'present' or 'absent'."
 
-- name: Include master tasks
-  include_tasks: master.yml
-  when: cluster_master | bool
+- name: Install cluster
+  include_tasks: isntall_cluster/main.yml
+  when: cluster_state == 'present'
 
-- name: Include node tasks
-  include_tasks: node.yml
-  when: not (cluster_master | bool)
+- name: Destroy cluster
+  include_tasks: destroy_cluster.yml
+  when: cluster_state == 'absent'

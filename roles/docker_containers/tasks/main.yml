@@ -3,8 +3,8 @@
 - name: Validate container_state
   assert:
     that:
-      - container_state is not defined or container_state in ['present', 'absent']
-    fail_msg: "container_state can only be 'present', 'absent', or undefined."
+      - container_state in ['present', 'absent']
+    fail_msg: "container_state can only be 'present' or 'absent'."
 
 - name: Ensure Docker networks exist or remove it
   community.docker.docker_network:

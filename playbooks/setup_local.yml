@@ -23,4 +23,4 @@
     - ../vars/setup.yml
   roles:
     - role: gitlab_setup
-      when: container_state is undefined
+      when: container_state is undefined or container_state == 'present'

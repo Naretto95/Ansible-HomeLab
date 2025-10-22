@@ -3,9 +3,9 @@
 - name: Validate packages_state and repos_state
   assert:
     that:
-      - packages_state is not defined or packages_state in ['present', 'absent']
-      - repos_state is not defined or repos_state in ['present', 'absent']
-    fail_msg: "packages_state and repos_state can only be 'present', 'absent', or undefined."
+      - packages_state in ['present', 'absent']
+      - repos_state in ['present', 'absent']
+    fail_msg: "packages_state and repos_state can only be 'present' or 'absent'."
 
 - name: Install Python with raw module
   raw: |

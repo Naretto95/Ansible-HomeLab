@@ -1,11 +1,5 @@
 ---
 
-- name: Validate container_state
-  assert:
-    that:
-      - container_state is not defined or container_state == 'absent'
-    fail_msg: "container_state can only be 'absent' or undefined (defaulting to present)."
-
 - name: Get gitlab container info
   set_fact:
     gitlab_container: "{{ docker_services | selectattr('name', 'equalto', 'gitlab') | first }}"
