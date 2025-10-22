@@ -23,7 +23,6 @@
 
 - name: Join cluster if not already joined
   ansible.builtin.command: pvecm add {{ master_ip }} --use_ssh 1
-  when: cluster_name not in cluster_status.stdout
   register: join_cluster
   changed_when: false
   failed_when: "'unable to add node' in join_cluster.stderr or 'cluster not ready' in join_cluster.stdout"

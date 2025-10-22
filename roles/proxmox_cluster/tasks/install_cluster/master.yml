@@ -2,7 +2,6 @@
 
 - name: Create cluster if not already present
   ansible.builtin.command: pvecm create {{ cluster_name }}
-  when: cluster_name not in cluster_status.stdout
   changed_when: false
 
 - name: Wait for master cluster to be ready
