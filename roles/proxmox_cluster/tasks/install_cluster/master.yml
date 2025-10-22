@@ -5,11 +5,6 @@
   when: cluster_name not in cluster_status.stdout
   changed_when: false
 
-- name: Set expected votes to 1 for 2-node cluster
-  ansible.builtin.command: pvecm expected 1
-  notify: restart corosync
-  changed_when: false
-
 - name: Wait for master cluster to be ready
   ansible.builtin.wait_for:
     path: /etc/pve/corosync.conf
