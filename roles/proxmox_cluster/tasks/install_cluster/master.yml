@@ -9,3 +9,9 @@
   ansible.builtin.command: pvecm expected 1
   notify: restart corosync
   changed_when: false
+
+- name: Wait for master cluster to be ready
+  ansible.builtin.wait_for:
+    path: /etc/pve/corosync.conf
+    state: present
+    timeout: 30
