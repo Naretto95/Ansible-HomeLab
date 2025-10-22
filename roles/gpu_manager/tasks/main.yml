@@ -8,7 +8,9 @@
 
 - name: Unmount GPU from PCI bus
   shell: "echo 1 > /sys/bus/pci/devices/{{ gpu_device_id }}/remove"
-  when: unmount_gpu and gpu_device.stat.exists
+  when: 
+    - unmount_gpu 
+    - gpu_device.stat.exists
   changed_when: false
 
 - name: Remount (rescan) PCI bus

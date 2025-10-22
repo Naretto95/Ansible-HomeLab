@@ -6,10 +6,13 @@
   failed_when: cluster_status.rc != 0 and "is this node part of a cluster?" not in cluster_status.stderr
   changed_when: false
 
-- name: Include master tasks
-  include_tasks: master.yml
-  when: cluster_master | bool and cluster_name not in cluster_status.stdout
+- name: Manage cluster
+  block:
+    - name: Include master tasks
+      include_tasks: master.yml
+      when: cluster_master | bool
 
-- name: Include node tasks
-  include_tasks: node.yml
-  when: not (cluster_master | bool) cluster_name not in cluster_status.stdout
+    - name: Include node tasks
+      include_tasks: node.yml
+      when: not (cluster_master | bool)
+  when: cluster_name not in cluster_status.stdout
