@@ -7,7 +7,7 @@
     fail_msg: "cluster_state can only be 'present' or 'absent'."
 
 - name: Install cluster
-  include_tasks: isntall_cluster/main.yml
+  include_tasks: install_cluster/main.yml
   when: cluster_state == 'present'
 
 - name: Destroy cluster
