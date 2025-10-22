@@ -18,4 +18,4 @@
   ansible.builtin.command: pvecm expected 1
   notify: restart corosync
   changed_when: false
-  when: groups['cluster'] | length == 2
+  when: groups['cluster'] | length == 2 and cluster_master | bool
