@@ -16,14 +16,14 @@
 
 - name: Create containers in user's base directory
   include_tasks: install_container.yml
-  loop: "{{ docker_services }}"
+  loop: "{{ docker_containers }}"
   loop_control:
     loop_var: container
   when: container_state == 'present'
 
 - name: Remove containers in user's base directory
   include_tasks: destroy_container.yml
-  loop: "{{ docker_services }}"
+  loop: "{{ docker_containers }}"
   loop_control:
     loop_var: container
   when: container_state == 'absent'

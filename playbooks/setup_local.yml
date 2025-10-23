@@ -16,6 +16,7 @@
   roles:
     - packages
     - docker_containers
+    - docker_images
 
 - name: Config gitlab
   hosts: localhost

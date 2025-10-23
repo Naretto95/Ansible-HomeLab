@@ -16,7 +16,7 @@
     src: docker-compose.yml.j2
     dest: "{{ base_directory }}/{{ container.name }}/docker-compose.yml"
   vars:
-    docker_services:
+    docker_containers:
       - "{{ container }}"
 
 - name: Launch container using docker-compose

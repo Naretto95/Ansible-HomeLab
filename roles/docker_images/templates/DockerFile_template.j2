@@ -1,0 +1,19 @@
+# {{ image.name }} Dockerfile
+FROM {{ image.base_image }}
+
+# Avoid interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ANSIBLE_FORCE_COLOR=true
+
+# Install system dependencies
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+        {% for pkg in image.apt_packages %}{{ pkg }} {% if not loop.last %}\ {% endif %}{% endfor %} \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages via pip
+RUN pip install --no-cache-dir \
+    {% for pkg in image.pip_packages %}{{ pkg }} {% if not loop.last %}\ {% endif %}{% endfor %}
+
+# Set working directory
+WORKDIR /workspace

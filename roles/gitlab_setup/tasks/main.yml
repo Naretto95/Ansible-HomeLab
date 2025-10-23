@@ -2,8 +2,8 @@
 
 - name: Get gitlab container info
   set_fact:
-    gitlab_container: "{{ docker_services | selectattr('name', 'equalto', 'gitlab') | first }}"
-    runner_container: "{{ docker_services | selectattr('name', 'equalto', 'gitlab-runner') | first }}"
+    gitlab_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab') | first }}"
+    runner_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab-runner') | first }}"
 
 - name: Wait for GitLab container to be healthy
   community.docker.docker_container_info:

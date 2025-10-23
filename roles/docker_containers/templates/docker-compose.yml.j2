@@ -1,5 +1,5 @@
 services:
-{% for service in docker_services %}
+{% for service in docker_containers %}
   {{ service.name }}:
     image: {{ service.image }}
     container_name: {{ service.container_name }}
