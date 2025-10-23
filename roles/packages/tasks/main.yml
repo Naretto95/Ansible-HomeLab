@@ -16,6 +16,8 @@
 
 - name: Gather host facts
   ansible.builtin.setup:
+  gather_subset:
+      - distribution_release
 
 - name: Setup repositories
   include_tasks: repositories/setup_repositories.yml
