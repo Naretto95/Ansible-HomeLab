@@ -59,6 +59,7 @@ docker_networks:
 
 docker_images:
   - name: ansible-image
+    tag: latest
     base_image: python:3.11-slim
     apt_packages:
       - sshpass

@@ -2,8 +2,18 @@
 
 - name: Get gitlab container info
   set_fact:
-    gitlab_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab') | first }}"
-    runner_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab-runner') | first }}"
+    gitlab_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab') | first | default(None) }}"
+    runner_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab-runner') | first | default(None) }}"
+
+- name: Ensure GitLab and Runner containers exist
+  assert:
+    that:
+      - gitlab_container is not none
+      - runner_container is not none
+    fail_msg: >
+      One or both required containers are missing:
+      gitlab_container={{ gitlab_container }},
+      runner_container={{ runner_container }}
 
 - name: Wait for GitLab container to be healthy
   community.docker.docker_container_info:
@@ -51,117 +61,14 @@
     "
   changed_when: false
 
-- name: Get project info
-  uri:
-    url: "http://localhost/api/v4/projects?search={{ project_name }}"
-    method: GET
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_token }}"
-  changed_when: false
-  register: project_info
+- name: Setup project
+  include_tasks: setup_project.yml
 
-- name: Create GitLab project if not found
-  uri:
-    url: "http://localhost/api/v4/projects"
-    method: POST
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_token }}"
-    body_format: json
-    body:
-      name: "{{ project_name }}"
-      visibility: "private"
-    status_code: 201
-  when: project_info.json | length == 0
-  register: project_create
+- name: Setup mirror script
+  include_tasks: setup_mirror_script.yml
 
-- name: Set git_repo fact
-  set_fact:
-    git_repo: "{{ project_create.json if project_info.json|length == 0 else project_info.json[0] }}"
-
-- name: Set Git repository URL facts
-  set_fact:
-    git_repo_url: "{{ git_repo.http_url_to_repo | regex_replace('http://', 'http://root:' + gitlab_token + '@') | regex_replace('gitlab.local','localhost') }}"
-    git_repo_ssh: "ssh://git@localhost:2222/{{ git_repo.path_with_namespace }}.git"
-
-- name: Push local Ansible project to GitLab
-  shell: |
-    cd "{{ playbook_dir | dirname }}"
-    git init
-    git config user.email "ansible@deploy.com"
-    git config user.name "Ansible CI"
-    git checkout -b main
-    git remote remove origin || true
-    git remote add origin "{{ git_repo_url }}"
-    git add .
-    git commit -m "Initial commit" || true
-    git push -u origin main
-  changed_when: false
-
-- name: Generate SSH key for GitLab
-  openssh_keypair:
-    path: "~/.ssh/gitlab_deploy_key"
-    type: rsa
-    size: 4096
-    state: present
-  register: ssh_key
-
-- name: Add deploy key to GitLab project
-  uri:
-    url: "http://localhost/api/v4/projects/{{ git_repo.id }}/deploy_keys"
-    method: POST
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_token }}"
-    body_format: json
-    body:
-      title: "Ansible deploy key"
-      key: "{{ ssh_key.public_key }}"
-      can_push: true
-    status_code: 201
-
-- name: Deploy mirror script
-  ansible.builtin.template:
-    src: github_gitlab_mirror.sh.j2
-    dest: "{{ mirror_script_directory }}/github_gitlab_mirror.sh"
-    mode: '0755'
-
-- name: Create systemd service file
-  ansible.builtin.copy:
-    dest: /etc/systemd/system/github_gitlab_mirror.service
-    content: |
-      [Unit]
-      Description=GitHub → GitLab mirror job
-      After=network-online.target
-
-      [Service]
-      Type=oneshot
-      ExecStart={{ mirror_script_directory }}/github_gitlab_mirror.sh
-      TimeoutStartSec=300
-
-      [Install]
-      WantedBy=multi-user.target
-  notify: Reload systemd
-
-- name: Create systemd timer file
-  ansible.builtin.copy:
-    dest: /etc/systemd/system/github_gitlab_mirror.timer
-    content: |
-      [Unit]
-      Description=Run GitHub → GitLab mirror every minute
-
-      [Timer]
-      OnBootSec=30s
-      OnUnitActiveSec=60s
-      Unit=github_gitlab_mirror.service
-
-      [Install]
-      WantedBy=timers.target
-  notify: Reload systemd
-
-- name: Enable and start mirror timer
-  ansible.builtin.systemd:
-    name: github_gitlab_mirror.timer
-    enabled: true
-    state: started
+- name: Setup docker images
+  include_tasks: setup_docker_images.yml
 
 - name: Delete GitLab root personal access token
   shell: |

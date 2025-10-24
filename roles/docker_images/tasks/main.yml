@@ -2,7 +2,7 @@
 
 - name: Generate Dockerfiles
   ansible.builtin.template:
-    src: DockerFile_template.j2
+    src: Dockerfile_template.j2
     dest: "{{ base_directory }}/{{ item.name }}/Dockerfile"
   loop: "{{ docker_images }}"
   loop_control:
