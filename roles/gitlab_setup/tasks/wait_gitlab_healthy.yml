@@ -7,3 +7,14 @@
   retries: 30
   delay: 10
   until: gitlab_info.container.State.Health.Status == "healthy"
+
+- name: Wait for GitLab web service
+  uri:
+    url: "http://{{ gitlab_container.hostname }}/users/sign_in"
+    method: GET
+    status_code: 200
+  register: gitlab_ui
+  retries: 30
+  delay: 10
+  until: gitlab_ui.status == 200
+  changed_when: false
