@@ -10,8 +10,8 @@ export GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_deploy_key -o StrictHostKeyChecking
 
 # Ensure GitLab host is trusted
 mkdir -p ~/.ssh
-ssh-keygen -f /root/.ssh/known_hosts -R '[localhost]:2222'
-ssh-keyscan -p 2222 localhost >> ~/.ssh/known_hosts 2>/dev/null
+ssh-keygen -f /root/.ssh/known_hosts -R '[{{ gitlab_container.hostname }}]:2222'
+ssh-keyscan -p 2222 {{ gitlab_container.hostname }} >> ~/.ssh/known_hosts 2>/dev/null
 
 echo "[INFO] Starting GitHub → GitLab mirror at $(date)"
 rm -rf "$WORKDIR"

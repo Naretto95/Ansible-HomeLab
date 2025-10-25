@@ -1,0 +1,9 @@
+---
+
+- name: Wait for GitLab container to be healthy
+  community.docker.docker_container_info:
+    name: "{{ gitlab_container.name }}"
+  register: gitlab_info
+  retries: 30
+  delay: 10
+  until: gitlab_info.container.State.Health.Status == "healthy"

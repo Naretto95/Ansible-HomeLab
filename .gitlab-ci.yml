@@ -12,15 +12,12 @@ stages:
 
 deploy_infra:
   stage: deploy_infra
-  image: python:3.11-slim
+  image: ansible-image:latest
   tags:
     - ansible
     - automation
   before_script:
     - chmod -R o-w .
-    - apt-get update -qq
-    - apt-get install -y --no-install-recommends sshpass git openssh-client
-    - pip install --no-cache-dir ansible
     - chmod +x ./scripts/setup_credentials.sh
     - ./scripts/setup_credentials.sh
   script:

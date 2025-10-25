@@ -1,6 +1,0 @@
----
-
-- name: Restart corosync service
-  ansible.builtin.systemd:
-    name: corosync
-    state: restarted

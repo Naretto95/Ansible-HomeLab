@@ -10,7 +10,7 @@
 
 - name: Add deploy key to GitLab project
   uri:
-    url: "http://localhost/api/v4/projects/{{ git_repo.id }}/deploy_keys"
+    url: "http://{{ gitlab_container.hostname }}/api/v4/projects/{{ git_repo.id }}/deploy_keys"
     method: POST
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"
