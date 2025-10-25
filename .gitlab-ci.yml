@@ -9,7 +9,7 @@ stages:
 
 deploy_infra:
   stage: deploy_infra
-  image: ansible-image:latest
+  image: gitlab.local:5050/root/ansible-homelab/ansible-image:latest
   tags:
     - ansible
     - automation
