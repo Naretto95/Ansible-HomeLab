@@ -1,0 +1,49 @@
+---
+
+- name: Get project info
+  uri:
+    url: "http://{{ gitlab_container.hostname }}/api/v4/projects?search={{ project.name }}"
+    method: GET
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+  changed_when: false
+  register: project_info
+
+- name: Create GitLab project if not found
+  uri:
+    url: "http://{{ gitlab_container.hostname }}/api/v4/projects"
+    method: POST
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+    body_format: json
+    body:
+      name: "{{ project.name }}"
+      visibility: "private"
+    status_code: 201
+  when: project_info.json | length == 0
+  register: project_create
+
+- name: Set Git repository fact
+  set_fact:
+    git_repo: "{{ project_create.json if project_info.json|length == 0 else project_info.json[0] }}"
+
+- name: Generate SSH key for GitLab
+  openssh_keypair:
+    path: "~/.ssh/gitlab_deploy_key"
+    type: rsa
+    size: 4096
+    state: present
+  register: ssh_key
+
+- name: Add deploy key to GitLab project
+  uri:
+    url: "http://{{ gitlab_container.hostname }}/api/v4/projects/{{ git_repo.id }}/deploy_keys"
+    method: POST
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+    body_format: json
+    body:
+      title: "Ansible deploy key"
+      key: "{{ ssh_key.public_key }}"
+      can_push: true
+    status_code: 201

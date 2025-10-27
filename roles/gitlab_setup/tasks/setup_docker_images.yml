@@ -14,7 +14,7 @@
   include_tasks: push_image.yml
   loop: "{{ docker_images }}"
   loop_control:
-    loop_var: item
+    loop_var: image
 
 - name: Logout from GitLab registry
   community.docker.docker_login:

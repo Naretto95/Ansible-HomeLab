@@ -2,24 +2,30 @@
 
 - name: Load Docker image from tarball
   community.docker.docker_image:
-    load_path: "{{ base_directory }}/{{ item.name }}/{{ item.name }}_{{ item.tag }}.tar"
+    name: "{{ image.name }}"
+    tag: "{{ image.tag }}"
+    load_path: "{{ base_directory }}/{{ image.name }}/{{ image.name }}_{{ image.tag }}.tar"
     source: load
 
 - name: Remove old Docker image from registry (if exists)
   community.docker.docker_image:
-    name: "{{ git_repo_registry }}/{{ item.name }}"
-    tag: "{{ item.tag }}"
+    name: "{{ git_repo_registry }}/{{ image.name }}"
+    tag: "{{ image.tag }}"
     state: absent
 
 - name: Push Docker image to GitLab registry
   community.docker.docker_image:
-    name: "{{ git_repo_registry }}/{{ item.name }}"
-    tag: "{{ item.tag }}"
+    name: "{{ image.name }}"
+    repository: "{{ git_repo_registry }}/{{ image.name }}"
+    tag: "{{ image.tag }}"
     push: true
     source: local
 
 - name: Remove local Docker image after pushing
   community.docker.docker_image:
-    name: "{{ item.name }}"
-    tag: "{{ item.tag }}"
+    name: "{{ item }}"
+    tag: "{{ image.tag }}"
     state: absent
+  loop:
+    - "{{ git_repo_registry }}/{{ image.name }}"
+    - "{{ image.name }}"

@@ -2,21 +2,34 @@
 
 set -e
 
-GITHUB_REPO="https://github.com/{{ github_username }}/{{ project_name }}.git"
-GITLAB_REPO="{{ git_repo_ssh }}"
 WORKDIR="/tmp/github_gitlab_mirror"
+SSH_KEY="$HOME/.ssh/gitlab_deploy_key"
+GITLAB_HOST="{{ gitlab_container.hostname }}"
+GITLAB_PORT=2222
 
-export GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_deploy_key -o StrictHostKeyChecking=yes -p 2222"
+export GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=yes -p $GITLAB_PORT"
 
 # Ensure GitLab host is trusted
-mkdir -p ~/.ssh
-ssh-keygen -f /root/.ssh/known_hosts -R '[{{ gitlab_container.hostname }}]:2222'
-ssh-keyscan -p 2222 {{ gitlab_container.hostname }} >> ~/.ssh/known_hosts 2>/dev/null
+mkdir -p "$HOME/.ssh"
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[$GITLAB_HOST]:$GITLAB_PORT"
+ssh-keyscan -p $GITLAB_PORT $GITLAB_HOST >> "$HOME/.ssh/known_hosts" 2>/dev/null
 
 echo "[INFO] Starting GitHub → GitLab mirror at $(date)"
+
 rm -rf "$WORKDIR"
 mkdir -p "$WORKDIR"
 cd "$WORKDIR"
+
+{% for project in projects %}
+PROJECT_DIR=$(echo "{{ project.name }}" | tr '/' '_')
+GITHUB_REPO="{{ project.url }}"
+GITLAB_REPO="ssh://git@{{ gitlab_container.hostname }}:2222/{{ git_namespace }}/{{ project.name }}.git"
+
+echo "[INFO] Mirroring $GITHUB_REPO → $GITLAB_REPO"
+
+rm -rf "$WORKDIR/$PROJECT_DIR"
+mkdir -p "$WORKDIR/$PROJECT_DIR"
+cd "$WORKDIR/$PROJECT_DIR"
 
 echo "[INFO] Cloning GitHub repository..."
 git clone --mirror "$GITHUB_REPO" .
@@ -24,4 +37,8 @@ git clone --mirror "$GITHUB_REPO" .
 echo "[INFO] Pushing to GitLab..."
 git push --mirror "$GITLAB_REPO"
 
-echo "[INFO] Mirror complete at $(date)"
+echo "[INFO] Finished mirroring $GITHUB_REPO → $GITLAB_REPO"
+
+{% endfor %}
+
+echo "[INFO] All mirrors complete at $(date)"

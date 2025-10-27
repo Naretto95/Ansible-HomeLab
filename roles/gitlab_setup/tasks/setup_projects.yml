@@ -1,0 +1,60 @@
+---
+
+- name: Create all projects
+  include_tasks: create_project.yml
+  loop: "{{ projects }}"
+  loop_control:
+    loop_var: project
+
+- name: Extract GitLab namespace (user or group)
+  set_fact:
+    git_namespace: "{{ git_repo.path_with_namespace.split('/')[0] }}"
+
+- name: Deploy mirror script
+  ansible.builtin.template:
+    src: github_gitlab_mirror.sh.j2
+    dest: "{{ base_directory }}/github_gitlab_mirror.sh"
+    mode: '0755'
+
+- name: Create systemd service file
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/github_gitlab_mirror.service
+    content: |
+      [Unit]
+      Description=GitHub → GitLab mirror job
+      After=network-online.target
+
+      [Service]
+      Type=oneshot
+      ExecStart={{ base_directory }}/github_gitlab_mirror.sh
+      TimeoutStartSec=300
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: Reload systemd
+
+- name: Create systemd timer file
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/github_gitlab_mirror.timer
+    content: |
+      [Unit]
+      Description=Run GitHub → GitLab mirror every minute
+
+      [Timer]
+      OnBootSec=30s
+      OnUnitActiveSec=60s
+      Unit=github_gitlab_mirror.service
+
+      [Install]
+      WantedBy=timers.target
+  notify: Reload systemd
+
+- name: Enable and start mirror timer
+  ansible.builtin.systemd:
+    name: "github_gitlab_mirror.timer"
+    enabled: true
+    state: started
+
+- name: Initiate first github push
+  ansible.builtin.command: "{{ base_directory }}/github_gitlab_mirror.sh"
+  changed_when: false

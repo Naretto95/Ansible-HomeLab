@@ -23,12 +23,10 @@
     source: build
 
 - name: Save Docker image to tarball
-  community.docker.docker_image:
+  community.docker.docker_image_export:
     name: "{{ image.name }}"
     tag: "{{ image.tag }}"
-    load_path: "{{ base_directory }}/{{ image.name }}/{{ image.name }}_{{ image.tag }}.tar"
-    state: absent
-    source: save
+    path: "{{ base_directory }}/{{ image.name }}/{{ image.name }}_{{ image.tag }}.tar"
 
 - name: Remove local Docker image
   community.docker.docker_image:

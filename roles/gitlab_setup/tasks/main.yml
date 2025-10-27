@@ -95,8 +95,8 @@
 - name: Check health Gitlab
   include_tasks: wait_gitlab_healthy.yml
 
-- name: Setup project
-  include_tasks: setup_project.yml
+- name: Setup projects
+  include_tasks: setup_projects.yml
 
 - name: Setup docker images
   include_tasks: setup_docker_images.yml
