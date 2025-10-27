@@ -1,5 +1,9 @@
 ---
 
 ansible_host: 192.168.1.2
+proxmox_node: "pve"
 
-unmount_gpu: false
+cluster_master: true
+
+services:
+  - wireguard

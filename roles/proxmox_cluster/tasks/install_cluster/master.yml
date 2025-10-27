@@ -1,0 +1,11 @@
+---
+
+- name: Create cluster if not already present
+  ansible.builtin.command: pvecm create {{ cluster_name }}
+  changed_when: false
+
+- name: Wait for master cluster to be ready
+  ansible.builtin.wait_for:
+    path: /etc/pve/corosync.conf
+    state: present
+    timeout: 30

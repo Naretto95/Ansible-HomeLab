@@ -19,9 +19,9 @@
 - name: Completely remove Python and dependencies (only if listed)
   raw: |
     apt-get update -y
-    apt-get purge -y {% if 'python3' in package_list %}python3 {% endif %}{% if 'python3-apt' in package_list %}python3-apt{% endif %}
+    apt-get purge -y {% if 'python3' in packages %}python3 {% endif %}{% if 'python3-apt' in packages %}python3-apt{% endif %}
     apt-get autoremove -y
   when:
     - os_family in ["Debian", "Proxmox"]
-    - "'python3' in package_list or 'python3-apt' in package_list"
+    - "'python3' in packages or 'python3-apt' in packages"
   changed_when: false

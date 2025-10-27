@@ -1,0 +1,67 @@
+---
+
+- name: Generate SSH key for GitLab
+  openssh_keypair:
+    path: "~/.ssh/gitlab_deploy_key"
+    type: rsa
+    size: 4096
+    state: present
+  register: ssh_key
+
+- name: Add deploy key to GitLab project
+  uri:
+    url: "http://{{ gitlab_container.hostname }}/api/v4/projects/{{ git_repo.id }}/deploy_keys"
+    method: POST
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+    body_format: json
+    body:
+      title: "Ansible deploy key"
+      key: "{{ ssh_key.public_key }}"
+      can_push: true
+    status_code: 201
+
+- name: Deploy mirror script
+  ansible.builtin.template:
+    src: github_gitlab_mirror.sh.j2
+    dest: "{{ base_directory }}/github_gitlab_mirror.sh"
+    mode: '0755'
+
+- name: Create systemd service file
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/github_gitlab_mirror.service
+    content: |
+      [Unit]
+      Description=GitHub → GitLab mirror job
+      After=network-online.target
+
+      [Service]
+      Type=oneshot
+      ExecStart={{ base_directory }}/github_gitlab_mirror.sh
+      TimeoutStartSec=300
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: Reload systemd
+
+- name: Create systemd timer file
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/github_gitlab_mirror.timer
+    content: |
+      [Unit]
+      Description=Run GitHub → GitLab mirror every minute
+
+      [Timer]
+      OnBootSec=30s
+      OnUnitActiveSec=60s
+      Unit=github_gitlab_mirror.service
+
+      [Install]
+      WantedBy=timers.target
+  notify: Reload systemd
+
+- name: Enable and start mirror timer
+  ansible.builtin.systemd:
+    name: github_gitlab_mirror.timer
+    enabled: true
+    state: started

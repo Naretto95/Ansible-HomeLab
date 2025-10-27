@@ -1,9 +1,5 @@
 ---
 
-gitlab_url: http://localhost/ 
-gitlab_token_name: "homelab-token"
-gitlab_token: "MySecretToken123!"
-
 github_username: "naretto95"
 
 project_name: "ansible-homelab"
@@ -24,7 +20,7 @@ packages:
   - containerd.io
   - docker-compose
 
-docker_services:
+docker_containers:
   - name: gitlab
     image: gitlab/gitlab-ce:latest
     container_name: gitlab
@@ -37,6 +33,7 @@ docker_services:
       - "80:80"
       - "443:443"
       - "2222:22"
+      - "5050:5050"
     volumes:
       - ./config:/etc/gitlab
       - ./logs:/var/log/gitlab
@@ -48,7 +45,7 @@ docker_services:
     image: gitlab/gitlab-runner:latest
     container_name: gitlab-runner
     restart: always
-    docker_image: "alpine:latest"
+    docker_image: "python:3.11-slim"
     executor: "docker"
     tags: "ci,automation,ansible"
     volumes:
@@ -60,3 +57,15 @@ docker_services:
 docker_networks:
   gitlab_net:
     external: true
+
+docker_images:
+  - name: ansible-image
+    tag: latest
+    base_image: python:3.11-slim
+    apt_packages:
+      - sshpass
+      - git
+      - openssh-client
+    pip_packages:
+      - ansible
+      - proxmoxer

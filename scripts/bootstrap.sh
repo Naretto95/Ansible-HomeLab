@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
+chmod -R o-w "$(dirname "$0")"
 
-# --- Variables ---*
+# --- Variables ---
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PLAYBOOK="$SCRIPT_DIR/../playbooks/setup_local.yml"
-INVENTORY="$SCRIPT_DIR/../inventory/hosts.ini"
+PLAYBOOK="${SCRIPT_DIR}/../playbooks/setup_local.yml"
+INVENTORY="${SCRIPT_DIR}/../inventory/hosts.ini"
+REQUIREMENTS_FILE="${SCRIPT_DIR}/../requirements.yml"
 
 # --- Detect OS & Install Ansible ---
 echo "[INFO] Detecting operating system..."
@@ -48,6 +50,14 @@ if ! command -v ansible >/dev/null 2>&1; then
 fi
 
 echo "[INFO] Ansible installed successfully: $(ansible --version | head -n1)"
+
+# --- Install Ansible Collections (requirements.yml) ---
+if [ -f "$REQUIREMENTS_FILE" ]; then
+    echo "[INFO] Installing Ansible collections from requirements.yml..."
+    ansible-galaxy collection install -r "$REQUIREMENTS_FILE" --force
+else
+    echo "[WARN] No requirements.yml found at $REQUIREMENTS_FILE. Skipping."
+fi
 
 # --- Run Playbook ---
 if [ -f "$PLAYBOOK" ]; then

@@ -12,4 +12,5 @@
   roles:
     - power_policy
     - gpu_manager
-
+    - proxmox_customizations
+    - proxmox_cluster
