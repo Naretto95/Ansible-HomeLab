@@ -8,7 +8,7 @@
 
 - name: Gather container definitions from services
   set_fact:
-    lxc_containers: "{{ services | select('in', groups['services']) | map('extract', hostvars, 'lxc_container') | select('defined') | list }}"
+    lxc_containers: "{{ services | select('in', groups['lxc_containers']) | map('extract', hostvars, 'lxc_container') | select('defined') | list }}"
 
 - name: Create containers on proxmox server
   include_tasks: install_container.yml
