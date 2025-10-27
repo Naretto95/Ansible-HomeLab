@@ -36,6 +36,7 @@ deploy_services:
   <<: *default_job
   stage: deploy_services
   script:
+    - pip freeze
     - echo "[INFO] Starting Ansible playbook"
     - ansible-playbook -i inventory/hosts.ini playbooks/deploy_services.yml -v
   rules:
