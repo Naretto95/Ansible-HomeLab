@@ -1,25 +1,14 @@
 ---
 
-- name: Generate SSH key for GitLab
-  openssh_keypair:
-    path: "~/.ssh/gitlab_deploy_key"
-    type: rsa
-    size: 4096
-    state: present
-  register: ssh_key
+- name: Create all projects
+  include_tasks: create_project.yml
+  loop: "{{ projects }}"
+  loop_control:
+    loop_var: project
 
-- name: Add deploy key to GitLab project
-  uri:
-    url: "http://{{ gitlab_container.hostname }}/api/v4/projects/{{ git_repo.id }}/deploy_keys"
-    method: POST
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_token }}"
-    body_format: json
-    body:
-      title: "Ansible deploy key"
-      key: "{{ ssh_key.public_key }}"
-      can_push: true
-    status_code: 201
+- name: Extract GitLab namespace (user or group)
+  set_fact:
+    git_namespace: "{{ git_repo.path_with_namespace.split('/')[0] }}"
 
 - name: Deploy mirror script
   ansible.builtin.template:
@@ -62,6 +51,10 @@
 
 - name: Enable and start mirror timer
   ansible.builtin.systemd:
-    name: github_gitlab_mirror.timer
+    name: "github_gitlab_mirror.timer"
     enabled: true
     state: started
+
+- name: Initiate first github push
+  ansible.builtin.command: "{{ base_directory }}/github_gitlab_mirror.sh"
+  changed_when: false

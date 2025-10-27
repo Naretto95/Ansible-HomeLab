@@ -10,16 +10,8 @@
     username: "oauth2"
     password: "{{ gitlab_token }}"
 
-- name: Build and push Docker image to GitLab registry
-  community.docker.docker_image:
-    name: "{{ git_repo_registry }}/{{ image.name }}"
-    tag: "{{ image.tag }}"
-    build:
-      path: "{{ base_directory }}/{{ image.name }}"
-      dockerfile: Dockerfile
-      pull: true
-    push: true
-    source: build
+- name: Push all Docker images
+  include_tasks: push_image.yml
   loop: "{{ docker_images }}"
   loop_control:
     loop_var: image

@@ -1,18 +1,7 @@
 ---
 
-- name: Ensure Docker image directories exist
-  ansible.builtin.file:
-    path: "{{ base_directory }}/{{ image.name }}"
-    state: directory
-    mode: '0755'
-  loop: "{{ docker_images }}"
-  loop_control:
-    loop_var: image
-
-- name: Generate Dockerfiles
-  ansible.builtin.template:
-    src: Dockerfile_template.j2
-    dest: "{{ base_directory }}/{{ image.name }}/Dockerfile"
+- name: Build, save, and remove Docker images
+  include_tasks: build_image.yml
   loop: "{{ docker_images }}"
   loop_control:
     loop_var: image

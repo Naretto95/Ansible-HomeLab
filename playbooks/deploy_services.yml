@@ -6,8 +6,9 @@
     - lxc_containers
 
 - name: Deploy proxmox services
-  hosts: wireguard
+  hosts: services
   gather_facts: false
   roles:
-    - packages
-    - install_wireguard
+    - role: packages
+    - role: install_wireguard
+      when: inventory_hostname == 'wireguard'

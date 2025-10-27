@@ -15,12 +15,15 @@
   roles:
     - packages
     - docker_containers
-    - docker_images
 
 - name: Config gitlab
   hosts: localhost
   vars_files:
     - ../vars/setup.yml
+  vars:
+    roles_condition: "{{ container_state is undefined or container_state == 'present' }}"
   roles:
+    - role: docker_images
+      when: roles_condition
     - role: gitlab_setup
-      when: container_state is undefined or container_state == 'present'
+      when: roles_condition
