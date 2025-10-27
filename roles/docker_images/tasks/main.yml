@@ -1,52 +1,43 @@
 ---
 
-- name: Ensure Docker image directories exist
-  ansible.builtin.file:
-    path: "{{ base_directory }}/{{ image.name }}"
-    state: directory
-    mode: '0755'
-  loop: "{{ docker_images }}"
-  loop_control:
-    loop_var: image
+- name: Build, save, and clean Docker images
+  block:
+    - name: Ensure Docker image directory exists
+      ansible.builtin.file:
+        path: "{{ base_directory }}/{{ item.name }}"
+        state: directory
+        mode: '0755'
 
-- name: Generate Dockerfiles
-  ansible.builtin.template:
-    src: Dockerfile_template.j2
-    dest: "{{ base_directory }}/{{ image.name }}/Dockerfile"
-  loop: "{{ docker_images }}"
-  loop_control:
-    loop_var: image
+    - name: Generate Dockerfile
+      ansible.builtin.template:
+        src: Dockerfile_template.j2
+        dest: "{{ base_directory }}/{{ item.name }}/Dockerfile"
 
-- name: Build Docker images locally
-  community.docker.docker_image:
-    name: "{{ image.name }}"
-    tag: "{{ image.tag }}"
-    build:
-      path: "{{ base_directory }}/{{ image.name }}"
-      dockerfile: Dockerfile
-      pull: true
-      nocache: true
-    source: build
-  loop: "{{ docker_images }}"
-  loop_control:
-    loop_var: image
+    - name: Build Docker image locally
+      community.docker.docker_image:
+        name: "{{ item.name }}"
+        tag: "{{ item.tag }}"
+        build:
+          path: "{{ base_directory }}/{{ item.name }}"
+          dockerfile: Dockerfile
+          pull: true
+          nocache: true
+        source: build
 
-- name: Save Docker images to tarball
-  community.docker.docker_image:
-    name: "{{ image.name }}"
-    tag: "{{ image.tag }}"
-    load_path: "{{ base_directory }}/{{ image.name }}/{{ image.name }}_{{ image.tag }}.tar"
-    state: absent
-    source: save
-  loop: "{{ docker_images }}"
-  loop_control:
-    loop_var: image
+    - name: Save Docker image to tarball
+      community.docker.docker_image:
+        name: "{{ item.name }}"
+        tag: "{{ item.tag }}"
+        load_path: "{{ base_directory }}/{{ item.name }}/{{ item.name }}_{{ item.tag }}.tar"
+        state: absent
+        source: save
 
-- name: Remove local Docker images after saving to tarball
-  community.docker.docker_image:
-    name: "{{ image.name }}"
-    tag: "{{ image.tag }}"
-    state: absent
+    - name: Remove local Docker image
+      community.docker.docker_image:
+        name: "{{ item.name }}"
+        tag: "{{ item.tag }}"
+        state: absent
+
   loop: "{{ docker_images }}"
   loop_control:
-    loop_var: image
+    loop_var: item

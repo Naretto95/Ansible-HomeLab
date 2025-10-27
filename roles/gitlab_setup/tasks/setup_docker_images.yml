@@ -10,41 +10,35 @@
     username: "oauth2"
     password: "{{ gitlab_token }}"
 
-- name: Load Docker images from tarball
-  community.docker.docker_image:
-    load_path: "{{ base_directory }}/{{ image.name }}/{{ image.name }}_{{ image.tag }}.tar"
-    source: load
-  loop: "{{ docker_images }}"
-  loop_control:
-    loop_var: image
+- name: Push Docker images to GitLab
+  block:
+    - name: Load Docker image from tarball
+      community.docker.docker_image:
+        load_path: "{{ base_directory }}/{{ item.name }}/{{ item.name }}_{{ item.tag }}.tar"
+        source: load
 
-- name: Remove old Docker images (if exists)
-  community.docker.docker_image:
-    name: "{{ git_repo_registry }}/{{ image.name }}"
-    tag: "{{ image.tag }}"
-    state: absent
-  loop: "{{ docker_images }}"
-  loop_control:
-    loop_var: image
+    - name: Remove old Docker image from registry (if exists)
+      community.docker.docker_image:
+        name: "{{ git_repo_registry }}/{{ item.name }}"
+        tag: "{{ item.tag }}"
+        state: absent
 
-- name: Push Docker images to GitLab registry
-  community.docker.docker_image:
-    name: "{{ git_repo_registry }}/{{ image.name }}"
-    tag: "{{ image.tag }}"
-    push: true
-    source: local
-  loop: "{{ docker_images }}"
-  loop_control:
-    loop_var: image
+    - name: Push Docker image to GitLab registry
+      community.docker.docker_image:
+        name: "{{ git_repo_registry }}/{{ item.name }}"
+        tag: "{{ item.tag }}"
+        push: true
+        source: local
 
-- name: Remove local Docker images after saving to tarball
-  community.docker.docker_image:
-    name: "{{ image.name }}"
-    tag: "{{ image.tag }}"
-    state: absent
+    - name: Remove local Docker image after pushing
+      community.docker.docker_image:
+        name: "{{ item.name }}"
+        tag: "{{ item.tag }}"
+        state: absent
+
   loop: "{{ docker_images }}"
   loop_control:
-    loop_var: image
+    loop_var: item
 
 - name: Logout from GitLab registry
   community.docker.docker_login:
