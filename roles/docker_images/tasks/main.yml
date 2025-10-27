@@ -4,4 +4,4 @@
   include_tasks: build_image.yml
   loop: "{{ docker_images }}"
   loop_control:
-    loop_var: item
+    loop_var: image

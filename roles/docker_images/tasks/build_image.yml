@@ -2,21 +2,21 @@
 
 - name: Ensure Docker image directory exists
   ansible.builtin.file:
-    path: "{{ base_directory }}/{{ item.name }}"
+    path: "{{ base_directory }}/{{ image.name }}"
     state: directory
     mode: '0755'
 
 - name: Generate Dockerfile
   ansible.builtin.template:
     src: Dockerfile_template.j2
-    dest: "{{ base_directory }}/{{ item.name }}/Dockerfile"
+    dest: "{{ base_directory }}/{{ image.name }}/Dockerfile"
 
 - name: Build Docker image locally
   community.docker.docker_image:
-    name: "{{ item.name }}"
-    tag: "{{ item.tag }}"
+    name: "{{ image.name }}"
+    tag: "{{ image.tag }}"
     build:
-      path: "{{ base_directory }}/{{ item.name }}"
+      path: "{{ base_directory }}/{{ image.name }}"
       dockerfile: Dockerfile
       pull: true
       nocache: true
@@ -24,14 +24,14 @@
 
 - name: Save Docker image to tarball
   community.docker.docker_image:
-    name: "{{ item.name }}"
-    tag: "{{ item.tag }}"
-    load_path: "{{ base_directory }}/{{ item.name }}/{{ item.name }}_{{ item.tag }}.tar"
+    name: "{{ image.name }}"
+    tag: "{{ image.tag }}"
+    load_path: "{{ base_directory }}/{{ image.name }}/{{ image.name }}_{{ image.tag }}.tar"
     state: absent
     source: save
 
 - name: Remove local Docker image
   community.docker.docker_image:
-    name: "{{ item.name }}"
-    tag: "{{ item.tag }}"
+    name: "{{ image.name }}"
+    tag: "{{ image.tag }}"
     state: absent
