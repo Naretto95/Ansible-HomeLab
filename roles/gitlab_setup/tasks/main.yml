@@ -1,6 +1,6 @@
 ---
 
-- name: Get gitlab container info
+- name: Get gitlab containers info
   set_fact:
     gitlab_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab') | first | default(None) }}"
     runner_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab-runner') | first | default(None) }}"
@@ -97,9 +97,6 @@
 
 - name: Setup project
   include_tasks: setup_project.yml
-
-- name: Setup mirror script
-  include_tasks: setup_mirror_script.yml
 
 - name: Setup docker images
   include_tasks: setup_docker_images.yml

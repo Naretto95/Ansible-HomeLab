@@ -10,16 +10,38 @@
     username: "oauth2"
     password: "{{ gitlab_token }}"
 
-- name: Build and push Docker image to GitLab registry
+- name: Load Docker images from tarball
+  community.docker.docker_image:
+    load_path: "{{ base_directory }}/{{ image.name }}/{{ image.name }}_{{ image.tag }}.tar"
+    source: load
+  loop: "{{ docker_images }}"
+  loop_control:
+    loop_var: image
+
+- name: Remove old Docker images (if exists)
   community.docker.docker_image:
     name: "{{ git_repo_registry }}/{{ image.name }}"
     tag: "{{ image.tag }}"
-    build:
-      path: "{{ base_directory }}/{{ image.name }}"
-      dockerfile: Dockerfile
-      pull: true
+    state: absent
+  loop: "{{ docker_images }}"
+  loop_control:
+    loop_var: image
+
+- name: Push Docker images to GitLab registry
+  community.docker.docker_image:
+    name: "{{ git_repo_registry }}/{{ image.name }}"
+    tag: "{{ image.tag }}"
     push: true
-    source: build
+    source: local
+  loop: "{{ docker_images }}"
+  loop_control:
+    loop_var: image
+
+- name: Remove local Docker images after saving to tarball
+  community.docker.docker_image:
+    name: "{{ image.name }}"
+    tag: "{{ image.tag }}"
+    state: absent
   loop: "{{ docker_images }}"
   loop_control:
     loop_var: image

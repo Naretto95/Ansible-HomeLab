@@ -16,3 +16,37 @@
   loop: "{{ docker_images }}"
   loop_control:
     loop_var: image
+
+- name: Build Docker images locally
+  community.docker.docker_image:
+    name: "{{ image.name }}"
+    tag: "{{ image.tag }}"
+    build:
+      path: "{{ base_directory }}/{{ image.name }}"
+      dockerfile: Dockerfile
+      pull: true
+      nocache: true
+    source: build
+  loop: "{{ docker_images }}"
+  loop_control:
+    loop_var: image
+
+- name: Save Docker images to tarball
+  community.docker.docker_image:
+    name: "{{ image.name }}"
+    tag: "{{ image.tag }}"
+    load_path: "{{ base_directory }}/{{ image.name }}/{{ image.name }}_{{ image.tag }}.tar"
+    state: absent
+    source: save
+  loop: "{{ docker_images }}"
+  loop_control:
+    loop_var: image
+
+- name: Remove local Docker images after saving to tarball
+  community.docker.docker_image:
+    name: "{{ image.name }}"
+    tag: "{{ image.tag }}"
+    state: absent
+  loop: "{{ docker_images }}"
+  loop_control:
+    loop_var: image
