@@ -1,0 +1,47 @@
+---
+
+- name: Get project info
+  uri:
+    url: "http://{{ gitlab_container.hostname }}/api/v4/projects?search={{ project_name }}"
+    method: GET
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+  changed_when: false
+  register: project_info
+
+- name: Create GitLab project if not found
+  uri:
+    url: "http://{{ gitlab_container.hostname }}/api/v4/projects"
+    method: POST
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+    body_format: json
+    body:
+      name: "{{ project_name }}"
+      visibility: "private"
+    status_code: 201
+  when: project_info.json | length == 0
+  register: project_create
+
+- name: Set git_repo fact
+  set_fact:
+    git_repo: "{{ project_create.json if project_info.json|length == 0 else project_info.json[0] }}"
+
+- name: Set Git repository URL facts
+  set_fact:
+    git_repo_url: "{{ git_repo.http_url_to_repo | regex_replace('http://', 'http://root:' + gitlab_token + '@') | regex_replace('gitlab.local', gitlab_container.hostname) }}"
+    git_repo_ssh: "ssh://git@{{ gitlab_container.hostname }}:2222/{{ git_repo.path_with_namespace }}.git"
+
+- name: Push local Ansible project to GitLab
+  shell: |
+    cd "{{ playbook_dir | dirname }}"
+    git init
+    git config user.email "ansible@deploy.com"
+    git config user.name "Ansible CI"
+    git checkout -b main
+    git remote remove origin || true
+    git remote add origin "{{ git_repo_url }}"
+    git add .
+    git commit -m "Initial commit" || true
+    git push -u origin main
+  changed_when: false

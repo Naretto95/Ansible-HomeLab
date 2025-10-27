@@ -1,0 +1,25 @@
+---
+
+- name: Validate container_state
+  assert:
+    that:
+      - container_state in ['present', 'absent']
+    fail_msg: "container_state can only be 'present' or 'absent'."
+
+- name: Gather container definitions from services
+  set_fact:
+    lxc_containers: "{{ services | select('in', groups['services']) | map('extract', hostvars, 'lxc_container') | select('defined') | list }}"
+
+- name: Create containers on proxmox server
+  include_tasks: install_container.yml
+  loop: "{{ lxc_containers }}"
+  loop_control:
+    loop_var: container
+  when: container_state == 'present'
+
+- name: Remove containers on proxmox server
+  include_tasks: destroy_container.yml
+  loop: "{{ lxc_containers }}"
+  loop_control:
+    loop_var: container
+  when: container_state == 'absent'

@@ -1,18 +1,16 @@
 ---
 
-- name: Fail if host is not part of the "cluster" group
-  ansible.builtin.fail:
-    msg: "This role can only be run on hosts in the 'cluster' group!"
-  when: "'cluster' not in group_names"
-
-- name: Fail if host OS is not Proxmox
-  ansible.builtin.fail:
-    msg: "This role can only be run on Proxmox hosts!"
-  when: host_os != "proxmox"
+- name: Check if GPU device exists
+  stat:
+    path: "/sys/bus/pci/devices/{{ gpu_device_id }}"
+  register: gpu_device
+  when: unmount_gpu
 
 - name: Unmount GPU from PCI bus
   shell: "echo 1 > /sys/bus/pci/devices/{{ gpu_device_id }}/remove"
-  when: unmount_gpu
+  when: 
+    - unmount_gpu 
+    - gpu_device.stat.exists
   changed_when: false
 
 - name: Remount (rescan) PCI bus

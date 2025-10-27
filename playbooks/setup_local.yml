@@ -6,7 +6,6 @@
     - ../vars/setup.yml
   roles:
     - disable_motd
-    - ansible_collections
 
 - name: Creating dockers
   hosts: localhost
@@ -16,11 +15,12 @@
   roles:
     - packages
     - docker_containers
+    - docker_images
 
 - name: Config gitlab
   hosts: localhost
   vars_files:
     - ../vars/setup.yml
   roles:
-    - install_gitlab
-  when: container_state is undefined
+    - role: gitlab_setup
+      when: container_state is undefined or container_state == 'present'

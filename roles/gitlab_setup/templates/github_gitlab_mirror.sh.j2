@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+GITHUB_REPO="https://github.com/{{ github_username }}/{{ project_name }}.git"
+GITLAB_REPO="{{ git_repo_ssh }}"
+WORKDIR="/tmp/github_gitlab_mirror"
+
+export GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_deploy_key -o StrictHostKeyChecking=yes -p 2222"
+
+# Ensure GitLab host is trusted
+mkdir -p ~/.ssh
+ssh-keygen -f /root/.ssh/known_hosts -R '[{{ gitlab_container.hostname }}]:2222'
+ssh-keyscan -p 2222 {{ gitlab_container.hostname }} >> ~/.ssh/known_hosts 2>/dev/null
+
+echo "[INFO] Starting GitHub → GitLab mirror at $(date)"
+rm -rf "$WORKDIR"
+mkdir -p "$WORKDIR"
+cd "$WORKDIR"
+
+echo "[INFO] Cloning GitHub repository..."
+git clone --mirror "$GITHUB_REPO" .
+
+echo "[INFO] Pushing to GitLab..."
+git push --mirror "$GITLAB_REPO"
+
+echo "[INFO] Mirror complete at $(date)"

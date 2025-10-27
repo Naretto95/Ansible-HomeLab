@@ -1,0 +1,27 @@
+---
+
+- name: Normalize required_group to a list
+  ansible.builtin.set_fact:
+    required_group_list: "{{ required_group if required_group is iterable and required_group is not string else [required_group] }}"
+  when: required_group is defined
+
+- name: Fail if host is not part of any required group
+  ansible.builtin.fail:
+    msg: "This role can only be run on hosts in one of the '{{ required_group_list }}' groups!"
+  when:
+    - required_group_list is defined
+    - required_group_list | length > 0
+    - (group_names | intersect(required_group_list)) | length == 0
+
+- name: Normalize required_os to a list
+  ansible.builtin.set_fact:
+    required_os_list: "{{ required_os if required_os is iterable and required_os is not string else [required_os] }}"
+  when: required_os is defined
+
+- name: Fail if host OS doesn't match any required OS
+  ansible.builtin.fail:
+    msg: "This role can only be run on hosts with OS in '{{ required_os_list }}'"
+  when:
+    - required_os_list is defined
+    - required_os_list | length > 0
+    - os_family | lower not in (required_os_list | map('lower') | list)

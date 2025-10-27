@@ -1,0 +1,62 @@
+---
+
+- name: Create WireGuard configuration directory
+  ansible.builtin.file:
+    path: /etc/wireguard
+    state: directory
+    mode: "0700"
+
+- name: Generate private key for WireGuard
+  ansible.builtin.command: wg genkey
+  register: wg_private
+  changed_when: false
+  check_mode: no
+  args:
+    creates: "/etc/wireguard/{{ wireguard_interface }}.key"
+
+- name: Save private key
+  ansible.builtin.copy:
+    content: "{{ wg_private.stdout }}"
+    dest: "/etc/wireguard/{{ wireguard_interface }}.key"
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Generate public key
+  ansible.builtin.command: "cat /etc/wireguard/{{ wireguard_interface }}.key | wg pubkey"
+  register: wg_public
+  changed_when: false
+
+- name: Save WireGuard configuration
+  ansible.builtin.copy:
+    dest: "/etc/wireguard/{{ wireguard_interface }}.conf"
+    content: |
+      [Interface]
+      Address = {{ wireguard_network | ipaddr('first') }}
+      ListenPort = {{ wireguard_port }}
+      PrivateKey = {{ wg_private.stdout }}
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Enable IPv4 forwarding
+  ansible.builtin.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    reload: yes
+
+- name: Configure NAT to allow VPN clients to access LAN
+  ansible.builtin.iptables:
+    table: nat
+    chain: POSTROUTING
+    source: "{{ wireguard_network }}"
+    out_interface: eth0
+    jump: MASQUERADE
+    state: present
+
+- name: Enable and start WireGuard interface
+  ansible.builtin.systemd:
+    name: "wg-quick@{{ wireguard_interface }}"
+    enabled: yes
+    state: started

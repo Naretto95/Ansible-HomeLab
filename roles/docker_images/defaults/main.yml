@@ -1,0 +1,4 @@
+---
+
+base_directory: "{{ ansible_env.HOME }}"
+docker_images: []

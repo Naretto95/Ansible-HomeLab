@@ -1,20 +1,48 @@
 ---
 
-- name: Debian repositories GPG keys
-  apt_key:
+- name: Download GPG keys for repositories
+  ansible.builtin.get_url:
     url: "{{ item.gpg_key }}"
-    state: "{{ repos_state | default('present') }}"
+    dest: "/usr/share/keyrings/{{ item.filename }}.gpg"
+    mode: '0644'
   loop: "{{ debian_repos }}"
-  when: 
+  when:
     - os_family in ["Debian", "Proxmox"]
     - debian_repos is defined
 
-- name: Debian repositories
+- name: Add APT repositories
   apt_repository:
     repo: "{{ item.repo }}"
-    filename: "{{ item.filename | default(omit) }}"
-    state: "{{ repos_state | default('present') }}"
+    filename: "{{ item.filename }}"
+    state: "{{ repos_state }}"
+    update_cache: true
   loop: "{{ debian_repos }}"
   when: 
-    - os_family in ["Debian", "Proxmox"]
+    - os_family == "Debian"
+    - debian_repos is defined
+
+- name: Add APT repositories (Deb822 format)
+  ansible.builtin.deb822_repository:
+    name: "{{ item.filename }}"
+    types: ["deb"]
+    uris: "{{ item.repo.split(' ')[1] }}"
+    suites: "{{ item.repo.split(' ')[2] }}"
+    components: "{{ item.repo.split(' ')[3:] }}"
+    enabled: true
+    signed_by: "/usr/share/keyrings/{{ item.filename }}.gpg"
+    state: present
+  loop: "{{ debian_repos }}"
+  when: 
+    - os_family == "Proxmox"
+    - debian_repos is defined
+
+- name: Remove Proxmox enterprise .sources file
+  ansible.builtin.file:
+    path: "/etc/apt/sources.list.d/{{ item }}"
+    state: absent
+  loop:
+    - pve-enterprise.sources
+    - ceph.sources
+  when: 
+    - os_family == "Proxmox"
     - debian_repos is defined

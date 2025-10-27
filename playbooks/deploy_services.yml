@@ -1,0 +1,13 @@
+---
+
+- name: Deploy proxmox containers
+  hosts: cluster
+  roles:
+    - lxc_containers
+
+- name: Deploy proxmox services
+  hosts: wireguard
+  gather_facts: false
+  roles:
+    - packages
+    - install_wireguard

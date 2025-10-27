@@ -1,0 +1,30 @@
+---
+
+- name: Set Git repository registry fact
+  set_fact:
+    git_repo_registry: "{{ gitlab_container.hostname }}:5050/{{ git_repo.path_with_namespace }}"
+
+- name: Log in to GitLab container registry using token
+  community.docker.docker_login:
+    registry_url: "{{ gitlab_container.hostname }}:5050"
+    username: "oauth2"
+    password: "{{ gitlab_token }}"
+
+- name: Build and push Docker image to GitLab registry
+  community.docker.docker_image:
+    name: "{{ git_repo_registry }}/{{ image.name }}"
+    tag: "{{ image.tag }}"
+    build:
+      path: "{{ base_directory }}/{{ image.name }}"
+      dockerfile: Dockerfile
+      pull: true
+    push: true
+    source: build
+  loop: "{{ docker_images }}"
+  loop_control:
+    loop_var: image
+
+- name: Logout from GitLab registry
+  community.docker.docker_login:
+    registry_url: "{{ gitlab_container.hostname }}:5050"
+    state: absent

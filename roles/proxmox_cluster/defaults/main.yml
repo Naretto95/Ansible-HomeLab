@@ -1,0 +1,5 @@
+---
+
+cluster_name: default-cluster
+cluster_master: false
+cluster_state: present
