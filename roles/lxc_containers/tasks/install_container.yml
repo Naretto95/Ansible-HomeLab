@@ -6,6 +6,10 @@
     creates: "/var/lib/vz/template/cache/{{ container.template | regex_replace('^local:vztmpl/', '') }}"
   changed_when: false
 
+- name: show root passw
+  debug:
+    msg: "{{ container.root_password }}"
+
 - name: Create LXC container on Proxmox
   community.proxmox.proxmox:
     api_user: "{{ ansible_user }}@pam"
