@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "[INFO] Creating Ansible VARs file"
+echo "[INFO] Creating Ansible private vars file"
 
 # Determine the directory where the script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

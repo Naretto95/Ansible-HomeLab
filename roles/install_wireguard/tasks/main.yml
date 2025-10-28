@@ -6,18 +6,20 @@
     state: directory
     mode: "0700"
 
+- name: Check if private key exists
+  ansible.builtin.stat:
+    path: "/etc/wireguard/{{ wireguard_interface }}.key"
+  register: wg_key_file
+
 - name: Generate private key for WireGuard
   ansible.builtin.command: wg genkey
   register: wg_private
   changed_when: false
   check_mode: no
-  args:
-    creates: "/etc/wireguard/{{ wireguard_interface }}.key"
+  when: not wg_key_file.stat.exists
 
-- name: Generate public key
-  ansible.builtin.command:
-    cmd: wg pubkey
-    stdin: "{{ wg_private.stdout | trim }}"
+- name: Generate public key from private key file
+  ansible.builtin.command: "wg pubkey < /etc/wireguard/{{ wireguard_interface }}.key"
   register: wg_public
   changed_when: false
 
@@ -28,7 +30,15 @@
     owner: root
     group: root
     mode: "0600"
-    force: no
+  when: not wg_key_file.stat.exists
+
+- name: Save WireGuard public key
+  ansible.builtin.copy:
+    content: "{{ wg_public.stdout | trim }}"
+    dest: "/etc/wireguard/{{ wireguard_interface }}.pub"
+    owner: root
+    group: root
+    mode: "0644"
 
 - name: Check if WireGuard config exists on host
   ansible.builtin.stat:
@@ -44,11 +54,12 @@
       ListenPort = {{ wireguard_port }}
       PrivateKey = /etc/wireguard/{{ wireguard_interface }}.key
 
+      {% if wireguard_client_public_key != 'none' %}
       [Peer]
       PublicKey = {{ wireguard_client_public_key }}
       AllowedIPs = {{ allowed_ips | join(', ') }}
+      {% endif %}
     mode: "0600"
-    when: wg_conf.stat.exists == false or wireguard_client_public_key != "none"
 
 - name: Enable IPv4 forwarding
   ansible.builtin.sysctl:
@@ -71,3 +82,7 @@
     name: "wg-quick@{{ wireguard_interface }}"
     enabled: true
     state: started
+
+- name: Print WireGuard public key
+  ansible.builtin.debug:
+    msg: "WireGuard public key: {{ wg_public.stdout | trim }}"
