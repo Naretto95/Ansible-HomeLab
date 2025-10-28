@@ -20,13 +20,12 @@ lxc_container:
     - nesting=1
     - keyctl=1
   root_password: "{{ ansible_password }}"
+  users:
+    - name: "{{ ansible_user }}"
+      password: "{{ ansible_password }}"
+      sudo: true
 
 packages:
   - wireguard
   - qrencode
   - iproute2
-
-users:
-  - name: "{{ ansible_user }}"
-    password: "{{ ansible_password }}"
-    sudo: true
