@@ -14,16 +14,10 @@
   args:
     creates: "/etc/wireguard/{{ wireguard_interface }}.key"
 
-- name: Save private key
-  ansible.builtin.copy:
-    content: "{{ wg_private.stdout }}"
-    dest: "/etc/wireguard/{{ wireguard_interface }}.key"
-    mode: "0600"
-
 - name: Generate public key
   ansible.builtin.command:
     cmd: wg pubkey
-    stdin: "{{ wg_private.stdout }}"
+    stdin: "{{ wg_private.stdout | trim }}"
   register: wg_public
   changed_when: false
 
