@@ -28,7 +28,7 @@
   when: not wg_key_file.stat.exists
 
 - name: Generate public key from private key file
-  ansible.builtin.command: "wg pubkey < /etc/wireguard/{{ wireguard_interface }}.key"
+  ansible.builtin.shell: "wg pubkey < /etc/wireguard/{{ wireguard_interface }}.key"
   register: wg_public
   changed_when: false
 
