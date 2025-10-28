@@ -30,15 +30,25 @@
     mode: "0600"
     force: no
 
+- name: Check if WireGuard config exists on host
+  ansible.builtin.stat:
+    path: "/etc/wireguard/{{ wireguard_interface }}.conf"
+  register: wg_conf
+
 - name: Save WireGuard configuration
   ansible.builtin.copy:
     dest: "/etc/wireguard/{{ wireguard_interface }}.conf"
     content: |
       [Interface]
-      Address = {{ wireguard_ip }}
+      Address = {{ wireguard_ip }}/{{ wireguard_subnet }}
       ListenPort = {{ wireguard_port }}
       PrivateKey = /etc/wireguard/{{ wireguard_interface }}.key
+
+      [Peer]
+      PublicKey = {{ wireguard_client_public_key }}
+      AllowedIPs = {{ allowed_ips | join(', ') }}
     mode: "0600"
+    when: wg_conf.stat.exists == false or wireguard_client_public_key != "none"
 
 - name: Enable IPv4 forwarding
   ansible.builtin.sysctl:

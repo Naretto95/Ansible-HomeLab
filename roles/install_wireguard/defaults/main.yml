@@ -4,3 +4,8 @@ wireguard_port: 51820
 wireguard_interface: wg0
 wireguard_network: 10.10.0.0/24
 wireguard_ip: 10.10.0.1
+wireguard_subnet: 24
+allowed_ips:
+  - 10.10.0.2/32
+  - 192.168.1.0/24
+wireguard_client_public_key: none

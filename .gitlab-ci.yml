@@ -11,8 +11,8 @@
     - automation
   before_script:
     - chmod -R o-w .
-    - chmod +x ./scripts/setup_credentials.sh
-    - ./scripts/setup_credentials.sh
+    - chmod +x ./scripts/setup_vars.sh
+    - ./scripts/setup_vars.sh
     - ansible-galaxy collection install -r "./requirements.yml"
   rules:
     *schedule_rules
