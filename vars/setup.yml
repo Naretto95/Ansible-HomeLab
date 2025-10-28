@@ -69,3 +69,4 @@ docker_images:
     pip_packages:
       - ansible
       - proxmoxer
+      - requests

@@ -1,26 +1,26 @@
 ---
 
-- name: Clear resolv.conf
-  raw: "echo '' > /etc/resolv.conf"
-  when: os_family == "Proxmox"
-  changed_when: false
+- block:
+    - name: Configure DNS servers
+      copy:
+        dest: /etc/resolv.conf
+        content: |
+          {% for ns in dns_servers %}
+          nameserver {{ ns }}
+          {% endfor %}
+      when: os_family in ["Debian", "Proxmox"]
 
-- name: Configure DNS servers using raw
-  raw: |
-    {% for ns in dns_servers %}
-    echo "nameserver {{ ns }}" >> /etc/resolv.conf
-    {% endfor %}
-  when: os_family == "Proxmox"
-  changed_when: false
-
-- name: Configure DNS servers
-  copy:
-    dest: /etc/resolv.conf
-    content: |
-      {% for ns in dns_servers %}
-      nameserver {{ ns }}
-      {% endfor %}
-  when: os_family == "Debian"
+  rescue:
+    - name: Fallback to raw method (no Python on host)
+      raw: |
+        if [ -f /etc/resolv.conf ]; then
+          : > /etc/resolv.conf
+        fi
+        {% for ns in dns_servers %}
+        echo "nameserver {{ ns }}" >> /etc/resolv.conf
+        {% endfor %}
+      when: os_family in ["Debian", "Proxmox"]
+      changed_when: false
 
 - name: Test DNS connectivity
   raw: ping -c 1 8.8.8.8

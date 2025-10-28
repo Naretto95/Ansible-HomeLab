@@ -3,16 +3,16 @@
 set -e
 
 WORKDIR="/tmp/github_gitlab_mirror"
-SSH_KEY="$HOME/.ssh/gitlab_deploy_key"
+SSH_KEY="~/.ssh/gitlab_deploy_key"
 GITLAB_HOST="{{ gitlab_container.hostname }}"
 GITLAB_PORT=2222
 
 export GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=yes -p $GITLAB_PORT"
 
 # Ensure GitLab host is trusted
-mkdir -p "$HOME/.ssh"
-ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[$GITLAB_HOST]:$GITLAB_PORT"
-ssh-keyscan -p $GITLAB_PORT $GITLAB_HOST >> "$HOME/.ssh/known_hosts" 2>/dev/null
+mkdir -p ~/.ssh
+ssh-keygen -f ~/.ssh/known_hosts -R "[$GITLAB_HOST]:$GITLAB_PORT"
+ssh-keyscan -p $GITLAB_PORT $GITLAB_HOST >> ~/.ssh/known_hosts 2>/dev/null
 
 echo "[INFO] Starting GitHub → GitLab mirror at $(date)"
 
