@@ -11,26 +11,26 @@
     path: "/etc/wireguard/{{ wireguard_interface }}.key"
   register: wg_key_file
 
-- name: Generate private key for WireGuard
-  ansible.builtin.command: wg genkey
-  register: wg_private
-  changed_when: false
-  check_mode: no
+- block:
+    - name: Generate private key for WireGuard
+      ansible.builtin.command: wg genkey
+      register: wg_private
+      changed_when: false
+      check_mode: no
+
+    - name: Save WireGuard private key
+      ansible.builtin.copy:
+        content: "{{ wg_private.stdout | trim }}"
+        dest: "/etc/wireguard/{{ wireguard_interface }}.key"
+        owner: root
+        group: root
+        mode: "0600"
   when: not wg_key_file.stat.exists
 
 - name: Generate public key from private key file
   ansible.builtin.command: "wg pubkey < /etc/wireguard/{{ wireguard_interface }}.key"
   register: wg_public
   changed_when: false
-
-- name: Save WireGuard private key
-  ansible.builtin.copy:
-    content: "{{ wg_private.stdout | trim }}"
-    dest: "/etc/wireguard/{{ wireguard_interface }}.key"
-    owner: root
-    group: root
-    mode: "0600"
-  when: not wg_key_file.stat.exists
 
 - name: Save WireGuard public key
   ansible.builtin.copy:
