@@ -18,8 +18,6 @@
   ansible.builtin.copy:
     content: "{{ wg_private.stdout }}"
     dest: "/etc/wireguard/{{ wireguard_interface }}.key"
-    owner: root
-    group: root
     mode: "0600"
 
 - name: Generate public key
@@ -28,7 +26,7 @@
     stdin: "{{ wg_private.stdout }}"
   register: wg_public
   changed_when: false
-  
+
 - name: Save WireGuard configuration
   ansible.builtin.copy:
     dest: "/etc/wireguard/{{ wireguard_interface }}.conf"
@@ -37,8 +35,6 @@
       Address = {{ wireguard_network | ipaddr('first') }}
       ListenPort = {{ wireguard_port }}
       PrivateKey = {{ wg_private.stdout }}
-    owner: root
-    group: root
     mode: "0600"
 
 - name: Enable IPv4 forwarding
