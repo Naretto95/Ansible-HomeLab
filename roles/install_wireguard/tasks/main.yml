@@ -23,10 +23,12 @@
     mode: "0600"
 
 - name: Generate public key
-  ansible.builtin.command: "cat /etc/wireguard/{{ wireguard_interface }}.key | wg pubkey"
+  ansible.builtin.command:
+    cmd: wg pubkey
+    stdin: "{{ wg_private.stdout }}"
   register: wg_public
   changed_when: false
-
+  
 - name: Save WireGuard configuration
   ansible.builtin.copy:
     dest: "/etc/wireguard/{{ wireguard_interface }}.conf"
