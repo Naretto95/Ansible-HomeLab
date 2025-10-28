@@ -19,7 +19,7 @@
     netif:
       net0: "name=eth0,bridge={{ container.net_bridge }},ip={{ container.net_ip_address }}/{{ container.net_subnet }},gw={{ container.net_gateway }}"
     disk: "{{ container.rootfs }}"
-    state: present   # create the container
+    state: present
   delegate_to: localhost
 
 - name: Start LXC container
