@@ -1,14 +1,7 @@
 ---
 
-- name: Debug transformed template variables
-  ansible.builtin.debug:
-    msg:
-      - "Original container.template: {{ container.template }}"
-      - "Template name for pveam download: {{ container.template | regex_replace('^local:vztmpl/', '') | regex_replace('\\.tar\\.zst$', '') }}"
-      - "Template path for creates: /var/lib/vz/template/cache/{{ container.template | regex_replace('^local:vztmpl/', '') }}"
-
 - name: Ensure LXC template is present
-  ansible.builtin.command: "pveam download local {{ container.template | regex_replace('^local:vztmpl/', '') | regex_replace('\\.tar\\.zst$', '') }}"
+  ansible.builtin.command: "pveam download local system:{{ container.template | regex_replace('^local:vztmpl/', '') | regex_replace('\\.tar\\.zst$', '') }}"
   args:
     creates: "/var/lib/vz/template/cache/{{ container.template | regex_replace('^local:vztmpl/', '') }}"
   changed_when: false
