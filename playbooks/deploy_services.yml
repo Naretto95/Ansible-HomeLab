@@ -5,10 +5,15 @@
   roles:
     - lxc_containers
 
-- name: Deploy proxmox services
+- name: Deploy proxmox services basic configuration
   hosts: services
   gather_facts: false
   roles:
-    - role: packages
+    - dns_setup
+    - packages
+
+- name: Deploy proxmox services specific configuration
+  hosts: services
+  roles:
     - role: install_wireguard
       when: inventory_hostname == 'wireguard'
