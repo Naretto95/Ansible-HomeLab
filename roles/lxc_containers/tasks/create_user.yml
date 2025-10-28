@@ -10,6 +10,11 @@
     pct exec {{ container.id }} -- bash -c "echo '{{ user.name }}:{{ user.password }}' | chpasswd"
   changed_when: false
 
+- name: Ensure sudo is installed in container
+  ansible.builtin.command: >
+    pct exec {{ container.id }} -- bash -c "dpkg -s sudo >/dev/null 2>&1 || (apt-get update -y && apt-get install -y sudo)"
+  changed_when: false
+
 - name: Add user to sudo group if needed
   ansible.builtin.command: >
     pct exec {{ container.id }} -- usermod -aG sudo {{ user.name }}
