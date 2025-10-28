@@ -19,5 +19,15 @@
     netif:
       net0: "name=eth0,bridge={{ container.net_bridge }},ip={{ container.net_ip_address }}/{{ container.net_subnet }},gw={{ container.net_gateway }}"
     disk: "{{ container.rootfs }}"
+    state: present   # create the container
+  delegate_to: localhost
+
+- name: Start LXC container
+  community.proxmox.proxmox:
+    api_user: "{{ ansible_user }}@pam"
+    api_password: "{{ ansible_password }}"
+    api_host: "{{ ansible_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ container.id }}"
     state: started
   delegate_to: localhost
