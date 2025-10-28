@@ -26,7 +26,7 @@
     dest: "/etc/wireguard/{{ wireguard_interface }}.conf"
     content: |
       [Interface]
-      Address = {{ wireguard_network | ipaddr('first') }}
+      Address = {{ wireguard_ip }}
       ListenPort = {{ wireguard_port }}
       PrivateKey = {{ wg_private.stdout }}
     mode: "0600"

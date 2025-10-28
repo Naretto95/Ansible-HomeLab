@@ -3,3 +3,4 @@
 wireguard_port: 51820
 wireguard_interface: wg0
 wireguard_network: 10.10.0.0/24
+wireguard_ip: 10.10.0.1
