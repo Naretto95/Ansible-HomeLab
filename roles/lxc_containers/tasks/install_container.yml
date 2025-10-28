@@ -1,5 +1,11 @@
 ---
 
+- name: Ensure LXC template is present
+  command: "pveam download local {{ container.template_name }}"
+  args:
+    creates: "/var/lib/vz/template/cache/{{ container.template_file }}"
+  delegate_to: localhost
+
 - name: Create LXC container on Proxmox
   community.proxmox.proxmox:
     api_user: "{{ ansible_user }}@pam"
