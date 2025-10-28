@@ -27,6 +27,6 @@ packages:
   - iproute2
 
 users:
-  - name: {{ ansible_user }}
-    password: {{ ansible_password }}
+  - name: "{{ ansible_user }}"
+    password: "{{ ansible_password }}"
     sudo: true
