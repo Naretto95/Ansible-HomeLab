@@ -21,7 +21,6 @@
     unprivileged: "{{ container.lxc_unprivileged }}"
     features: "{{ container.features }}"
     password: "{{ container.root_password }}"
-    ip_address: "{{ container.net_ip_address }}/{{ container.net_subnet }}"
     netif:
       net0: "name=eth0,bridge={{ container.net_bridge }},ip={{ container.net_ip_address }}/{{ container.net_subnet }},gw={{ container.net_gateway }}"
     disk: "{{ container.rootfs }}"
