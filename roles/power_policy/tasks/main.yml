@@ -13,12 +13,12 @@
 
 - name: Reload systemd daemon
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
   when: "'pstate' in cpu_driver.stdout"
 
 - name: Enable and start CPU power management service
   ansible.builtin.systemd:
     name: "{{ service_name }}"
-    enabled: yes
+    enabled: true
     state: started
   when: "'pstate' in cpu_driver.stdout"

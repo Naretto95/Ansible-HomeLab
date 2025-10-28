@@ -36,7 +36,7 @@
     name: net.ipv4.ip_forward
     value: "1"
     state: present
-    reload: yes
+    reload: true
 
 - name: Configure NAT to allow VPN clients to access LAN
   ansible.builtin.iptables:
@@ -50,5 +50,5 @@
 - name: Enable and start WireGuard interface
   ansible.builtin.systemd:
     name: "wg-quick@{{ wireguard_interface }}"
-    enabled: yes
+    enabled: true
     state: started
