@@ -15,6 +15,10 @@
     - os_family in ["Debian", "Proxmox"]
     - packages | difference(['python3', 'python3-apt']) | length > 0
 
+- name: debug
+  debug:
+    msg: {{ packages }}
+
 - name: Ensure Docker service is running
   service:
     name: docker

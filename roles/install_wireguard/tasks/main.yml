@@ -73,9 +73,9 @@
       ListenPort = {{ wireguard_port }}
       PrivateKey = /etc/wireguard/{{ wireguard_interface }}.key
 
-      {% for idx, client in enumerate(wireguard_clients) %}
+      {% for client in wireguard_clients %}
       [Peer]
-      PublicKey = {{ client_pub_keys.results[idx].content | b64decode | trim }}
+      PublicKey = {{ client_pub_keys.results[loop.index0].content | b64decode | trim }}
       AllowedIPs = {{ client.ip }}
       {% endfor %}
     mode: "0600"
