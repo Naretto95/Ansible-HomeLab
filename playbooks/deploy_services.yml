@@ -1,0 +1,19 @@
+---
+
+- name: Deploy proxmox containers
+  hosts: cluster
+  roles:
+    - lxc_containers
+
+- name: Deploy proxmox services basic configuration
+  hosts: services
+  gather_facts: false
+  roles:
+    - dns_setup
+    - packages
+
+- name: Deploy proxmox services specific configuration
+  hosts: services
+  roles:
+    - role: install_wireguard
+      when: inventory_hostname == 'wireguard'

@@ -3,27 +3,27 @@
 - name: Validate container_state
   assert:
     that:
-      - container_state is not defined or container_state in ['present', 'absent']
-    fail_msg: "container_state can only be 'present', 'absent', or undefined."
+      - container_state in ['present', 'absent']
+    fail_msg: "container_state can only be 'present' or 'absent'."
 
 - name: Ensure Docker networks exist or remove it
   community.docker.docker_network:
     name: "{{ item.key }}"
     driver: bridge
-    state: "{{ container_state | default('present') }}"
+    state: "{{ container_state }}"
   loop: "{{ docker_networks | dict2items }}"
   when: docker_networks is defined
 
 - name: Create containers in user's base directory
   include_tasks: install_container.yml
-  loop: "{{ docker_services | default([]) }}"
+  loop: "{{ docker_containers }}"
   loop_control:
     loop_var: container
-  when: container_state | default('present') == 'present'
+  when: container_state == 'present'
 
 - name: Remove containers in user's base directory
   include_tasks: destroy_container.yml
-  loop: "{{ docker_services | default([]) }}"
+  loop: "{{ docker_containers }}"
   loop_control:
     loop_var: container
-  when: container_state | default('present') == 'absent'
+  when: container_state == 'absent'

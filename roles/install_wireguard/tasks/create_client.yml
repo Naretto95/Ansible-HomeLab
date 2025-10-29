@@ -1,0 +1,65 @@
+---
+
+- name: Ensure client directory exists
+  ansible.builtin.file:
+    path: "/etc/wireguard/clients/{{ client.name }}"
+    state: directory
+    mode: "0700"
+
+- name: Check if private key exists
+  ansible.builtin.stat:
+    path: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.key"
+  register: client_key_file
+
+- block:
+    - name: Generate client private key
+      ansible.builtin.command: wg genkey
+      register: client_private
+      changed_when: false
+      check_mode: no
+
+    - name: Save client private key
+      ansible.builtin.copy:
+        content: "{{ client_private.stdout | trim }}"
+        dest: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.key"
+        mode: "0600"
+
+    - name: Generate client public key
+      ansible.builtin.shell: "wg pubkey < /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.key"
+      register: client_public
+      changed_when: false
+
+    - name: Save client public key
+      ansible.builtin.copy:
+        content: "{{ client_public.stdout | trim }}"
+        dest: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.pub"
+        mode: "0644"
+  when: not client_key_file.stat.exists
+
+- name: Read client private key
+  ansible.builtin.slurp:
+    src: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.key"
+  register: client_priv_data
+
+- name: Generate WireGuard client configuration files
+  ansible.builtin.copy:
+    dest: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.conf"
+    content: |
+      [Interface]
+      PrivateKey = {{ client_priv_data.content | b64decode | trim }}
+      Address = {{ client.ip }}
+      DNS = 1.1.1.1
+
+      [Peer]
+      PublicKey = {{ wg_public_data.content | b64decode | trim }}
+      Endpoint = {{ wireguard_endpoint }}:{{ wireguard_port }}
+      AllowedIPs = {{ client.allowed_ips | join(', ') }}
+    mode: "0600"
+
+- name: Generate QR code for WireGuard client
+  ansible.builtin.command: >
+    qrencode -o /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.png
+    < /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.conf
+  when: client.qr | default(false)
+  args:
+    creates: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.png"

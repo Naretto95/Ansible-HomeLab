@@ -1,0 +1,103 @@
+---
+
+- name: Install wireguard required packages
+  include_role:
+    name: packages
+  vars:
+    packages: "{{ wireguard_packages }}"
+
+- name: Create WireGuard directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0700"
+  loop:
+    - /etc/wireguard
+    - /etc/wireguard/clients
+
+- name: Check if private key exists
+  ansible.builtin.stat:
+    path: "/etc/wireguard/{{ wireguard_interface }}.key"
+  register: wg_key_file
+
+- block:
+    - name: Generate private key for WireGuard
+      ansible.builtin.command: wg genkey
+      register: wg_private
+      changed_when: false
+      check_mode: no
+
+    - name: Save WireGuard private key
+      ansible.builtin.copy:
+        content: "{{ wg_private.stdout | trim }}"
+        dest: "/etc/wireguard/{{ wireguard_interface }}.key"
+        mode: "0600"
+
+    - name: Generate public key from private key file
+      ansible.builtin.shell: "wg pubkey < /etc/wireguard/{{ wireguard_interface }}.key"
+      register: wg_public
+      changed_when: false
+
+    - name: Save WireGuard public key
+      ansible.builtin.copy:
+        content: "{{ wg_public.stdout | trim }}"
+        dest: "/etc/wireguard/{{ wireguard_interface }}.pub"
+        mode: "0644"
+  when: not wg_key_file.stat.exists
+
+- name: Read WireGuard public key
+  ansible.builtin.slurp:
+    src: "/etc/wireguard/{{ wireguard_interface }}.pub"
+  register: wg_public_data
+
+- name: Create WirGuard clients
+  include_tasks: create_client.yml
+  loop: "{{ wireguard_clients}}"
+  loop_control:
+    loop_var: client
+
+- name: Read all client public keys
+  ansible.builtin.slurp:
+    src: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.pub"
+  loop: "{{ wireguard_clients }}"
+  loop_control:
+    loop_var: client
+  register: client_pub_keys
+
+- name: Save WireGuard server configuration
+  ansible.builtin.copy:
+    dest: "/etc/wireguard/{{ wireguard_interface }}.conf"
+    content: |
+      [Interface]
+      Address = {{ wireguard_ip }}
+      ListenPort = {{ wireguard_port }}
+      PrivateKey = /etc/wireguard/{{ wireguard_interface }}.key
+
+      {% for client in wireguard_clients %}
+      [Peer]
+      PublicKey = {{ client_pub_keys.results[loop.index0].content | b64decode | trim }}
+      AllowedIPs = {{ client.ip }}
+      {% endfor %}
+    mode: "0600"
+
+- name: Enable IPv4 forwarding
+  ansible.builtin.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    reload: true
+
+- name: Configure NAT to allow VPN clients to access LAN
+  ansible.builtin.iptables:
+    table: nat
+    chain: POSTROUTING
+    source: "{{ wireguard_network }}"
+    out_interface: eth0
+    jump: MASQUERADE
+    state: present
+
+- name: Enable and start WireGuard interface
+  ansible.builtin.systemd:
+    name: "wg-quick@{{ wireguard_interface }}"
+    enabled: true
+    state: started

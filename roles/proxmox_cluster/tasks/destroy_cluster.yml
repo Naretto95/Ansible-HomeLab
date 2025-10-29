@@ -1,0 +1,39 @@
+---
+
+- name: Stop Proxmox cluster and corosync services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+  loop:
+    - pve-cluster
+    - corosync
+  ignore_errors: true
+
+- name: Start pmxcfs in local mode
+  ansible.builtin.command: pmxcfs -l
+  async: 5
+  poll: 0
+  changed_when: false
+  ignore_errors: true
+
+- name: Remove all files in /etc/corosync but keep the directory
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ lookup('ansible.builtin.fileglob', '/etc/corosync/*', wantlist=True) }}"
+  when: item is defined
+
+- name: Remove cluster configuration link
+  ansible.builtin.file:
+    path: /etc/pve/corosync.conf
+    state: absent
+
+- name: Kill any running pmxcfs processes
+  ansible.builtin.command: killall pmxcfs
+  ignore_errors: true
+  changed_when: false
+
+- name: Start Proxmox cluster service again
+  ansible.builtin.systemd:
+    name: pve-cluster
+    state: started

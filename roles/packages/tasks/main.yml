@@ -3,25 +3,35 @@
 - name: Validate packages_state and repos_state
   assert:
     that:
-      - packages_state is not defined or packages_state in ['present', 'absent']
-      - repos_state is not defined or repos_state in ['present', 'absent']
-    fail_msg: "packages_state and repos_state can only be 'present', 'absent', or undefined."
+      - packages_state in ['present', 'absent']
+      - repos_state in ['present', 'absent']
+    fail_msg: "packages_state and repos_state can only be 'present' or 'absent'."
 
-- name: Install Python with raw module
+- name: Check if Python3 is installed
+  raw: which python3
+  register: python_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Install Python if not present
   raw: |
     apt-get update -y
     apt-get install -y python3 python3-apt
-  when: os_family in ["Debian", "Proxmox"]
+  when: python_check.rc != 0
   changed_when: false
+
+- name: Gather host facts
+  ansible.builtin.setup:
+    gather_subset:
+        - distribution_release
 
 - name: Setup repositories
   include_tasks: repositories/setup_repositories.yml
-  when: repos_state | default('present') == 'present'
 
 - name: Install packages
   include_tasks: packages/install_packages.yml
-  when: packages_state | default('present') == 'present'
+  when: packages_state == 'present'
 
 - name: Remove packages
   include_tasks: packages/remove_packages.yml
-  when: packages_state | default('present') == 'absent'
+  when: packages_state == 'absent'

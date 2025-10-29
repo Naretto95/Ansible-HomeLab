@@ -1,0 +1,10 @@
+---
+
+- name: Delete LXC container on Proxmox
+  community.proxmox.proxmox:
+    api_user: "{{ ansible_user }}@pam"
+    api_password: "{{ ansible_password }}"
+    api_host: "{{ ansible_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ container.id }}"
+    state: absent

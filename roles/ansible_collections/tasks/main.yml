@@ -1,6 +1,0 @@
----
-
-- name: Install Ansible collections from requirements.yml
-  ansible.builtin.command:
-    cmd: ansible-galaxy collection install -r "{{ playbook_dir }}/../requirements.yml"
-  changed_when: false

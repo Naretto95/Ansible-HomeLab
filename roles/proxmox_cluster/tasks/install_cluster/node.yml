@@ -1,0 +1,28 @@
+---
+
+- name: Get master IP dynamically
+  set_fact:
+    master_ip: "{{ (groups['cluster'] | map('extract', hostvars) | selectattr('cluster_master', 'defined') | selectattr('cluster_master', 'equalto', true)  | first).ansible_host }}"
+    master_host: "{{ (groups['cluster'] | map('extract', hostvars) | selectattr('cluster_master', 'defined') | selectattr('cluster_master', 'equalto', true)  | first).inventory_hostname }}"
+
+- name: Generate SSH key on joining node
+  ansible.builtin.openssh_keypair:
+    path: /root/.ssh/id_rsa
+    type: ed25519
+  register: node_ssh_key
+
+- name: Add joining node key to master
+  authorized_key:
+    user: root
+    key: "{{ node_ssh_key.public_key }}"
+  delegate_to: "{{ master_host }}"
+
+- name: Add master to known_hosts
+  ansible.builtin.shell: "ssh-keyscan -H {{ master_ip }} >> /root/.ssh/known_hosts"
+  changed_when: false
+
+- name: Join cluster if not already joined
+  ansible.builtin.command: pvecm add {{ master_ip }} --use_ssh 1
+  register: join_cluster
+  changed_when: false
+  failed_when: "'unable to add node' in join_cluster.stderr or 'cluster not ready' in join_cluster.stdout"

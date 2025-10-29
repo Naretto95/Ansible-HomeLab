@@ -1,0 +1,123 @@
+---
+
+- name: Get gitlab containers info
+  set_fact:
+    gitlab_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab') | first | default(None) }}"
+    runner_container: "{{ docker_containers | selectattr('name', 'equalto', 'gitlab-runner') | first | default(None) }}"
+
+- name: Ensure GitLab and Runner containers exist
+  assert:
+    that:
+      - gitlab_container is not none
+      - runner_container is not none
+    fail_msg: >
+      One or both required containers are missing:
+      gitlab_container={{ gitlab_container }},
+      runner_container={{ runner_container }}
+
+- name: Ensure {{ gitlab_container.hostname }} resolves to localhost
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1 {{ gitlab_container.hostname }}"
+    state: present
+
+- name: Check health Gitlab
+  include_tasks: wait_gitlab_healthy.yml
+
+- name: Get instance runner token from GitLab Rails console
+  community.docker.docker_container_exec:
+    container: "{{ gitlab_container.name }}"
+    command: >
+      gitlab-rails runner "puts Gitlab::CurrentSettings.runners_registration_token"
+  register: token_output
+  changed_when: false
+
+- name: Register GitLab runner
+  community.docker.docker_container_exec:
+    container: "{{ runner_container.name }}"
+    command: >
+      gitlab-runner register --non-interactive --url http://{{ gitlab_container.hostname }}/ --registration-token {{ token_output.stdout }} --docker-image {{ runner_container.docker_image }} --executor {{ runner_container.executor }} --description "{{ runner_container.name }}" --tag-list "{{ runner_container.tags }}" --docker-network-mode {{ runner_container.networks[0] }}
+  changed_when: false
+
+- name: Disable GitLab user signups
+  community.docker.docker_container_exec:
+    container: "{{ gitlab_container.name }}"
+    command: >
+      gitlab-rails runner "ApplicationSetting.current.update!(signup_enabled: false)"
+  changed_when: false
+
+- name: Generate GitLab root personal access token
+  community.docker.docker_container_exec:
+    container: "{{ gitlab_container.name }}"
+    command: |
+      gitlab-rails runner "
+      user = User.find_by_username('root')
+      token = user.personal_access_tokens.find_by(name: '{{ gitlab_token }}')
+      unless token
+        token = user.personal_access_tokens.create!(
+          scopes: [:api, :read_user, :write_repository],
+          name: '{{ gitlab_token }}',
+          expires_at: 1.year.from_now
+        )
+        token.set_token('{{ gitlab_token }}')
+        token.save!
+      end
+      puts token.token
+      "
+  changed_when: false
+
+- name: Set registry_external_url in gitlab.rb
+  community.docker.docker_container_exec:
+    container: "{{ gitlab_container.name }}"
+    command: >
+      sed -i "s|^#\?\s*registry_external_url.*|registry_external_url 'http://{{ gitlab_container.hostname }}:5050'|" /etc/gitlab/gitlab.rb
+  changed_when: false
+
+- name: Set registry NGINX listen port
+  community.docker.docker_container_exec:
+    container: "{{ gitlab_container.name }}"
+    command: >
+      sed -i "s|^#\?\s*registry_nginx\['listen_port'\].*|registry_nginx['listen_port'] = 5050 |" /etc/gitlab/gitlab.rb
+  changed_when: false
+
+- name: Reconfigure GitLab
+  community.docker.docker_container_exec:
+    container: "{{ gitlab_container.name }}"
+    command: gitlab-ctl reconfigure
+  changed_when: false
+
+- name: Restart GitLab registry
+  community.docker.docker_container_exec:
+    container: "{{ gitlab_container.name }}"
+    command: gitlab-ctl restart registry
+  changed_when: false
+
+- name: Check health Gitlab
+  include_tasks: wait_gitlab_healthy.yml
+
+- name: Setup projects
+  include_tasks: setup_projects.yml
+
+- name: Setup docker images
+  include_tasks: setup_docker_images.yml
+
+- name: Delete GitLab root personal access token
+  shell: |
+    docker exec -i {{ gitlab_container.name }} gitlab-rails runner "
+      user = User.find_by_username('root')
+      token = user.personal_access_tokens.find_by(name: '{{ gitlab_token }}')
+      token.destroy! if token
+    "
+  changed_when: true
+
+- name: Get GitLab initial root password
+  become: true
+  ansible.builtin.command: "docker exec {{ gitlab_container.name }} grep 'Password:' /etc/gitlab/initial_root_password"
+  register: gitlab_password
+  changed_when: false
+  failed_when: false
+
+- name: Show GitLab initial root password
+  debug:
+    msg: "{{ gitlab_password.stdout }}"
+  when: gitlab_password.rc == 0
