@@ -21,3 +21,4 @@ wireguard_clients:
     allowed_ips:
       - 10.10.0.0/24
       - 192.168.1.0/24
+    qr: true

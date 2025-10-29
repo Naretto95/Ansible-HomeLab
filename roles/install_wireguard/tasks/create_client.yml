@@ -55,3 +55,11 @@
       Endpoint = {{ wireguard_endpoint }}:{{ wireguard_port }}
       AllowedIPs = {{ client.allowed_ips | join(', ') }}
     mode: "0600"
+
+- name: Generate QR code for WireGuard client
+  ansible.builtin.command: >
+    qrencode -o /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.png
+    < /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.conf
+  when: client.qr | default(false)
+  args:
+    creates: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.png"
