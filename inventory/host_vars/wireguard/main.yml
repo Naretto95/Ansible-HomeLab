@@ -24,9 +24,3 @@ lxc_container:
     - name: "{{ ansible_user }}"
       password: "{{ ansible_password }}"
       sudo: true
-
-packages:
-  - wireguard
-  - qrencode
-  - iproute2
-  - iptables

@@ -10,7 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 declare -A VAR_FILES
 VAR_FILES["cluster"]="${SCRIPT_DIR}/../inventory/group_vars/cluster/private_vars.yml"
 VAR_FILES["services"]="${SCRIPT_DIR}/../inventory/group_vars/services/private_vars.yml"
-VAR_FILES["wireguard"]="${SCRIPT_DIR}/../inventory/host_vars/wireguard/private_vars.yml"
+VAR_FILES["all"]="${SCRIPT_DIR}/../inventory/group_vars/all/private_vars.yml"
 
 for key in "${!VAR_FILES[@]}"; do
   FILE="${VAR_FILES[$key]}"
@@ -31,9 +31,9 @@ for key in "${!VAR_FILES[@]}"; do
     echo "ansible_password: \"${!VAR_PASS}\"" >> "${FILE}"
   fi
 
-  VAR_WG_KEY="${key}_client_public_key"
-  if [[ -n "${!VAR_WG_KEY:-}" ]]; then
-    echo "${key}_client_public_key: \"${!VAR_WG_KEY}\"" >> "${FILE}"
+  VAR_DOM="${key}_domain"
+  if [[ -n "${!VAR_DOM:-}" ]]; then
+    echo "domain: \"${!VAR_DOM}\"" >> "${FILE}"
   fi
 
   echo "[INFO] Private vars file created successfully at ${FILE}"
