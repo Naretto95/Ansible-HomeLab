@@ -1,7 +1,0 @@
----
-
-dependencies:
-  - role: precheck
-    vars:
-      required_group: "services"
-      required_os: "Debian"
