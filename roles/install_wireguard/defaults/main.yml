@@ -4,7 +4,7 @@ wireguard_port: 51820
 wireguard_interface: wg0
 wireguard_network: 10.10.0.0/24
 wireguard_endpoint: vpn.{{ domain }}
-wireguard_ip: 10.10.0.1/24
+wireguard_ip: 10.10.0.1/32
 wireguard_packages:
   - wireguard
   - qrencode
@@ -12,12 +12,12 @@ wireguard_packages:
   - iptables
 wireguard_clients:
   - name: "PC"
-    ip: 10.10.0.10/24
+    ip: 10.10.0.10/32
     allowed_ips:
       - 10.10.0.0/24
       - 192.168.1.0/24
   - name: "Phone"
-    ip: 10.10.0.11/24
+    ip: 10.10.0.11/32
     allowed_ips:
       - 10.10.0.0/24
       - 192.168.1.0/24
