@@ -58,7 +58,7 @@
 
 - name: Generate QR code for WireGuard client
   ansible.builtin.shell: |
-    qrencode -o /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.png < /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.conf
+    qrencode -t ansiutf8 -r /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.conf > /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.txt
   when: client.qr | default(false)
   args:
     creates: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.png"
