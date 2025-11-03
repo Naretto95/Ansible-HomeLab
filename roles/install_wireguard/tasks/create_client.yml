@@ -57,7 +57,7 @@
     mode: "0600"
 
 - name: Generate QR code for WireGuard client
-  ansible.builtin.command: >
+  ansible.builtin.shell: |
     qrencode -o /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.png
     < /etc/wireguard/clients/{{ client.name }}/{{ client.name }}.conf
   when: client.qr | default(false)
