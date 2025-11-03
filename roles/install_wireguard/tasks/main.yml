@@ -105,3 +105,4 @@
   ansible.builtin.systemd:
     name: "wg-quick@{{ wireguard_interface }}"
     state: restarted
+    enabled: true
