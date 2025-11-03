@@ -8,7 +8,7 @@ EPP: balance_power
 packages:
   - python3
   - python3-apt
-  - powertop
+  - powerstat
 
 debian_repos:
   # --- Proxmox No-Subscription Repo ---
