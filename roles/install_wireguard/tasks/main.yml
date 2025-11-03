@@ -56,13 +56,18 @@
   loop_control:
     loop_var: client
 
-- name: Read all client public keys
+- name: Read all clients public keys
   ansible.builtin.slurp:
     src: "/etc/wireguard/clients/{{ client.name }}/{{ client.name }}.pub"
   loop: "{{ wireguard_clients }}"
   loop_control:
     loop_var: client
-  register: client_pub_keys
+  register: clients_pub_keys
+
+- name: Read WireGuard private key
+  ansible.builtin.slurp:
+    src: "/etc/wireguard/{{ wireguard_interface }}.key"
+  register: wireguard_priv_data
 
 - name: Save WireGuard server configuration
   ansible.builtin.copy:
@@ -71,11 +76,11 @@
       [Interface]
       Address = {{ wireguard_ip }}
       ListenPort = {{ wireguard_port }}
-      PrivateKey = /etc/wireguard/{{ wireguard_interface }}.key
+      PrivateKey = {{ wireguard_priv_data.content | b64decode | trim }}
 
       {% for client in wireguard_clients %}
       [Peer]
-      PublicKey = {{ client_pub_keys.results[loop.index0].content | b64decode | trim }}
+      PublicKey = {{ clients_pub_keys.results[loop.index0].content | b64decode | trim }}
       AllowedIPs = {{ client.ip }}
       {% endfor %}
     mode: "0600"
