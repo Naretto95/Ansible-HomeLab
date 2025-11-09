@@ -1,12 +1,5 @@
 ---
 
-- name: Validate packages_state and repos_state
-  assert:
-    that:
-      - packages_state in ['present', 'absent']
-      - repos_state in ['present', 'absent']
-    fail_msg: "packages_state and repos_state can only be 'present' or 'absent'."
-
 - name: Check if Python3 is installed
   raw: which python3
   register: python_check

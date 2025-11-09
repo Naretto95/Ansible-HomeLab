@@ -21,7 +21,7 @@
   vars_files:
     - ../vars/setup.yml
   vars:
-    roles_condition: "{{ container_state is undefined or container_state == 'present' }}"
+    roles_condition: "{{ containers_state is undefined or containers_state == 'present' }}"
   roles:
     - role: docker_images
       when: roles_condition

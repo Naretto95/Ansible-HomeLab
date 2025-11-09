@@ -1,4 +1,4 @@
 ---
 
-container_state: present
+containers_state: present
 services: []
