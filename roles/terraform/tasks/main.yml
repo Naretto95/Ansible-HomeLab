@@ -1,0 +1,50 @@
+---
+
+- name: Gather services definitions from services
+  set_fact:
+    lxc_containers: "{{ services | select('in', groups['lxc_containers']) | map('extract', hostvars, 'lxc_container') | select('defined') | list }}"
+    virtual_machines: "{{ services | select('in', groups['virtual_machines']) | map('extract', hostvars, 'virtual_machine') | select('defined') | list }}"
+
+- name: Stop role if no lxc_containers or virtual_machines
+  meta: end_role
+  when: lxc_containers | length == 0 and virtual_machines | length == 0
+
+- block:
+    - name: Ensure destination directory exists
+      file:
+        path: "/tmp/terraform"
+        state: directory
+        mode: '0755'
+
+    - name: Generate Terraform provider file
+      template:
+        src: provider.tf.j2
+        dest: "/tmp/terraform/provider.tf"
+
+    - name: Generate terraform templates of containers
+      template:
+        src: "templates/container.tf.j2"
+        dest: "/tmp/terraform/{{ item.name }}.tf"
+      loop: "{{ lxc_containers }}"
+
+    - name: Generate terraform templates of virtual_machines
+      template:
+        src: "templates/virtual_machine.tf.j2"
+        dest: "/tmp/terraform/{{ item.name }}.tf"
+      loop: "{{ virtual_machines }}"
+
+    - name: Initialize Terraform
+      command: terraform init
+      args:
+        chdir: "/tmp/terraform"
+
+    - name: Create Terraform Plan
+      command: terraform plan -out=tfplan
+      args:
+        chdir: "/tmp/terraform"
+
+    - name: Apply Terraform Plan
+      command: terraform apply -auto-approve tfplan
+      args:
+        chdir: "/tmp/terraform"
+  delegate_to: localhost

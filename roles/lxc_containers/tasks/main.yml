@@ -1,8 +1,12 @@
 ---
 
-- name: Gather container definitions from services
+- name: Gather containers definitions from services
   set_fact:
     lxc_containers: "{{ services | select('in', groups['lxc_containers']) | map('extract', hostvars, 'lxc_container') | select('defined') | list }}"
+
+- name: Stop role if no lxc_containers
+  meta: end_role
+  when: lxc_containers | length == 0
 
 - name: Create containers on proxmox server
   include_tasks: install_container.yml

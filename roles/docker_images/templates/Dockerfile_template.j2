@@ -19,5 +19,13 @@ RUN pip install --no-cache-dir \
     {% for pkg in image.pip_packages %}{{ pkg }}{% if not loop.last %} {% endif %}{% endfor %}
 {% endif %}
 
+# Install Terraform
+{% if image.terraform is defined and image.terraform.version is defined %}
+RUN wget https://releases.hashicorp.com/terraform/{{ image.terraform.version }}/terraform_{{ image.terraform.version }}_linux_amd64.zip && \
+    unzip terraform_{{ image.terraform.version }}_linux_amd64.zip && \
+    mv terraform /usr/local/bin/ && \
+    rm terraform_{{ image.terraform.version }}_linux_amd64.zip
+{% endif %}
+
 # Set working directory
 WORKDIR /workspace

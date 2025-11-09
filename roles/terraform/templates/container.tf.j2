@@ -1,0 +1,28 @@
+resource "proxmox_lxc" "{{ item.name }}" {
+  vmid         = {{ item.id }}
+  hostname     = "{{ item.name }}"
+  ostemplate   = "{{ item.template }}"
+  cores        = {{ item.cores }}
+  memory       = {{ item.memory }}
+  swap         = {{ item.swap }}
+  unprivileged = {{ item.lxc_unprivileged | lower }}
+  password     = "{{ item.root_password }}"
+
+  {% if item.features is defined %}
+  features = {
+    {% for key, value in item.features.items() %}
+    {{ key }} = {{ value | lower }}
+    {% endfor %}
+  }
+  {% endif %}
+
+  network {
+    name    = "eth0"
+    bridge  = "{{ item.net_bridge }}"
+    ip      = "{{ item.net_ip_address }}/{{ item.net_subnet }}"
+    gateway = "{{ item.net_gateway }}"
+  }
+
+  rootfs = "{{ item.rootfs }}"
+  state  = "{{ services_state }}"
+}
