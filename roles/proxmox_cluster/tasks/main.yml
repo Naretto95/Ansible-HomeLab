@@ -1,11 +1,5 @@
 ---
 
-- name: Validate cluster_state
-  assert:
-    that:
-      - cluster_state in ['present', 'absent']
-    fail_msg: "cluster_state can only be 'present' or 'absent'."
-
 - name: Install cluster
   include_tasks: install_cluster/main.yml
   when: cluster_state == 'present'

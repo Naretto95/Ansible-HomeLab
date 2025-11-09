@@ -5,3 +5,4 @@ dependencies:
     vars:
       required_group: "cluster"
       required_os: "Proxmox"
+      states: "{{ cluster_state }}"

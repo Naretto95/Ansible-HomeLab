@@ -1,5 +1,5 @@
 ---
 
 base_directory: "{{ ansible_env.HOME }}"
-container_state: present
+containers_state: present
 docker_containers: []

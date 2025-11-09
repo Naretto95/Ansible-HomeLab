@@ -1,5 +1,10 @@
 ---
 
+- name: Conditionally include os_detect role
+  include_role:
+    name: os_detect
+  when: required_os is defined
+
 - name: Normalize required_group to a list
   ansible.builtin.set_fact:
     required_group_list: "{{ required_group if required_group is iterable and required_group is not string else [required_group] }}"
@@ -25,3 +30,19 @@
     - required_os_list is defined
     - required_os_list | length > 0
     - os_family | lower not in (required_os_list | map('lower') | list)
+
+- name: Normalize states to a list
+  ansible.builtin.set_fact:
+    states_list: "{{ states if states is iterable and states is not string else [states] }}"
+  when: states is defined
+
+- name: Validate allowed states
+  ansible.builtin.assert:
+    that:
+      - states_list | difference(['present', 'absent']) | length == 0
+    fail_msg: >
+      Invalid values in 'states'. Allowed values are:
+      - present
+      - absent
+      Received: {{ states_list }}
+  when: states_list is defined and states_list | length > 0

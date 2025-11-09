@@ -1,16 +1,10 @@
 ---
 
-- name: Validate container_state
-  assert:
-    that:
-      - container_state in ['present', 'absent']
-    fail_msg: "container_state can only be 'present' or 'absent'."
-
 - name: Ensure Docker networks exist or remove it
   community.docker.docker_network:
     name: "{{ item.key }}"
     driver: bridge
-    state: "{{ container_state }}"
+    state: "{{ containers_state }}"
   loop: "{{ docker_networks | dict2items }}"
   when: docker_networks is defined
 
@@ -19,11 +13,11 @@
   loop: "{{ docker_containers }}"
   loop_control:
     loop_var: container
-  when: container_state == 'present'
+  when: containers_state == 'present'
 
 - name: Remove containers in user's base directory
   include_tasks: destroy_container.yml
   loop: "{{ docker_containers }}"
   loop_control:
     loop_var: container
-  when: container_state == 'absent'
+  when: containers_state == 'absent'
