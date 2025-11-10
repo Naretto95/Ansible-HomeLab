@@ -1,4 +1,5 @@
 resource "proxmox_lxc" "{{ item.name }}" {
+  target_node  = "{{ proxmox_node }}"
   vmid         = {{ item.id }}
   hostname     = "{{ item.name }}"
   ostemplate   = "{{ item.template }}"
@@ -11,7 +12,7 @@ resource "proxmox_lxc" "{{ item.name }}" {
   {% if item.features is defined %}
   features = {
     {% for key, value in item.features.items() %}
-    {{ key }} = {{ value | lower }}
+    {{ key }} = {{ 'true' if value|int == 1 else 'false' }}
     {% endfor %}
   }
   {% endif %}
@@ -23,6 +24,10 @@ resource "proxmox_lxc" "{{ item.name }}" {
     gateway = "{{ item.net_gateway }}"
   }
 
-  rootfs = "{{ item.rootfs }}"
+  rootfs {
+    storage = "{{ item.rootfs.split(':')[0] }}"
+    size    = "{{ item.rootfs.split(':')[1] }}G"
+  }
+  
   state  = "{{ services_state }}"
 }
