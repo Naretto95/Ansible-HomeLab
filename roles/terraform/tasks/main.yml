@@ -12,25 +12,25 @@
 - block:
     - name: Ensure destination directory exists
       file:
-        path: "/tmp/terraform"
+        path: "/tmp/terraform/{{ ansible_host }}"
         state: directory
         mode: '0755'
 
     - name: Generate Terraform provider file
       template:
         src: provider.tf.j2
-        dest: "/tmp/terraform/provider.tf"
+        dest: "/tmp/terraform/{{ ansible_host }}/provider.tf"
 
     - name: Generate terraform templates of containers
       template:
         src: "templates/container.tf.j2"
-        dest: "/tmp/terraform/{{ item.name }}.tf"
+        dest: "/tmp/terraform/{{ ansible_host }}/{{ item.name }}.tf"
       loop: "{{ lxc_containers }}"
 
     - name: Generate terraform templates of virtual_machines
       template:
         src: "templates/virtual_machine.tf.j2"
-        dest: "/tmp/terraform/{{ item.name }}.tf"
+        dest: "/tmp/terraform/{{ ansible_host }}/{{ item.name }}.tf"
       loop: "{{ virtual_machines }}"
 
     - name: Initialize Terraform
