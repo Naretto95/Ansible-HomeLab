@@ -66,7 +66,10 @@ docker_images:
       - sshpass
       - git
       - openssh-client
+      - unzip
     pip_packages:
       - ansible
       - proxmoxer
       - requests
+    terraform:
+      version: 1.13.5

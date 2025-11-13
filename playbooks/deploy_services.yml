@@ -4,6 +4,7 @@
   hosts: cluster
   roles:
     - lxc_containers
+    - user_management
 
 - name: Deploy proxmox services basic configuration
   hosts: services

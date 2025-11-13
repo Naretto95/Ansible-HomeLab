@@ -1,0 +1,22 @@
+---
+
+- name: Create user if not exists
+  ansible.builtin.command: >
+    pct exec {{ container_user.0.id }} -- bash -c "id -u {{ container_user.1.name }} || adduser --disabled-password --gecos '' {{ container_user.1.name }}"
+  changed_when: false
+
+- name: Set user password
+  ansible.builtin.command: >
+    pct exec {{ container_user.0.id }} -- bash -c "echo '{{ container_user.1.name }}:{{ container_user.1.password }}' | chpasswd"
+  changed_when: false
+
+- name: Ensure sudo is installed in container
+  ansible.builtin.command: >
+    pct exec {{ container_user.0.id }} -- bash -c "dpkg -s sudo >/dev/null 2>&1 || (apt-get update -y && apt-get install -y sudo)"
+  changed_when: false
+
+- name: Add user to sudo group if needed
+  ansible.builtin.command: >
+    pct exec {{ container_user.0.id }} -- usermod -aG sudo {{ container_user.1.name }}
+  changed_when: false
+  when: container_user.1.sudo | default(false)

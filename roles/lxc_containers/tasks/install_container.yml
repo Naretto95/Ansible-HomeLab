@@ -6,39 +6,33 @@
     creates: "/var/lib/vz/template/cache/{{ container.template | regex_replace('^local:vztmpl/', '') }}"
   changed_when: false
 
-- name: Create LXC container on Proxmox
-  community.proxmox.proxmox:
-    api_user: "{{ ansible_user }}@pam"
-    api_password: "{{ ansible_password }}"
-    api_host: "{{ ansible_host }}"
-    node: "{{ proxmox_node }}"
-    vmid: "{{ container.id }}"
-    hostname: "{{ container.name }}"
-    ostemplate: "{{ container.template }}"
-    memory: "{{ container.memory }}"
-    swap: "{{ container.swap }}"
-    cores: "{{ container.cores }}"
-    unprivileged: "{{ container.lxc_unprivileged }}"
-    features: "{{ container.features }}"
-    password: "{{ container.root_password }}"
-    netif:
-      net0: "name=eth0,bridge={{ container.net_bridge }},ip={{ container.net_ip_address }}/{{ container.net_subnet }},gw={{ container.net_gateway }}"
-    disk: "{{ container.rootfs }}"
-    state: present
-  delegate_to: localhost
+- block:
+    - name: Create LXC container on Proxmox
+      community.proxmox.proxmox:
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        api_host: "{{ ansible_host }}"
+        node: "{{ proxmox_node }}"
+        vmid: "{{ container.id }}"
+        hostname: "{{ container.name }}"
+        ostemplate: "{{ container.template }}"
+        memory: "{{ container.memory }}"
+        swap: "{{ container.swap }}"
+        cores: "{{ container.cores }}"
+        unprivileged: "{{ container.lxc_unprivileged }}"
+        features: "{{ container.features }}"
+        password: "{{ container.root_password }}"
+        netif:
+          net0: "name=eth0,bridge={{ container.net_bridge }},ip={{ container.net_ip_address }}/{{ container.net_subnet }},gw={{ container.net_gateway }}"
+        disk: "{{ container.rootfs }}"
+        state: present
 
-- name: Start LXC container
-  community.proxmox.proxmox:
-    api_user: "{{ ansible_user }}@pam"
-    api_password: "{{ ansible_password }}"
-    api_host: "{{ ansible_host }}"
-    node: "{{ proxmox_node }}"
-    vmid: "{{ container.id }}"
-    state: started
+    - name: Start LXC container
+      community.proxmox.proxmox:
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        api_host: "{{ ansible_host }}"
+        node: "{{ proxmox_node }}"
+        vmid: "{{ container.id }}"
+        state: started
   delegate_to: localhost
-
-- name: Create users on container
-  include_tasks: create_user.yml
-  loop: "{{ container.users | default([]) }}"
-  loop_control:
-    loop_var: user

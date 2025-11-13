@@ -1,0 +1,16 @@
+---
+
+- name: Gather users definitions from services
+  set_fact:
+    lxc_containers_users: "{{ (services | select('in', groups['lxc_containers']) | map('extract', hostvars, 'lxc_container') | select('defined') | list) | subelements('users', skip_missing=True) }}"
+    virtual_machines_users: "{{ (services | select('in', groups['virtual_machines']) | map('extract', hostvars, 'virtual_machine') | select('defined') | list) | subelements('users', skip_missing=True) }}"
+
+- name: Stop role if no users in lxc_containers or virtual_machines
+  meta: end_role
+  when: lxc_containers_users | length == 0 and virtual_machines_users | length == 0
+
+- name: Create users for all containers
+  include_tasks: create_users_container.yml
+  loop: "{{ lxc_containers_users }}"
+  loop_control:
+    loop_var: container_user
