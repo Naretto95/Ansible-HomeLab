@@ -33,18 +33,9 @@
         dest: "/tmp/terraform/{{ ansible_host }}/{{ item.name }}.tf"
       loop: "{{ virtual_machines }}"
 
-    - name: Initialize Terraform
-      command: terraform init
-      args:
-        chdir: "/tmp/terraform"
-
-    - name: Create Terraform Plan
-      command: terraform plan -out=tfplan
-      args:
-        chdir: "/tmp/terraform"
-
-    - name: Apply Terraform Plan
-      command: terraform apply -auto-approve tfplan
-      args:
-        chdir: "/tmp/terraform"
+    - name: Initialize and apply Terraform configuration
+      community.general.terraform:
+        project_path: "/tmp/terraform/{{ ansible_host }}"
+        state: present
+        force_init: yes
   delegate_to: localhost
