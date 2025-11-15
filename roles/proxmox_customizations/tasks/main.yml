@@ -5,3 +5,29 @@
     path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
     regexp: "res\\.data\\.status\\.toLowerCase\\(\\) !== 'active'"
     replace: 'false /* subscription nag disabled */'
+
+- name: Inject script to remove "No valid subscription" dialog
+  ansible.builtin.blockinfile:
+    path: /usr/share/pve-yew-mobile-gui/index.html.tpl
+    marker: "<!-- ANSIBLE_REMOVE_SUB_DIALOG {mark} -->"
+    insertbefore: "</body>"
+    block: |
+      <script>  
+          function watchAndRemoveDialog() {  
+              const observer = new MutationObserver(() => {  
+                  const dialog = document.querySelector('dialog[aria-label="No valid subscription"]');  
+                  if (dialog) {  
+                      dialog.remove();  
+                      console.log("Removed dialog: No valid subscription");  
+                  }  
+              });
+
+              observer.observe(document.body, {  
+                  childList: true,  
+                  subtree: true  
+              });  
+          }
+
+          // Start after page load  
+          setTimeout(watchAndRemoveDialog, 100);  
+      </script>
