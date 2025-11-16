@@ -30,6 +30,10 @@
     patterns: "BAT*"
   register: battery_dirs
 
+- name: debug
+  ansible.builtin.debug:
+    var: battery_dirs
+
 - name: Check for charge_control_end_threshold on each battery
   ansible.builtin.stat:
     path: "{{ item.path }}/charge_control_end_threshold"
