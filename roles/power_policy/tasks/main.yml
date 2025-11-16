@@ -22,3 +22,22 @@
     enabled: true
     state: started
   when: "'pstate' in cpu_driver.stdout"
+
+- name: Discover battery directories (BAT*)
+  ansible.builtin.find:
+    paths: /sys/class/power_supply/
+    file_type: directory
+    patterns: "BAT*"
+  register: battery_dirs
+
+- name: Check for charge_control_end_threshold on each battery
+  ansible.builtin.stat:
+    path: "{{ item.path }}/charge_control_end_threshold"
+  with_items: "{{ battery_dirs.files }}"
+  register: battery_thresholds
+
+- name: Set charge limit to 60% where supported
+  ansible.builtin.command:
+    cmd: "sh -c 'echo 60 > {{ item.item.path }}/charge_control_end_threshold'"
+  when: item.stat.exists
+  loop: "{{ battery_thresholds.results }}"
