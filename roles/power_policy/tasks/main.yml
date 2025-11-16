@@ -24,15 +24,14 @@
   when: "'pstate' in cpu_driver.stdout"
 
 - name: Discover battery directories (BAT*)
-  ansible.builtin.find:
-    paths: /sys/class/power_supply/
-    file_type: directory
-    patterns: "BAT*"
-  register: battery_dirs
+  ansible.builtin.command: "ls -d /sys/class/power_supply/BAT*"
+  changed_when: false
+  ignore_errors: true
+  register: battery_dirs_raw
 
-- name: debug
-  ansible.builtin.debug:
-    var: battery_dirs
+- name: Normalize battery directories list
+  ansible.builtin.set_fact:
+    battery_dirs: "{{ battery_dirs_raw.stdout_lines | default([]) }}"
 
 - name: Check for charge_control_end_threshold on each battery
   ansible.builtin.stat:
