@@ -24,9 +24,9 @@
   when: "'pstate' in cpu_driver.stdout"
 
 - name: Discover battery directories (BAT*)
-  ansible.builtin.command: "ls -d /sys/class/power_supply/BAT*"
+  ansible.builtin.shell: "ls -d /sys/class/power_supply/BAT*"
   changed_when: false
-  ignore_errors: true
+  failed_when: false
   register: battery_dirs_raw
 
 - name: Normalize battery directories list
@@ -35,12 +35,12 @@
 
 - name: Check for charge_control_end_threshold on each battery
   ansible.builtin.stat:
-    path: "{{ item.path }}/charge_control_end_threshold"
-  with_items: "{{ battery_dirs.files }}"
+    path: "{{ item }}/charge_control_end_threshold"
+  with_items: "{{ battery_dirs }}"
   register: battery_thresholds
 
 - name: Set charge limit to 60% where supported
   ansible.builtin.command:
-    cmd: "sh -c 'echo 60 > {{ item.item.path }}/charge_control_end_threshold'"
+    cmd: "sh -c 'echo 60 > {{ item.item }}/charge_control_end_threshold'"
   when: item.stat.exists
   loop: "{{ battery_thresholds.results }}"
