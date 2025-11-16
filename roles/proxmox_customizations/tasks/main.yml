@@ -7,7 +7,7 @@
     line: 'HandleLidSwitch=ignore'
     state: present
   notify: Restart systemd-logind
-  
+
 - name: Remove subscription nag
   ansible.builtin.replace:
     path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
