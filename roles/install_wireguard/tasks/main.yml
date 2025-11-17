@@ -1,11 +1,5 @@
 ---
 
-- name: Install wireguard required packages
-  include_role:
-    name: packages
-  vars:
-    packages: "{{ wireguard_packages }}"
-
 - name: Create WireGuard directories
   ansible.builtin.file:
     path: "{{ item }}"
