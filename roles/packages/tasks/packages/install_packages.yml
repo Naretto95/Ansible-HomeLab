@@ -4,7 +4,9 @@
   apt:
     upgrade: true
     update_cache: true
-  when: os_family in ["Debian", "Proxmox"]
+  when: 
+    - update_packages | bool
+    - os_family in ["Debian", "Proxmox"]
 
 - name: Install packages 
   apt:
