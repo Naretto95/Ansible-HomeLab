@@ -2,4 +2,5 @@
 
 packages_state: present
 repos_state: present
+update_packages: true
 packages: []

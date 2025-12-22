@@ -4,16 +4,16 @@
   stat:
     path: "/sys/bus/pci/devices/{{ gpu_device_id }}"
   register: gpu_device
-  when: unmount_gpu
+  when: unmount_gpu | bool
 
 - name: Unmount GPU from PCI bus
   shell: "echo 1 > /sys/bus/pci/devices/{{ gpu_device_id }}/remove"
   when: 
-    - unmount_gpu 
+    - unmount_gpu | bool
     - gpu_device.stat.exists
   changed_when: false
 
 - name: Remount (rescan) PCI bus
   shell: "echo 1 > /sys/bus/pci/rescan"
-  when: not unmount_gpu
+  when: not unmount_gpu | bool
   changed_when: false
