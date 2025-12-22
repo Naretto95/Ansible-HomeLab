@@ -10,6 +10,7 @@ packages:
   - python3-apt
   - powerstat
   - powertop
+  - lm-sensors
 
 debian_repos:
   # --- Proxmox No-Subscription Repo ---
