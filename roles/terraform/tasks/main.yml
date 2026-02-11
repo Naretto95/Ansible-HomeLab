@@ -10,6 +10,12 @@
   when: lxc_containers | length == 0 and virtual_machines | length == 0
 
 - block:
+
+    - name: Clear old Terraform files
+      file:
+        path: "/tmp/terraform/{{ ansible_host }}"
+        state: absent
+
     - name: Ensure destination directory exists
       file:
         path: "/tmp/terraform/{{ ansible_host }}"
