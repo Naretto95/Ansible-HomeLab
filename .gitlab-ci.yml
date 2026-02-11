@@ -18,7 +18,7 @@ stages:
 
 setup_vars:
   <<: *default_job
-  stage: setup_infra
+  stage: setup_vars
   script:
     - echo "[INFO] Setup vars"
     - chmod -R o-w .
