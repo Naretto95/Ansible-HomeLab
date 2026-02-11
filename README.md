@@ -78,6 +78,20 @@ Customize deployments through:
 4. Test thoroughly
 5. Submit a pull request
 
+## 💡 Pipeline Variables
+
+| Variable Name       | Description |
+|--------------------|-------------|
+| `all_domain`        | The main domain used for all deployed services. |
+| `deploy_services`   | Boolean flag (`true`/`false`) to control whether service deployment should run. |
+| `services_user`     | Username for services authentication. |
+| `services_password` | Password for services authentication. |
+| `cluster_user`      | Username for cluster management (e.g., Kubernetes/Ansible). |
+| `cluster_password`  | Password for cluster management. |
+| `setup_infra`       | Boolean flag (`true`/`false`) to control whether infrastructure setup should run. |
+
+> 🔒 **Note:** All passwords and sensitive credentials are stored securely in GitLab CI/CD as protected variables and are not stored in the repository.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
