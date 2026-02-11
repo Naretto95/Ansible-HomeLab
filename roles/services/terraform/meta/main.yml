@@ -1,0 +1,8 @@
+---
+
+dependencies:
+  - role: common/precheck
+    vars:
+      required_group: "cluster"
+      required_os: "Proxmox"
+      states: "{{ services_state }}"

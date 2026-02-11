@@ -1,8 +1,0 @@
----
-
-dependencies:
-  - role: precheck
-    vars:
-      states:
-        - "{{ packages_state }}"
-        - "{{ repos_state }}"

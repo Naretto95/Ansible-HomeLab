@@ -37,7 +37,11 @@ This Ansible project provides automated setup and deployment of infrastructure c
 
 ```
 ├── playbooks/           # Main playbooks
-├── roles/              # Ansible roles for specific tasks
+├── roles/              # Ansible roles organized by category
+│   ├── common/         # Common system roles (packages, DNS, precheck)
+│   ├── infrastructure/ # Infrastructure management roles
+│   ├── local/          # Local development roles
+│   └── services/       # Service deployment roles
 ├── inventory/          # Host inventories and variables
 ├── vars/               # Global variables
 ├── scripts/            # Utility scripts
@@ -53,14 +57,29 @@ This Ansible project provides automated setup and deployment of infrastructure c
 
 ## Roles Overview
 
-- `packages`: System package management
-- `dns_setup`: DNS configuration
-- `docker_containers`: Docker container lifecycle
-- `docker_images`: Docker image building
-- `gitlab_setup`: GitLab installation and configuration
-- `proxmox_cluster`: Proxmox cluster management
-- `wireguard`: VPN setup
-- And more...
+### Common Roles
+- `common/packages`: System package management
+- `common/dns_setup`: DNS configuration
+- `common/precheck`: Pre-deployment checks
+- `common/os_detect`: Operating system detection
+
+### Local Roles
+- `local/disable_motd`: Disable message of the day
+- `local/docker_containers`: Docker container lifecycle
+- `local/docker_images`: Docker image building
+- `local/gitlab_setup`: GitLab installation and configuration
+
+### Infrastructure Roles
+- `infrastructure/gpu_manager`: GPU management
+- `infrastructure/power_policy`: Power management policies
+- `infrastructure/proxmox_cluster`: Proxmox cluster management
+- `infrastructure/proxmox_customizations`: Proxmox customizations
+
+### Services Roles
+- `services/install_wireguard`: WireGuard VPN setup
+- `services/lxc_containers`: LXC container management
+- `services/terraform`: Terraform integration
+- `services/user_management`: User management
 
 ## Configuration
 
