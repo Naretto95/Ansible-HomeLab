@@ -1,5 +1,7 @@
 ---
 
+image: gitlab.local:5050/root/ansible-homelab/ansible-image:latest
+
 .default_schedule_rules: &schedule_rules
   - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
   - when: never
