@@ -2,7 +2,7 @@
 
 - name: Conditionally include os_detect role
   include_role:
-    name: os_detect
+    name: common/os_detect
   when: required_os is defined
 
 - name: Normalize required_group to a list
