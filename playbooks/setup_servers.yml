@@ -4,13 +4,13 @@
   hosts: cluster
   gather_facts: false
   roles:
-    - dns_setup
-    - packages
+    - common/dns_setup
+    - common/packages
 
 - name: Applying basic configuration
   hosts: cluster
   roles:
-    - power_policy
-    - gpu_manager
-    - proxmox_customizations
-    - proxmox_cluster
+    - infrastructure/power_policy
+    - infrastructure/gpu_manager
+    - infrastructure/proxmox_customizations
+    - infrastructure/proxmox_cluster

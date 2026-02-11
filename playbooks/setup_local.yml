@@ -5,7 +5,7 @@
   vars_files:
     - ../vars/setup.yml
   roles:
-    - disable_motd
+    - local/disable_motd
 
 - name: Creating dockers
   hosts: localhost
@@ -13,8 +13,8 @@
   vars_files:
     - ../vars/setup.yml
   roles:
-    - packages
-    - docker_containers
+    - common/packages
+    - local/docker_containers
 
 - name: Config gitlab
   hosts: localhost
@@ -23,7 +23,7 @@
   vars:
     roles_condition: "{{ containers_state is undefined or containers_state == 'present' }}"
   roles:
-    - role: docker_images
+    - role: local/docker_images
       when: roles_condition
-    - role: gitlab_setup
+    - role: local/gitlab_setup
       when: roles_condition

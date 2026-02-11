@@ -1,6 +1,0 @@
----
-
-dependencies:
-  - role: precheck
-    vars:
-      states: "{{ containers_state }}"
