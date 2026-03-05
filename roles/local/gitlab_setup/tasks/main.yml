@@ -32,12 +32,21 @@
   register: token_output
   changed_when: false
 
+- name: Check if GitLab runner already registered
+  community.docker.docker_container_exec:
+    container: "{{ runner_container.name }}"
+    command: cat /etc/gitlab-runner/config.toml
+  register: runner_config
+  failed_when: false
+  changed_when: false
+
 - name: Register GitLab runner
   community.docker.docker_container_exec:
     container: "{{ runner_container.name }}"
     command: >
       gitlab-runner register --non-interactive --url http://{{ gitlab_container.hostname }}/ --registration-token {{ token_output.stdout }} --docker-image {{ runner_container.docker_image }} --executor {{ runner_container.executor }} --description "{{ runner_container.name }}" --tag-list "{{ runner_container.tags }}" --docker-network-mode {{ runner_container.networks[0] }}
   changed_when: false
+  when: runner_container.name not in runner_config.stdout
 
 - name: Disable GitLab user signups
   community.docker.docker_container_exec:
