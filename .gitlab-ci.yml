@@ -1,28 +1,23 @@
 ---
 
-.default_schedule_rules: &schedule_rules
-  - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
-  - when: never
+image: gitlab.local:5050/root/ansible-homelab/ansible-image:latest
 
-.default_job: &default_job
-  image: gitlab.local:5050/root/ansible-homelab/ansible-image:latest
-  tags:
-    - ansible
-    - automation
-  before_script:
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - when: never
+
+before_script:
     - chmod -R o-w .
     - chmod +x ./scripts/setup_vars.sh
     - ./scripts/setup_vars.sh
     - ansible-galaxy collection install -r "./requirements.yml"
-  rules:
-    *schedule_rules
 
 stages:
   - setup_infra
   - deploy_services
 
 setup_infra:
-  <<: *default_job
   stage: setup_infra
   script:
     - echo "[INFO] Starting Ansible playbook for infrastructure"
@@ -32,7 +27,6 @@ setup_infra:
       when: on_success
 
 deploy_services:
-  <<: *default_job
   stage: deploy_services
   script:
     - echo "[INFO] Starting Ansible playbook for services"
