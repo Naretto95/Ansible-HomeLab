@@ -1,22 +1,20 @@
 ---
 
-image: gitlab.local:5050/root/ansible-homelab/ansible-image:latest
-
-default:
-  tags:
-    - ansible
-    - automation
-
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
     - when: never
 
-before_script:
+default:
+  image: gitlab.local:5050/root/ansible-homelab/ansible-image:latest
+  tags:
+    - ansible
+    - automation
+  before_script:
     - chmod -R o-w .
     - chmod +x ./scripts/setup_vars.sh
     - ./scripts/setup_vars.sh
-    - ansible-galaxy collection install -r "./requirements.yml"
+    - ansible-galaxy collection install -r requirements.yml
 
 stages:
   - setup_infra
