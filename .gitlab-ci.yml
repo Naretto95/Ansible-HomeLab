@@ -2,6 +2,11 @@
 
 image: gitlab.local:5050/root/ansible-homelab/ansible-image:latest
 
+default:
+  tags:
+    - ansible
+    - automation
+
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
