@@ -3,4 +3,4 @@
 dependencies:
   - role: common/role_guard
     vars:
-      states: "{{ packages_state }}"
+      states: "{{ repos_state }}"
