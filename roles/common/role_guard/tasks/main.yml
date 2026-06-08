@@ -19,7 +19,7 @@
         - (os_family | lower) not in (required_os_list | map('lower') | list)
   
   when:
-      - required_os_list | length > 0
+    - required_os_list | length > 0
 
 - name: Fail if host is not in required groups
   ansible.builtin.fail:
