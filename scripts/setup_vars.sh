@@ -23,7 +23,6 @@ for VAR_NAME in  $(compgen -e); do
   for group in "${VAR_GROUPS[@]}"; do
     prefix="${group}_"
     if [[ "${VAR_NAME}" == "${prefix}"* ]]; then
-      echo "Matched $VAR_NAME to group $group"
       var_key="${VAR_NAME#"${prefix}"}"
       value="${!VAR_NAME}"
 
