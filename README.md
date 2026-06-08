@@ -42,7 +42,7 @@ This Ansible project provides automated setup and deployment of infrastructure c
 ```
 ├── playbooks/           # Main playbooks
 ├── roles/              # Ansible roles organized by category
-│   ├── common/         # Common system roles (packages, DNS, precheck)
+│   ├── common/         # Common system roles (packages, DNS, role_guard)
 │   ├── infrastructure/ # Infrastructure management roles
 │   ├── local/          # Local development roles
 │   └── services/       # Service deployment roles
@@ -64,7 +64,7 @@ This Ansible project provides automated setup and deployment of infrastructure c
 ### Common Roles
 - `common/packages`: System package management
 - `common/dns_setup`: DNS configuration
-- `common/precheck`: Pre-deployment checks
+- `common/role_guard`: Pre-deployment checks
 - `common/os_detect`: Operating system detection
 
 ### Local Roles

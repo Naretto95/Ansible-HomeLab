@@ -1,0 +1,37 @@
+---
+
+- name: Normalize role guard inputs
+  ansible.builtin.set_fact:
+    required_group_list: "{{ required_group if required_group is iterable and required_group is not string else [required_group] }}"
+    required_os_list: "{{ required_os if required_os is iterable and required_os is not string else [required_os] }}"
+    states_list: "{{ states if states is iterable and states is not string else [states] }}"
+
+- block:
+
+    - name: Conditionally include os_detect role
+      include_role:
+        name: common/os_detect
+
+    - name: Fail if OS is not allowed
+      ansible.builtin.fail:
+        msg: "OS '{{ os_family }}' not allowed. Allowed: {{ required_os_list }}"
+      when:
+        - (os_family | lower) not in (required_os_list | map('lower') | list)
+  
+  when:
+    - required_os_list | length > 0
+
+- name: Fail if host is not in required groups
+  ansible.builtin.fail:
+    msg: "Host must be in one of: {{ required_group_list }}"
+  when:
+    - required_group_list | length > 0
+    - (group_names | intersect(required_group_list)) | length == 0
+
+- name: Validate states
+  ansible.builtin.assert:
+    that:
+      - states_list | difference(['present', 'absent']) | length == 0
+    fail_msg: "Invalid states: {{ states_list }} (allowed: present, absent)"
+  when:
+    - states_list | length > 0
