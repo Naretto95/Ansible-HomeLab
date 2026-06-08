@@ -22,9 +22,6 @@ done
 for VAR_NAME in $(env | cut -d= -f1); do
   for group in "${VAR_GROUPS[@]}"; do
     prefix="${group}_"
-    printf 'VAR_NAME=[%s]\n' "$VAR_NAME"
-    printf 'group=[%s]\n' "$group"
-    printf 'prefix=[%s]\n' "$prefix"
     if [[ "${VAR_NAME}" == "${prefix}"* ]]; then
       echo "Matched $VAR_NAME to group $group"
       var_key="${VAR_NAME#"${prefix}"}"
