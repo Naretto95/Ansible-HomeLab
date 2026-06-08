@@ -19,7 +19,7 @@ for key in "${!VAR_FILES[@]}"; do
   echo "[INFO] Initialized ${FILE}"
 done
 
-for VAR_NAME in $(env | cut -d= -f1); do
+for VAR_NAME in  $(compgen -e); do
   for group in "${VAR_GROUPS[@]}"; do
     prefix="${group}_"
     if [[ "${VAR_NAME}" == "${prefix}"* ]]; then
