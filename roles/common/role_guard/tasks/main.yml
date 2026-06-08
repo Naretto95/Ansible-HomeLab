@@ -28,13 +28,6 @@
     - required_group_list | length > 0
     - (group_names | intersect(required_group_list)) | length == 0
 
-- name: Fail if OS is not allowed
-  ansible.builtin.fail:
-    msg: "OS '{{ os_family }}' not allowed. Allowed: {{ required_os_list }}"
-  when:
-    - required_os_list | length > 0
-    - (os_family | lower) not in (required_os_list | map('lower') | list)
-
 - name: Validate states
   ansible.builtin.assert:
     that:
