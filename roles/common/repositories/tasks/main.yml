@@ -1,0 +1,25 @@
+---
+
+- name: Gather host facts
+  ansible.builtin.setup:
+    gather_subset:
+        - distribution_release
+
+- name: Download GPG keys for repositories
+  ansible.builtin.get_url:
+    url: "{{ item.gpg_key }}"
+    dest: "/usr/share/keyrings/{{ item.filename }}.gpg"
+    mode: '0644'
+  loop: "{{ debian_repos }}"
+  when:
+    - os_family in ["Debian", "Proxmox"]
+
+- name: Install packages
+  include_tasks: debian.yml
+  when: 
+    - os_family == "Debian"
+
+- name: Remove packages
+  include_tasks: proxmox.yml
+  when:
+    - os_family == "Proxmox"

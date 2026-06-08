@@ -6,11 +6,13 @@
     - services/lxc_containers
     - services/user_management
 
-- name: Deploy proxmox services basic configuration
+- name: Bootstrap service nodes (DNS, repos, packages)
   hosts: services
   gather_facts: false
   roles:
     - common/dns_setup
+    - common/bootstrap
+    - common/repositories
     - common/packages
 
 - name: Deploy proxmox services specific configuration

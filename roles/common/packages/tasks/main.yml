@@ -1,30 +1,14 @@
 ---
 
-- name: Check if Python3 is installed
-  raw: which python3
-  register: python_check
-  ignore_errors: true
-  changed_when: false
-
-- name: Install Python if not present
-  raw: |
-    apt-get update -y
-    apt-get install -y python3 python3-apt
-  when: python_check.rc != 0
-  changed_when: false
-
 - name: Gather host facts
   ansible.builtin.setup:
     gather_subset:
         - distribution_release
 
-- name: Setup repositories
-  include_tasks: repositories/setup_repositories.yml
-
 - name: Install packages
-  include_tasks: packages/install_packages.yml
+  include_tasks: install_packages.yml
   when: packages_state == 'present'
 
 - name: Remove packages
-  include_tasks: packages/remove_packages.yml
+  include_tasks: remove_packages.yml
   when: packages_state == 'absent'

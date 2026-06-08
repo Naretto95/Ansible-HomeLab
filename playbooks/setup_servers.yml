@@ -1,10 +1,12 @@
 ---
 
-- name: Install required packages
+- name: Bootstrap cluster nodes (DNS, repos, packages)
   hosts: cluster
   gather_facts: false
   roles:
     - common/dns_setup
+    - common/bootstrap
+    - common/repositories
     - common/packages
 
 - name: Applying basic configuration
