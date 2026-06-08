@@ -13,6 +13,7 @@
   vars_files:
     - ../vars/setup.yml
   roles:
+    - common/repositories
     - common/packages
     - local/docker_containers
 
