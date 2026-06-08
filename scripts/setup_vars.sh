@@ -21,9 +21,11 @@ done
 
 for VAR_NAME in $(env | cut -d= -f1); do
   VAR_NAME_LC="${VAR_NAME,,}"
+  echo "Found env var: $VAR_NAME"
   for group in "${GROUPS[@]}"; do
     prefix="${group}_"
     if [[ "${VAR_NAME_LC}" == "${prefix}"* ]]; then
+      echo "Matched $VAR_NAME to group $group"
       var_key="${VAR_NAME_LC#"${prefix}"}"
       value="${!VAR_NAME_LC}"
 
