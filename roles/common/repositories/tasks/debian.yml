@@ -1,0 +1,9 @@
+---
+
+- name: Add APT repositories
+  apt_repository:
+    repo: "{{ item.repo }}"
+    filename: "{{ item.filename }}"
+    state: "{{ repos_state }}"
+    update_cache: true
+  loop: "{{ debian_repos }}"
