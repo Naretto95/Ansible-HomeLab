@@ -10,7 +10,7 @@ VAR_FILES["cluster"]="${SCRIPT_DIR}/../inventory/group_vars/cluster/private_vars
 VAR_FILES["services"]="${SCRIPT_DIR}/../inventory/group_vars/services/private_vars.yml"
 VAR_FILES["all"]="${SCRIPT_DIR}/../inventory/group_vars/all/private_vars.yml"
 
-GROUPS=("cluster" "services" "all")
+VAR_GROUPS=("cluster" "services" "all")
 
 for key in "${!VAR_FILES[@]}"; do
   FILE="${VAR_FILES[$key]}"
@@ -20,7 +20,7 @@ for key in "${!VAR_FILES[@]}"; do
 done
 
 for VAR_NAME in $(env | cut -d= -f1); do
-  for group in "${GROUPS[@]}"; do
+  for group in "${VAR_GROUPS[@]}"; do
     prefix="${group}_"
     printf 'VAR_NAME=[%s]\n' "$VAR_NAME"
     printf 'group=[%s]\n' "$group"
