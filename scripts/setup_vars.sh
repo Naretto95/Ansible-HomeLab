@@ -25,12 +25,14 @@ for VAR_NAME in $(env | cut -d= -f1); do
     if [[ "${VAR_NAME}" == "${prefix}"* ]]; then
       var_key="${VAR_NAME#"${prefix}"}"
       value="${!VAR_NAME}"
+
       if [[ -n "${value}" ]]; then
         FILE="${VAR_FILES[$group]}"
         echo "[INFO] Wrote ${var_key} to ${FILE}"
       fi
+
     fi
-  fi
+  done
 done
 
 echo "[INFO] Private vars files updated successfully"
