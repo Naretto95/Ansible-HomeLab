@@ -8,7 +8,6 @@
   loop: "{{ debian_repos }}"
   when:
     - os_family in ["Debian", "Proxmox"]
-    - debian_repos is defined
 
 - name: Add APT repositories
   apt_repository:
@@ -19,30 +18,28 @@
   loop: "{{ debian_repos }}"
   when: 
     - os_family == "Debian"
-    - debian_repos is defined
 
-- name: Add APT repositories (Deb822 format)
-  ansible.builtin.deb822_repository:
-    name: "{{ item.filename }}"
-    types: ["deb"]
-    uris: "{{ item.repo.split(' ')[1] }}"
-    suites: "{{ item.repo.split(' ')[2] }}"
-    components: "{{ item.repo.split(' ')[3:] }}"
-    enabled: true
-    signed_by: "/usr/share/keyrings/{{ item.filename }}.gpg"
-    state: present
-  loop: "{{ debian_repos }}"
-  when: 
-    - os_family == "Proxmox"
-    - debian_repos is defined
+- block:
 
-- name: Remove Proxmox enterprise .sources file
-  ansible.builtin.file:
-    path: "/etc/apt/sources.list.d/{{ item }}"
-    state: absent
-  loop:
-    - pve-enterprise.sources
-    - ceph.sources
-  when: 
+    - name: Add APT repositories (Deb822 format)
+      ansible.builtin.deb822_repository:
+        name: "{{ item.filename }}"
+        types: ["deb"]
+        uris: "{{ item.repo.split(' ')[1] }}"
+        suites: "{{ item.repo.split(' ')[2] }}"
+        components: "{{ item.repo.split(' ')[3:] }}"
+        enabled: true
+        signed_by: "/usr/share/keyrings/{{ item.filename }}.gpg"
+        state: present
+      loop: "{{ debian_repos }}"
+
+    - name: Remove Proxmox enterprise .sources file
+      ansible.builtin.file:
+        path: "/etc/apt/sources.list.d/{{ item }}"
+        state: absent
+      loop:
+        - pve-enterprise.sources
+        - ceph.sources
+
+  when:
     - os_family == "Proxmox"
-    - debian_repos is defined
