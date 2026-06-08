@@ -2,9 +2,9 @@
 
 - name: Normalize role guard inputs
   ansible.builtin.set_fact:
-    required_group_list: "{{ (required_group | default([])) | list }}"
-    required_os_list: "{{ (required_os | default([])) | list }}"
-    states_list: "{{ (states | default([])) | list }}"
+    required_group_list: "{{ required_group if required_group is iterable and required_group is not string else [required_group] }}"
+    required_os_list: "{{ required_os if required_os is iterable and required_os is not string else [required_os] }}"
+    states_list: "{{ states if states is iterable and states is not string else [states] }}"
 
 - name: Fail if host is not in required groups
   ansible.builtin.fail:
