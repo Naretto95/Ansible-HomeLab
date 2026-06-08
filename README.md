@@ -33,6 +33,10 @@ This Ansible project provides automated setup and deployment of infrastructure c
    - Server setup: `ansible-playbook playbooks/setup_servers.yml`
    - Deploy services: `ansible-playbook playbooks/deploy_services.yml`
 
+4. **Prepare private variables**:
+   - Export private values using environment variables with prefixes: `cluster_`, `services_`, or `all_`
+   - Run `./scripts/setup_vars.sh` to create or update `inventory/group_vars/<group>/private_vars.yml`
+
 ## Project Structure
 
 ```
@@ -87,6 +91,7 @@ Customize deployments through:
 - `inventory/group_vars/`: Environment-specific variables
 - `inventory/host_vars/`: Host-specific variables
 - `vars/setup.yml`: Global setup variables
+- `scripts/setup_vars.sh`: Generates private variable files from environment variables
 - Role defaults in `roles/*/defaults/main.yml`
 
 ## Contributing
@@ -99,15 +104,15 @@ Customize deployments through:
 
 ## 💡 Pipeline Variables
 
-| Variable Name       | Description |
-|--------------------|-------------|
-| `all_domain`        | The main domain used for all deployed services. |
-| `deploy_services`   | Boolean flag (`true`/`false`) to control whether service deployment should run. |
-| `services_user`     | Username for services authentication. |
-| `services_password` | Password for services authentication. |
-| `cluster_user`      | Username for cluster management (e.g., Kubernetes/Ansible). |
-| `cluster_password`  | Password for cluster management. |
-| `setup_infra`       | Boolean flag (`true`/`false`) to control whether infrastructure setup should run. |
+| Variable Name               | Description |
+|-----------------------------|-------------|
+| `all_domain`                | The main domain used for all deployed services. |
+| `deploy_services`           | Boolean flag (`true`/`false`) to control whether service deployment should run. |
+| `services_ansible_user`     | Username for services authentication. |
+| `services_ansible_password` | Password for services authentication. |
+| `cluster_ansible_user`      | Username for cluster management (e.g., Kubernetes/Ansible). |
+| `cluster_ansible_password`  | Password for cluster management. |
+| `setup_infra`               | Boolean flag (`true`/`false`) to control whether infrastructure setup should run. |
 
 > 🔒 **Note:** All passwords and sensitive credentials are stored securely in GitLab CI/CD as protected variables and are not stored in the repository.
 
