@@ -6,11 +6,20 @@
     required_os_list: "{{ required_os if required_os is iterable and required_os is not string else [required_os] }}"
     states_list: "{{ states if states is iterable and states is not string else [states] }}"
 
-- name: Conditionally include os_detect role
-  include_role:
-    name: common/os_detect
+- block:
+
+    - name: Conditionally include os_detect role
+      include_role:
+        name: common/os_detect
+
+    - name: Fail if OS is not allowed
+      ansible.builtin.fail:
+        msg: "OS '{{ os_family }}' not allowed. Allowed: {{ required_os_list }}"
+      when:
+        - (os_family | lower) not in (required_os_list | map('lower') | list)
+  
   when:
-    - required_os_list | length > 0
+      - required_os_list | length > 0
 
 - name: Fail if host is not in required groups
   ansible.builtin.fail:
