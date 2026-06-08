@@ -20,11 +20,12 @@ for key in "${!VAR_FILES[@]}"; do
 done
 
 for VAR_NAME in $(env | cut -d= -f1); do
+  VAR_NAME_LC="${VAR_NAME,,}"
   for group in "${GROUPS[@]}"; do
     prefix="${group}_"
-    if [[ "${VAR_NAME}" == "${prefix}"* ]]; then
-      var_key="${VAR_NAME#"${prefix}"}"
-      value="${!VAR_NAME}"
+    if [[ "${VAR_NAME_LC}" == "${prefix}"* ]]; then
+      var_key="${VAR_NAME_LC#"${prefix}"}"
+      value="${!VAR_NAME_LC}"
 
       if [[ -n "${value}" ]]; then
         FILE="${VAR_FILES[$group]}"
