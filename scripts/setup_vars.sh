@@ -28,6 +28,7 @@ for VAR_NAME in $(env | cut -d= -f1); do
 
       if [[ -n "${value}" ]]; then
         FILE="${VAR_FILES[$group]}"
+        echo "${var_key}: ${value}" >> "${FILE}"
         echo "[INFO] Wrote ${var_key} to ${FILE}"
       fi
 
