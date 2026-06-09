@@ -23,4 +23,4 @@
       when: inventory_hostname == 'wireguard'
 
     - role: services/postgresql
-      when: inventory_hostname == 'django_db'
+      when: inventory_hostname == 'django-db'
