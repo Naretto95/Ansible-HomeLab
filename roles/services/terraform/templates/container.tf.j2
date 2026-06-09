@@ -1,17 +1,17 @@
-resource "proxmox_lxc" "{{ item.lxc_container.name }}" {
+resource "proxmox_lxc" "{{ item.name }}" {
   target_node  = "{{ proxmox_node }}"
-  vmid         = {{ item.lxc_container.id }}
-  hostname     = "{{ item.lxc_container.name }}"
-  ostemplate   = "{{ item.lxc_container.template }}"
-  cores        = {{ item.lxc_container.cores }}
-  memory       = {{ item.lxc_container.memory }}
-  swap         = {{ item.lxc_container.swap }}
-  unprivileged = {{ item.lxc_container.lxc_unprivileged | lower }}
-  password     = "{{ item.lxc_container.root_password }}"
+  vmid         = {{ item.id }}
+  hostname     = "{{ item.name }}"
+  ostemplate   = "{{ item.template }}"
+  cores        = {{ item.cores }}
+  memory       = {{ item.memory }}
+  swap         = {{ item.swap }}
+  unprivileged = {{ item.lxc_unprivileged | lower }}
+  password     = "{{ item.root_password }}"
 
-  {% if item.lxc_container.features is defined %}
+  {% if item.features is defined %}
   features = {
-    {% for key, value in item.lxc_container.features.items() %}
+    {% for key, value in item.features.items() %}
     {{ key }} = {{ 'true' if value|int == 1 else 'false' }}
     {% endfor %}
   }
@@ -19,14 +19,14 @@ resource "proxmox_lxc" "{{ item.lxc_container.name }}" {
 
   network {
     name    = "eth0"
-    bridge  = "{{ item.lxc_container.net_bridge }}"
-    ip      = "{{ item.lxc_container.net_ip_address }}/{{ item.lxc_container.net_subnet }}"
-    gateway = "{{ item.lxc_container.net_gateway }}"
+    bridge  = "{{ item.net_bridge }}"
+    ip      = "{{ item.net_ip_address }}/{{ item.net_subnet }}"
+    gateway = "{{ item.net_gateway }}"
   }
 
   rootfs {
-    storage = "{{ item.lxc_container.rootfs.split(':')[0] }}"
-    size    = "{{ item.lxc_container.rootfs.split(':')[1] }}G"
+    storage = "{{ item.rootfs.split(':')[0] }}"
+    size    = "{{ item.rootfs.split(':')[1] }}G"
   }
   
   state  = "{{ services_state }}"

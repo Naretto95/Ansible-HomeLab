@@ -1,17 +1,17 @@
-resource "proxmox_vm_qemu" "{{ item.virtual_machine.name }}" {
+resource "proxmox_vm_qemu" "{{ item.name }}" {
   target_node  = "{{ proxmox_node }}"
-  clone = "{{ item.virtual_machine.template }}"
-  vmid    = {{ item.virtual_machine.id }}
-  name    = "{{ item.virtual_machine.name }}"
-  cores   = {{ item.virtual_machine.cores }}
-  memory  = {{ item.virtual_machine.memory }}
+  clone = "{{ item.template }}"
+  vmid    = {{ item.id }}
+  name    = "{{ item.name }}"
+  cores   = {{ item.cores }}
+  memory  = {{ item.memory }}
   onboot  = true
   agent   = 1
 
   disk {
     slot     = 0
-    size     = "{{ item.virtual_machine.disk_size }}"
-    storage  = "{{ item.virtual_machine.storage }}"
+    size     = "{{ item.disk_size }}"
+    storage  = "{{ item.storage }}"
     type     = "scsi"
   }
 
@@ -19,13 +19,13 @@ resource "proxmox_vm_qemu" "{{ item.virtual_machine.name }}" {
 
   network {
     model   = "virtio"
-    bridge  = "{{ item.virtual_machine.net_bridge }}"
+    bridge  = "{{ item.net_bridge }}"
   }
 
-  {% if item.virtual_machine.cloud_init is defined and item.virtual_machine.cloud_init %}
-  ciuser     = "{{ item.virtual_machine.cloud_user }}"
-  cipassword = "{{ item.virtual_machine.cloud_password }}"
-  ipconfig0  = "ip={{ item.virtual_machine.net_ip_address }}/{{ item.virtual_machine.net_subnet }},gw={{ item.virtual_machine.net_gateway }}"
+  {% if item.cloud_init is defined and item.cloud_init %}
+  ciuser     = "{{ item.cloud_user }}"
+  cipassword = "{{ item.cloud_password }}"
+  ipconfig0  = "ip={{ item.net_ip_address }}/{{ item.net_subnet }},gw={{ item.net_gateway }}"
   {% endif %}
 
   state = "{{ services_state }}"

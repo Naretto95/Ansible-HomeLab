@@ -26,25 +26,25 @@
 
 - name: Filter services that do not exist yet
   set_fact:
-    virtual_machines: "{{ virtual_machines | rejectattr('virtual_machine.id', 'in', existing_vms) | list }}"
-    lxc_containers: "{{ lxc_containers | rejectattr('lxc_container.id', 'in', existing_lxcs) | list }}"
+    virtual_machines: "{{ virtual_machines | rejectattr('id', 'in', existing_vms) | list }}"
+    lxc_containers: "{{ lxc_containers | rejectattr('id', 'in', existing_lxcs) | list }}"
 
 - block:
 
     - name: Ensure LXC template is present
-      ansible.builtin.command: "pveam download local {{ item.lxc_container.template | regex_replace('^local:vztmpl/', '') }}"
+      ansible.builtin.command: "pveam download local {{ item.template | regex_replace('^local:vztmpl/', '') }}"
       args:
-        creates: "/var/lib/vz/template/cache/{{ item.lxc_container.template | regex_replace('^local:vztmpl/', '') }}"
+        creates: "/var/lib/vz/template/cache/{{ item.template | regex_replace('^local:vztmpl/', '') }}"
       changed_when: false
       loop: "{{ lxc_containers }}"
 
     - name: Ensure VM image is present
       ansible.builtin.get_url:
-        url: "{{ item.virtual_machine.image_url }}"
-        dest: "/var/lib/vz/template/qcow/{{ item.virtual_machine.image | basename }}"
+        url: "{{ item.image_url }}"
+        dest: "/var/lib/vz/template/qcow/{{ item.image | basename }}"
         mode: "0644"
       args:
-        creates: "/var/lib/vz/template/qcow/{{ item.virtual_machine.image | basename }}"
+        creates: "/var/lib/vz/template/qcow/{{ item.image | basename }}"
       loop: "{{ virtual_machines }}"
       
   when: services_state == 'present'
