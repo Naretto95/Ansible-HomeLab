@@ -41,7 +41,7 @@
     - name: Ensure VM image is present
       ansible.builtin.get_url:
         url: "{{ item.image_url }}"
-        dest: "/var/lib/vz/template/qcow/{{ item.image | basename }}"
+        dest: "/var/lib/vz/template/cache/{{ item.image | basename }}"
         mode: "0644"
       loop: "{{ virtual_machines }}"
       
