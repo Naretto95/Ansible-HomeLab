@@ -43,8 +43,6 @@
         url: "{{ item.image_url }}"
         dest: "/var/lib/vz/template/qcow/{{ item.image | basename }}"
         mode: "0644"
-      args:
-        creates: "/var/lib/vz/template/qcow/{{ item.image | basename }}"
       loop: "{{ virtual_machines }}"
       
   when: services_state == 'present'
