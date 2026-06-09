@@ -26,8 +26,8 @@
 
 - name: Filter services that do not exist yet
   set_fact:
-    virtual_machines: {{ virtual_machines | rejectattr('virtual_machine.id', 'in', existing_vms) | list }}
-    lxc_containers: {{ lxc_containers | rejectattr('lxc_container.id', 'in', existing_lxcs) | list }}
+    virtual_machines: "{{ virtual_machines | rejectattr('virtual_machine.id', 'in', existing_vms) | list }}"
+    lxc_containers: "{{ lxc_containers | rejectattr('lxc_container.id', 'in', existing_lxcs) | list }}"
 
 - block:
 
