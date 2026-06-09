@@ -9,6 +9,46 @@
   meta: end_role
   when: lxc_containers | length == 0 and virtual_machines | length == 0
 
+- name: Get existing Proxmox VMs
+  ansible.builtin.command: qm list
+  register: qm_list
+  changed_when: false
+
+- name: Get existing Proxmox LXCs
+  ansible.builtin.command: pct list
+  register: pct_list
+  changed_when: false
+
+- name: Parse existing VM/LXC IDs
+  set_fact:
+    existing_vms: "{{ qm_list.stdout_lines[1:] | map('split') | map('first') | list }}"
+    existing_lxcs: "{{ pct_list.stdout_lines[1:] | map('split') | map('first') | list }}"
+
+- name: Filter services that do not exist yet
+  set_fact:
+    virtual_machines: {{ virtual_machines | rejectattr('virtual_machine.id', 'in', existing_vms) | list }}
+    lxc_containers: {{ lxc_containers | rejectattr('lxc_container.id', 'in', existing_lxcs) | list }}
+
+- block:
+
+    - name: Ensure LXC template is present
+      ansible.builtin.command: "pveam download local {{ item.lxc_container.template | regex_replace('^local:vztmpl/', '') }}"
+      args:
+        creates: "/var/lib/vz/template/cache/{{ item.lxc_container.template | regex_replace('^local:vztmpl/', '') }}"
+      changed_when: false
+      loop: "{{ lxc_containers }}"
+
+    - name: Ensure VM image is present
+      ansible.builtin.get_url:
+        url: "{{ item.virtual_machine.image_url }}"
+        dest: "/var/lib/vz/template/qcow/{{ item.virtual_machine.image | basename }}"
+        mode: "0644"
+      args:
+        creates: "/var/lib/vz/template/qcow/{{ item.virtual_machine.image | basename }}"
+      loop: "{{ virtual_machines }}"
+      
+  when: services_state == 'present'
+
 - block:
 
     - name: Clear old Terraform files
