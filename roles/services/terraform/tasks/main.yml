@@ -68,6 +68,20 @@
         state: directory
         mode: '0755'
 
+    - name: Ensure Terraform provider config exists
+      ansible.builtin.copy:
+        dest: "/tmp/terraform/{{ ansible_host }}/versions.tf"
+        mode: "0644"
+        content: |
+          terraform {
+            required_providers {
+              proxmox = {
+                source  = "proxmox"
+                version = "~> 0.0.1"
+              }
+            }
+          }
+
     - name: Generate Terraform provider file
       template:
         src: provider.tf.j2
