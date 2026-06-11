@@ -17,4 +17,5 @@
     ciuser: "{{ vm.cloud_user }}"
     cipassword: "{{ vm.cloud_password }}"
     clone: "{{ vm.template_id }}" 
+    state: present
   delegate_to: localhost
