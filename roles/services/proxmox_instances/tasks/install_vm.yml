@@ -6,7 +6,6 @@
     api_password: "{{ ansible_password }}"
     api_host: "{{ ansible_host }}"
     node: "{{ proxmox_node }}"
-    vmid: "{{ vm.id }}"
     name: "{{ vm.name }}"
     cores: "{{ vm.cores }}"
     memory: "{{ vm.memory }}"
