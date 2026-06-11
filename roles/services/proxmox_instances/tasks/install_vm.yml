@@ -1,32 +1,21 @@
 ---
 
-- block:
-    - name: Create VM on Proxmox
-      community.proxmox.proxmox_kvm:
-        api_user: "{{ ansible_user }}@pam"
-        api_password: "{{ ansible_password }}"
-        api_host: "{{ ansible_host }}"
-        node: "{{ proxmox_node }}"
-        newid: "{{ vm.id }}"
-        name: "{{ vm.name }}"
-        cores: "{{ vm.cores }}"
-        memory: "{{ vm.memory }}"
-        net:
-          net0: "virtio,bridge={{ vm.net_bridge }}"
-        ipconfig:
-          ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
-        ciuser: "{{ vm.cloud_user }}"
-        cipassword: "{{ vm.cloud_password }}"
-        clone: "{{ vm.template }}" 
-        state: present
-
-    - name: Start VM
-      community.proxmox.proxmox:
-        api_user: "{{ ansible_user }}@pam"
-        api_password: "{{ ansible_password }}"
-        api_host: "{{ ansible_host }}"
-        node: "{{ proxmox_node }}"
-        vmid: "{{ vm.id }}"
-        state: started
-        
-  delegate_to: localhost
+- name: Create VM on Proxmox
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ ansible_user }}@pam"
+    api_password: "{{ ansible_password }}"
+    api_host: "{{ ansible_host }}"
+    node: "{{ proxmox_node }}"
+    newid: "{{ vm.id }}"
+    name: "{{ vm.name }}"
+    cores: "{{ vm.cores }}"
+    memory: "{{ vm.memory }}"
+    net:
+      net0: "virtio,bridge={{ vm.net_bridge }}"
+    ipconfig:
+      ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
+    ciuser: "{{ vm.cloud_user }}"
+    cipassword: "{{ vm.cloud_password }}"
+    clone: "{{ vm.template }}" 
+    state: started
+    delegate_to: localhost
