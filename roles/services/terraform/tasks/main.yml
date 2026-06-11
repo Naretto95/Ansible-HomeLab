@@ -43,7 +43,7 @@
         url: "{{ item.image }}"
         dest: "/var/lib/vz/template/cache/{{ item.image | basename }}"
         mode: "0644"
-        timeout: 300
+        timeout: 600
       loop: "{{ virtual_machines }}"
       
   when: services_state == 'present'
