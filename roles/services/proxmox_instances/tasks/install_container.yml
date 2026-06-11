@@ -20,7 +20,7 @@
         netif:
           net0: "name=eth0,bridge={{ container.net_bridge }},ip={{ container.net_ip_address }}/{{ container.net_subnet }},gw={{ container.net_gateway }}"
         disk: "{{ container.rootfs }}"
-        state: started
+        state: present
 
     - name: Start LXC container
       community.proxmox.proxmox:

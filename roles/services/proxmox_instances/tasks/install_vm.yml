@@ -18,7 +18,7 @@
         ciuser: "{{ vm.cloud_user }}"
         cipassword: "{{ vm.cloud_password }}"
         clone: "{{ vm.template }}" 
-        state: started
+        state: present
 
     - name: Start VM
       community.proxmox.proxmox_kvm:
