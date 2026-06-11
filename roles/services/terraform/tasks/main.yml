@@ -31,7 +31,9 @@
 
 - name: Remove VMs on proxmox server
   include_role: 
-    name: remove_proxmox_instance
+    name: proxmox_instances
+  vars:
+    services_state: absent
   when: services_state == 'absent'
 
 - block:

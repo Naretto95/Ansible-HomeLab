@@ -1,0 +1,5 @@
+---
+
+templates_state: present
+lxc_templates: []
+vm_templates: []

@@ -15,7 +15,7 @@ postgresql_allowed_networks:
 virtual_machine:
   name: django-db
   id: 102
-  image: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+  template_id: 103
   cores: 2
   memory: 4096
   disk_size: 40

@@ -9,3 +9,11 @@ services:
   - wireguard
   - django-db
   - django-app
+
+vm_templates:
+  - image_url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+    name: debian-13
+    id: 103
+
+lxc_templates:
+  - name: debian-13-standard_13.1-2_amd64.tar.zst

@@ -1,0 +1,21 @@
+---
+
+- name: Create VM on Proxmox
+  community.proxmox.proxmox:
+    api_user: "{{ ansible_user }}@pam"
+    api_password: "{{ ansible_password }}"
+    api_host: "{{ ansible_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ vm.id }}"
+    hostname: "{{ vm.name }}"
+    cores: "{{ vm.cores }}"
+    memory: "{{ vm.memory }}"
+    netif:
+      net0: "virtio,bridge={{ vm.net_bridge }}"
+    ipconfig:
+      ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
+    ciuser: "{{ vm.cloud_user }}"
+    cipassword: "{{ vm.cloud_password }}"
+    clone: "{{ vm.template_id }}" 
+    state: present
+  delegate_to: localhost

@@ -1,0 +1,47 @@
+---
+
+- name: Check if template exists
+  ansible.builtin.command: "qm status {{ vm_template.id }}"
+  register: template_check
+  failed_when: false
+  changed_when: false
+
+- name: Check if VM image exists
+  ansible.builtin.stat:
+    path: "/var/lib/vz/template/cache/{{ vm_template.image_url | basename }}"
+  register: vm_image_stat
+
+- name: Download VM image
+  ansible.builtin.get_url:
+    url: "{{ vm_template.image_url }}"
+    dest: "/var/lib/vz/template/cache/{{ vm_template.image_url | basename }}"
+    mode: "0644"
+    timeout: 600
+  when: not vm_image_stat.stat.exists
+
+- block:
+
+    - name: Create base VM for template
+      ansible.builtin.command: >
+        qm create {{ vm_template.id }}
+        --name {{ vm_template.name }}
+
+    - name: Import disk into template
+      ansible.builtin.command: >
+        qm importdisk {{ vm_template.id }}
+        /var/lib/vz/template/cache/{{ vm_template.image_url | basename }}
+        local-lvm
+      
+    - name: Configure VM boot + cloud-init
+      ansible.builtin.command: >
+        qm set {{ vm_template.id }}
+        --scsihw virtio-scsi-pci
+        --boot c --bootdisk scsi0
+        --scsi0 local-lvm:vm-{{ vm_template.id }}-disk-0
+        --ide2 local-lvm:cloudinit
+
+    - name: Convert VM to template
+      ansible.builtin.command: qm template {{ vm_template.id }}
+  
+  when: template_check.rc != 0
+  changed_when: false

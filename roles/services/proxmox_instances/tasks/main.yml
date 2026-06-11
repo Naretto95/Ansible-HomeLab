@@ -1,0 +1,30 @@
+---
+
+- name: Gather services definitions from services
+  set_fact:
+    lxc_containers: "{{ services | select('in', groups['lxc_containers']) | map('extract', hostvars, 'lxc_container') | select('defined') | list }}"
+    virtual_machines: "{{ services | select('in', groups['virtual_machines']) | map('extract', hostvars, 'virtual_machine') | select('defined') | list }}"
+
+- name: Stop role if no lxc_containers or virtual_machines
+  meta: end_role
+  when: lxc_containers | length == 0 and virtual_machines | length == 0
+
+- block:
+
+    - name: Create containers on proxmox server
+      include_tasks: install_container.yml
+      loop: "{{ lxc_containers }}"
+      loop_control:
+        loop_var: container
+
+    - name: Create VMs on proxmox server
+      include_tasks: install_vm.yml
+      loop: "{{ virtual_machines }}"
+      loop_control:
+        loop_var: vm
+
+  when: services_state == 'present'
+
+- name: Remove instances on proxmox server
+  include_tasks: remove_instances.yml
+  when: services_state == 'absent'
