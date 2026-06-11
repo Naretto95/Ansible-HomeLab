@@ -11,6 +11,7 @@
         name: "{{ vm.name }}"
         cores: "{{ vm.cores }}"
         memory: "{{ vm.memory }}"
+        full: true
         net:
           net0: "virtio,bridge={{ vm.net_bridge }}"
         ipconfig:
