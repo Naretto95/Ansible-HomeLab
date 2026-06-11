@@ -15,7 +15,7 @@ postgresql_allowed_networks:
 virtual_machine:
   name: django-db
   id: 102
-  template_id: 103
+  template: debian-13
   cores: 2
   memory: 4096
   disk_size: 40
