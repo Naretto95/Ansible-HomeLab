@@ -40,7 +40,7 @@
 
     - name: Ensure VM image is present
       ansible.builtin.get_url:
-        url: "{{ item.image_url }}"
+        url: "{{ item.image }}"
         dest: "/var/lib/vz/template/cache/{{ item.image | basename }}"
         mode: "0644"
         timeout: 300
