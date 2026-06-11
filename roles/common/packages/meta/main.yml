@@ -1,6 +1,7 @@
 ---
 
 dependencies:
+  - role: common/os_detect
   - role: common/role_guard
     vars:
       states: "{{ packages_state }}"

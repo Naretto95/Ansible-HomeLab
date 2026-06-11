@@ -63,6 +63,7 @@ docker_images:
     tag: latest
     base_image: python:3.11-slim
     apt_packages:
+      - wget
       - sshpass
       - git
       - openssh-client
