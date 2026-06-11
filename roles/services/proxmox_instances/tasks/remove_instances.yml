@@ -9,3 +9,4 @@
     vmid: "{{ item.id }}"
     state: absent
   loop: "{{ lxc_containers + virtual_machines }}"
+  delegate_to: localhost
