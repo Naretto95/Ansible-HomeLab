@@ -21,8 +21,8 @@
 
 - name: Parse existing VM/LXC IDs
   set_fact:
-    existing_vms: "{{ qm_list.stdout_lines[1:] | map('split') | map('first') | list }}"
-    existing_lxcs: "{{ pct_list.stdout_lines[1:] | map('split') | map('first') | list }}"
+    existing_vms: "{{ qm_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
+    existing_lxcs: "{{ pct_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
 
 - name: Filter services that do not exist yet
   set_fact:

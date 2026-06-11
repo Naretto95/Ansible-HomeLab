@@ -11,9 +11,9 @@ resource "proxmox_lxc" "{{ item.name }}" {
 
   {% if item.features is defined %}
   features = {
-    {% for key, value in item.features.items() %}
-    {{ key }} = {{ 'true' if value|int == 1 else 'false' }}
-    {% endfor %}
+  {% for feature in item.features %}
+    {{ feature.split('=')[0] }} = {{ 'true' if feature.split('=')[1] == '1' else 'false' }}
+  {% endfor %}
   }
   {% endif %}
 
