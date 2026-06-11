@@ -1,33 +1,42 @@
-resource "proxmox_lxc" "{{ item.name }}" {
-  target_node  = "{{ proxmox_node }}"
-  vmid         = {{ item.id }}
-  hostname     = "{{ item.name }}"
-  ostemplate   = "{{ item.template }}"
-  cores        = {{ item.cores }}
-  memory       = {{ item.memory }}
-  swap         = {{ item.swap }}
-  unprivileged = {{ item.lxc_unprivileged | lower }}
-  password     = "{{ item.root_password }}"
+resource "proxmox_virtual_environment_container" "{{ item.name }}" {
+  node_name = "{{ proxmox_node }}"
+  vm_id     = {{ item.id }}
+  hostname  = "{{ item.name }}"
+  unprivileged = {{ item.lxc_unprivileged | bool }}
+  root_password = "{{ item.root_password }}"
 
-  {% if item.features is defined %}
-  features = {
-  {% for feature in item.features %}
-    {{ feature.split('=')[0] }} = {{ 'true' if feature.split('=')[1] == '1' else 'false' }}
-  {% endfor %}
+  template {
+    storage = "{{ item.template_storage | default('local') }}"
+    id      = "{{ item.template_id }}"
   }
-  {% endif %}
 
-  network {
-    name    = "eth0"
-    bridge  = "{{ item.net_bridge }}"
-    ip      = "{{ item.net_ip_address }}/{{ item.net_subnet }}"
-    gateway = "{{ item.net_gateway }}"
+  cpu {
+    cores = {{ item.cores }}
+  }
+
+  memory {
+    dedicated = {{ item.memory }}
+    swap      = {{ item.swap }}
+  }
+
+  initialization {
+    ip_config {
+      ipv4 {
+        address = "{{ item.net_ip_address }}/{{ item.net_subnet }}"
+        gateway = "{{ item.net_gateway }}"
+      }
+    }
+  }
+
+  network_interface {
+    name   = "eth0"
+    bridge = "{{ item.net_bridge }}"
   }
 
   rootfs {
-    storage = "{{ item.rootfs.split(':')[0] }}"
-    size    = "{{ item.rootfs.split(':')[1] }}G"
+    storage_id = "{{ item.rootfs.split(':')[0] }}"
+    size       = "{{ item.rootfs.split(':')[1] }}G"
   }
-  
-  state  = "{{ services_state }}"
+
+  started = true
 }

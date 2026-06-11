@@ -29,6 +29,10 @@
     virtual_machines: "{{ virtual_machines | rejectattr('id', 'in', existing_vms) | list }}"
     lxc_containers: "{{ lxc_containers | rejectattr('id', 'in', existing_lxcs) | list }}"
 
+- name: Remove VMs on proxmox server
+  include_role: remove_proxmox_instance
+  when: services_state == 'absent'
+
 - block:
 
     - name: Ensure LXC template is present
@@ -52,56 +56,8 @@
         timeout: 600
       when: not item.stat.exists
       loop: "{{ vm_image_stat.results }}"
-      
+
+    - name: Create VMs on proxmox server
+      include_tasks: install_instances.yml
+
   when: services_state == 'present'
-
-- block:
-
-    - name: Clear old Terraform files
-      file:
-        path: "/tmp/terraform/{{ ansible_host }}"
-        state: absent
-
-    - name: Ensure destination directory exists
-      file:
-        path: "/tmp/terraform/{{ ansible_host }}"
-        state: directory
-        mode: '0755'
-
-    - name: Ensure Terraform provider config exists
-      ansible.builtin.copy:
-        dest: "/tmp/terraform/{{ ansible_host }}/versions.tf"
-        mode: "0644"
-        content: |
-          terraform {
-            required_providers {
-              proxmox = {
-                source  = "bpg/proxmox"
-              }
-            }
-          }
-
-    - name: Generate Terraform provider file
-      template:
-        src: provider.tf.j2
-        dest: "/tmp/terraform/{{ ansible_host }}/provider.tf"
-
-    - name: Generate terraform templates of containers
-      template:
-        src: "templates/container.tf.j2"
-        dest: "/tmp/terraform/{{ ansible_host }}/{{ item.name }}.tf"
-      loop: "{{ lxc_containers }}"
-
-    - name: Generate terraform templates of virtual_machines
-      template:
-        src: "templates/virtual_machine.tf.j2"
-        dest: "/tmp/terraform/{{ ansible_host }}/{{ item.name }}.tf"
-      loop: "{{ virtual_machines }}"
-
-    - name: Initialize and apply Terraform configuration
-      community.general.terraform:
-        project_path: "/tmp/terraform/{{ ansible_host }}"
-        state: present
-        force_init: yes
-
-  delegate_to: localhost

@@ -16,8 +16,5 @@
   when: containers_state == 'present'
 
 - name: Remove containers on proxmox server
-  include_tasks: destroy_container.yml
-  loop: "{{ lxc_containers }}"
-  loop_control:
-    loop_var: container
+  include_role: remove_proxmox_instance
   when: containers_state == 'absent'
