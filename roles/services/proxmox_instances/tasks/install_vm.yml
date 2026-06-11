@@ -1,7 +1,9 @@
 ---
 
 - block:
-    - community.proxmox.proxmox_kvm:
+
+    - name: Create VM on Proxmox
+      community.proxmox.proxmox_kvm:
         api_host: "{{ ansible_host }}"
         api_user: "{{ ansible_user }}@pam"
         api_password: "{{ ansible_password }}"
@@ -11,7 +13,8 @@
         node: "{{ proxmox_node }}"
         state: present
 
-    - community.proxmox.proxmox_kvm:
+    - name: Configure VM on Proxmox
+      community.proxmox.proxmox_kvm:
         api_host: "{{ ansible_host }}"
         api_user: "{{ ansible_user }}@pam"
         api_password: "{{ ansible_password }}"
@@ -24,5 +27,15 @@
         ciuser: "{{ vm.cloud_user }}"
         cipassword: "{{ vm.cloud_password }}"
         update: true
+        update_unsafe: true
+
+    - name: Start VM
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        vmid: "{{ vm.id }}"
+        node: "{{ proxmox_node }}"
+        state: started
 
   delegate_to: localhost
