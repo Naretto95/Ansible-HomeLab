@@ -7,10 +7,10 @@
     api_host: "{{ ansible_host }}"
     node: "{{ proxmox_node }}"
     vmid: "{{ vm.id }}"
-    hostname: "{{ vm.name }}"
+    name: "{{ vm.name }}"
     cores: "{{ vm.cores }}"
     memory: "{{ vm.memory }}"
-    netif:
+    net:
       net0: "virtio,bridge={{ vm.net_bridge }}"
     ipconfig:
       ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
