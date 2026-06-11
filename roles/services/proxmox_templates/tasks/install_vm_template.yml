@@ -25,12 +25,14 @@
       ansible.builtin.command: >
         qm create {{ vm_template.id }}
         --name {{ vm_template.name }}
+      changed_when: false
 
     - name: Import disk into template
       ansible.builtin.command: >
         qm importdisk {{ vm_template.id }}
         /var/lib/vz/template/cache/{{ vm_template.image_url | basename }}
         local-lvm
+      changed_when: false
       
     - name: Configure VM boot + cloud-init
       ansible.builtin.command: >
@@ -39,9 +41,10 @@
         --boot c --bootdisk scsi0
         --scsi0 local-lvm:vm-{{ vm_template.id }}-disk-0
         --ide2 local-lvm:cloudinit
+      changed_when: false
 
     - name: Convert VM to template
       ansible.builtin.command: qm template {{ vm_template.id }}
+      changed_when: false
   
   when: template_check.rc != 0
-  changed_when: false
