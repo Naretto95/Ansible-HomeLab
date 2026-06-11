@@ -38,13 +38,20 @@
       changed_when: false
       loop: "{{ lxc_containers }}"
 
-    - name: Ensure VM image is present
+    - name: Check if VM image exists
+      ansible.builtin.stat:
+        path: "/var/lib/vz/template/cache/{{ item.image | basename }}"
+      register: vm_image_stat
+      loop: "{{ virtual_machines }}"
+
+    - name: Download VM image
       ansible.builtin.get_url:
-        url: "{{ item.image }}"
-        dest: "/var/lib/vz/template/cache/{{ item.image | basename }}"
+        url: "{{ item.item.image }}"
+        dest: "/var/lib/vz/template/cache/{{ item.item.image | basename }}"
         mode: "0644"
         timeout: 600
-      loop: "{{ virtual_machines }}"
+      when: not item.stat.exists
+      loop: "{{ vm_image_stat.results }}"
       
   when: services_state == 'present'
 
