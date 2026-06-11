@@ -1,0 +1,7 @@
+---
+
+dependencies:
+  - role: common/role_guard
+    vars:
+      required_group: "cluster"
+      required_os: "Proxmox"
