@@ -104,4 +104,5 @@
         project_path: "/tmp/terraform/{{ ansible_host }}"
         state: present
         force_init: yes
+        
   delegate_to: localhost

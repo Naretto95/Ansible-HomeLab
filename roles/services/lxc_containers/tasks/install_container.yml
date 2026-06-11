@@ -7,6 +7,7 @@
   changed_when: false
 
 - block:
+
     - name: Create LXC container on Proxmox
       community.proxmox.proxmox:
         api_user: "{{ ansible_user }}@pam"
@@ -35,4 +36,5 @@
         node: "{{ proxmox_node }}"
         vmid: "{{ container.id }}"
         state: started
+
   delegate_to: localhost
