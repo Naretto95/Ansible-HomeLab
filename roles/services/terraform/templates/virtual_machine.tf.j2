@@ -16,6 +16,7 @@ resource "proxmox_virtual_environment_vm" "{{ item.name }}" {
   }
 
   disk {
+    interface    = "scsi0"
     datastore_id = "{{ item.storage }}"
     size         = "{{ item.disk_size }}"
   }
