@@ -16,5 +16,6 @@
   when: containers_state == 'present'
 
 - name: Remove containers on proxmox server
-  include_role: remove_proxmox_instance
+  include_role: 
+    name: remove_proxmox_instance
   when: containers_state == 'absent'

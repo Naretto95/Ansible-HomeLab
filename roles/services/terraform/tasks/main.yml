@@ -30,7 +30,8 @@
     lxc_containers: "{{ lxc_containers | rejectattr('id', 'in', existing_lxcs) | list }}"
 
 - name: Remove VMs on proxmox server
-  include_role: remove_proxmox_instance
+  include_role: 
+    name: remove_proxmox_instance
   when: services_state == 'absent'
 
 - block:
