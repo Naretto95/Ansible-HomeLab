@@ -9,6 +9,52 @@
   meta: end_role
   when: lxc_containers | length == 0 and virtual_machines | length == 0
 
+- name: Get existing Proxmox VMs
+  ansible.builtin.command: qm list
+  register: qm_list
+  changed_when: false
+
+- name: Get existing Proxmox LXCs
+  ansible.builtin.command: pct list
+  register: pct_list
+  changed_when: false
+
+- name: Parse existing VM/LXC IDs
+  set_fact:
+    existing_vms: "{{ qm_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
+    existing_lxcs: "{{ pct_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
+
+- name: Filter services that do not exist yet
+  set_fact:
+    virtual_machines: "{{ virtual_machines | rejectattr('id', 'in', existing_vms) | list }}"
+    lxc_containers: "{{ lxc_containers | rejectattr('id', 'in', existing_lxcs) | list }}"
+
+- block:
+
+    - name: Ensure LXC template is present
+      ansible.builtin.command: "pveam download local {{ item.template | regex_replace('^local:vztmpl/', '') }}"
+      args:
+        creates: "/var/lib/vz/template/cache/{{ item.template | regex_replace('^local:vztmpl/', '') }}"
+      changed_when: false
+      loop: "{{ lxc_containers }}"
+
+    - name: Check if VM image exists
+      ansible.builtin.stat:
+        path: "/var/lib/vz/template/cache/{{ item.image | basename }}"
+      register: vm_image_stat
+      loop: "{{ virtual_machines }}"
+
+    - name: Download VM image
+      ansible.builtin.get_url:
+        url: "{{ item.item.image }}"
+        dest: "/var/lib/vz/template/cache/{{ item.item.image | basename }}"
+        mode: "0644"
+        timeout: 600
+      when: not item.stat.exists
+      loop: "{{ vm_image_stat.results }}"
+      
+  when: services_state == 'present'
+
 - block:
 
     - name: Clear old Terraform files
@@ -21,6 +67,19 @@
         path: "/tmp/terraform/{{ ansible_host }}"
         state: directory
         mode: '0755'
+
+    - name: Ensure Terraform provider config exists
+      ansible.builtin.copy:
+        dest: "/tmp/terraform/{{ ansible_host }}/versions.tf"
+        mode: "0644"
+        content: |
+          terraform {
+            required_providers {
+              proxmox = {
+                source  = "bpg/proxmox"
+              }
+            }
+          }
 
     - name: Generate Terraform provider file
       template:
@@ -44,4 +103,5 @@
         project_path: "/tmp/terraform/{{ ansible_host }}"
         state: present
         force_init: yes
+
   delegate_to: localhost

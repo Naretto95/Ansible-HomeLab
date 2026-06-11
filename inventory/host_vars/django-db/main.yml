@@ -1,0 +1,29 @@
+---
+
+ansible_host: 192.168.1.96
+
+postgresql_db_name: django-db
+postgresql_db_user: "{{ ansible_user }}"
+postgresql_db_password: "{{ ansible_password }}"
+
+postgresql_listen_addresses: "*"
+
+# Allow only the Django application server
+postgresql_allowed_networks:
+  - "192.168.1.95/32"
+
+virtual_machine:
+  name: django-db
+  id: 102
+  image: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+  cores: 2
+  memory: 4096
+  disk_size: "40G"
+  storage: "local-lvm"
+  net_bridge: "vmbr0"
+  net_ip_address: "{{ ansible_host }}"
+  net_subnet: 24
+  net_gateway: "{{ net_gateway }}"
+  cloud_init: true
+  cloud_user: "{{ ansible_user }}"
+  cloud_password: "{{ ansible_password }}"

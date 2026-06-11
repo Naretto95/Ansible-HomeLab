@@ -7,3 +7,5 @@ cluster_master: true
 
 services:
   - wireguard
+  - django-db
+  - django-app

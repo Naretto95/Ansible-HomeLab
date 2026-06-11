@@ -1,0 +1,9 @@
+---
+
+postgresql_db_name: db_name
+postgresql_db_user: db_user
+postgresql_db_password: change_me
+
+postgresql_listen_addresses: "*"
+
+postgresql_allowed_networks: []

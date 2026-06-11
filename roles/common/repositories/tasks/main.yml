@@ -1,10 +1,5 @@
 ---
 
-- name: Gather host facts
-  ansible.builtin.setup:
-    gather_subset:
-        - distribution_release
-
 - name: Download GPG keys for repositories
   ansible.builtin.get_url:
     url: "{{ item.gpg_key }}"

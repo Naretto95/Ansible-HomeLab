@@ -1,5 +1,6 @@
 resource "proxmox_vm_qemu" "{{ item.name }}" {
   target_node  = "{{ proxmox_node }}"
+  clone = "{{ item.image | basename }}"
   vmid    = {{ item.id }}
   name    = "{{ item.name }}"
   cores   = {{ item.cores }}
@@ -25,10 +26,6 @@ resource "proxmox_vm_qemu" "{{ item.name }}" {
   ciuser     = "{{ item.cloud_user }}"
   cipassword = "{{ item.cloud_password }}"
   ipconfig0  = "ip={{ item.net_ip_address }}/{{ item.net_subnet }},gw={{ item.net_gateway }}"
-  {% endif %}
-
-  {% if item.iso is defined %}
-  cdrom = "{{ item.iso }}"
   {% endif %}
 
   state = "{{ services_state }}"
