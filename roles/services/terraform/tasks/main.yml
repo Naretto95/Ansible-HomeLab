@@ -60,6 +60,5 @@
 
     - name: Create VMs on proxmox server
       include_tasks: install_instances.yml
-      delegate_to: localhost
 
   when: services_state == 'present'
