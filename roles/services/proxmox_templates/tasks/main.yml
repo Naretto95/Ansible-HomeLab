@@ -2,13 +2,13 @@
 
 
 - name: Create LXC templates on proxmox server
-  include_tasks: install_lxc_templates.yml
+  include_tasks: install_lxc_template.yml
   loop: "{{ lxc_templates }}"
   loop_control:
     loop_var: lxc_template
 
 - name: Create VM templates on proxmox server
-  include_tasks: install_vm_templates.yml
+  include_tasks: install_vm_template.yml
   loop: "{{ vm_templates }}"
   loop_control:
     loop_var: vm_template
