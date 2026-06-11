@@ -18,7 +18,7 @@ virtual_machine:
   image: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
   cores: 2
   memory: 4096
-  disk_size: "40G"
+  disk_size: 40
   storage: "local-lvm"
   net_bridge: "vmbr0"
   net_ip_address: "{{ ansible_host }}"
