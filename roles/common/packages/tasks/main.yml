@@ -1,10 +1,5 @@
 ---
 
-- name: Gather host facts
-  ansible.builtin.setup:
-    gather_subset:
-        - distribution_release
-
 - name: Install packages
   include_tasks: install_packages.yml
   when: packages_state == 'present'

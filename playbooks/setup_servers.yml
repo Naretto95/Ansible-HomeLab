@@ -4,6 +4,7 @@
   hosts: cluster
   gather_facts: false
   roles:
+    - common/os_detect
     - common/dns_setup
     - common/bootstrap
     - common/repositories

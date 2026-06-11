@@ -1,4 +1,0 @@
----
-
-dependencies:
-  - role: common/os_detect
