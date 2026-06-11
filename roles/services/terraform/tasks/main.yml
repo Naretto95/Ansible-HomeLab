@@ -77,7 +77,6 @@
             required_providers {
               proxmox = {
                 source  = "bpg/proxmox"
-                version = "~> 0.0.1"
               }
             }
           }
@@ -104,5 +103,5 @@
         project_path: "/tmp/terraform/{{ ansible_host }}"
         state: present
         force_init: yes
-        
+
   delegate_to: localhost
