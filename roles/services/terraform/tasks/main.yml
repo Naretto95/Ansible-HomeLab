@@ -32,7 +32,7 @@
 - name: Remove VMs on proxmox server
   include_role: 
     name: services/proxmox_instances
-  when: services_state == 'absent'
+  when: services_state == 'absent' or force_recreate
 
 - block:
 

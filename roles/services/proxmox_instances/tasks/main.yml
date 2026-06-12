@@ -9,7 +9,30 @@
   meta: end_role
   when: lxc_containers | length == 0 and virtual_machines | length == 0
 
+- name: Remove instances on proxmox server
+  include_tasks: remove_instances.yml
+  when: services_state == 'absent' or force_recreate
+
 - block:
+    - name: Get existing Proxmox VMs
+      ansible.builtin.command: qm list
+      register: qm_list
+      changed_when: false
+
+    - name: Get existing Proxmox LXCs
+      ansible.builtin.command: pct list
+      register: pct_list
+      changed_when: false
+
+    - name: Parse existing VM/LXC IDs
+      set_fact:
+        existing_vms: "{{ qm_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
+        existing_lxcs: "{{ pct_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
+
+    - name: Filter services that do not exist yet
+      set_fact:
+        virtual_machines: "{{ virtual_machines | rejectattr('id', 'in', existing_vms) | list }}"
+        lxc_containers: "{{ lxc_containers | rejectattr('id', 'in', existing_lxcs) | list }}"
 
     - name: Create containers on proxmox server
       include_tasks: install_container.yml
@@ -24,7 +47,3 @@
         loop_var: vm
 
   when: services_state == 'present'
-
-- name: Remove instances on proxmox server
-  include_tasks: remove_instances.yml
-  when: services_state == 'absent'

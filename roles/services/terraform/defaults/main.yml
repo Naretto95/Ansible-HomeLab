@@ -1,4 +1,5 @@
 ---
 
 services_state: present
+force_recreate: false
 services: []
