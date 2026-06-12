@@ -54,6 +54,6 @@
         api_password: "{{ ansible_password }}"
         vmid: "{{ vm.id }}"
         node: "{{ proxmox_node }}"
-        state: started
+        state: restarted
 
   delegate_to: localhost

@@ -5,6 +5,7 @@
   roles:
     - services/proxmox_templates
     - services/proxmox_instances
+    - services/terraform
     - services/user_management
 
 - name: Bootstrap service nodes (DNS, repos, packages)
