@@ -1,12 +1,25 @@
 ---
 
-- name: Delete instances on Proxmox
-  community.proxmox.proxmox:
-    api_user: "{{ ansible_user }}@pam"
-    api_password: "{{ ansible_password }}"
-    api_host: "{{ ansible_host }}"
-    node: "{{ proxmox_node }}"
-    vmid: "{{ item.id }}"
-    state: absent
-  loop: "{{ lxc_containers + virtual_machines }}"
+- block:
+
+    - name: Delete lxc containers on Proxmox
+      community.proxmox.proxmox:
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        api_host: "{{ ansible_host }}"
+        node: "{{ proxmox_node }}"
+        vmid: "{{ item.id }}"
+        state: absent
+      loop: "{{ lxc_containers }}"
+
+    - name: Delete virtual machines on Proxmox
+      community.proxmox.proxmox_kvm:
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        api_host: "{{ ansible_host }}"
+        node: "{{ proxmox_node }}"
+        vmid: "{{ item.id }}"
+        state: absent
+      loop: "{{ virtual_machines }}"
+  
   delegate_to: localhost
