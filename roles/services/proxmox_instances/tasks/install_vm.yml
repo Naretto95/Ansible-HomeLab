@@ -43,7 +43,7 @@
           ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
         ciuser: "{{ vm.cloud_user }}"
         cipassword: "{{ vm.cloud_password }}"
-        cicustom: "/var/lib/vz/snippets/{{ vm.name }}-user.yaml"
+        cicustom: "user=local:snippets/{{ vm.name }}-user.yaml"
         update: true
         update_unsafe: true
 
