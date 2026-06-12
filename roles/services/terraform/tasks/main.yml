@@ -29,16 +29,10 @@
     virtual_machines: "{{ virtual_machines | rejectattr('id', 'in', existing_vms) | list }}"
     lxc_containers: "{{ lxc_containers | rejectattr('id', 'in', existing_lxcs) | list }}"
 
-- name: Save requested state
-  set_fact:
-    requested_services_state: "{{ services_state }}"
-
 - name: Remove VMs on proxmox server
   include_role: 
     name: services/proxmox_instances
-  vars:
-    services_state: absent
-  when: requested_services_state == 'absent'
+  when: services_state == 'absent'
 
 - block:
 
