@@ -1,0 +1,45 @@
+---
+
+- block:
+
+    - name: Stop LXC containers on Proxmox
+      community.proxmox.proxmox:
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        api_host: "{{ ansible_host }}"
+        node: "{{ proxmox_node }}"
+        vmid: "{{ item.id }}"
+        state: stopped
+      loop: "{{ lxc_containers }}"
+
+    - name: Delete LXC containers on Proxmox
+      community.proxmox.proxmox:
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        api_host: "{{ ansible_host }}"
+        node: "{{ proxmox_node }}"
+        vmid: "{{ item.id }}"
+        state: absent
+      loop: "{{ lxc_containers }}"
+
+    - name: Stop virtual machines on Proxmox
+      community.proxmox.proxmox_kvm:
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        api_host: "{{ ansible_host }}"
+        node: "{{ proxmox_node }}"
+        vmid: "{{ item.id }}"
+        state: stopped
+      loop: "{{ virtual_machines }}"
+
+    - name: Delete virtual machines on Proxmox
+      community.proxmox.proxmox_kvm:
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        api_host: "{{ ansible_host }}"
+        node: "{{ proxmox_node }}"
+        vmid: "{{ item.id }}"
+        state: absent
+      loop: "{{ virtual_machines }}"
+
+  delegate_to: localhost

@@ -15,15 +15,15 @@ postgresql_allowed_networks:
 virtual_machine:
   name: django-db
   id: 102
-  image: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+  template: debian-13
   cores: 2
   memory: 4096
-  disk_size: 40
+  scsi:
+    scsi1:  "local-lvm:40,size=40G"
   storage: "local-lvm"
   net_bridge: "vmbr0"
   net_ip_address: "{{ ansible_host }}"
   net_subnet: 24
   net_gateway: "{{ net_gateway }}"
-  cloud_init: true
   cloud_user: "{{ ansible_user }}"
   cloud_password: "{{ ansible_password }}"

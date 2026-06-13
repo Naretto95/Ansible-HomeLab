@@ -1,0 +1,69 @@
+---
+
+- name: Create cloud-init user config
+  copy:
+    dest: "/var/lib/vz/snippets/{{ vm.name }}-user.yaml"
+    content: |
+      #cloud-config
+      ssh_pwauth: true
+
+      write_files:
+        - path: /etc/ssh/sshd_config.d/99-password-auth.conf
+          content: |
+            PasswordAuthentication yes
+            KbdInteractiveAuthentication yes
+            UsePAM yes
+
+      runcmd:
+        - systemctl restart ssh || systemctl restart sshd
+
+- block:
+
+    - name: Create VM on Proxmox
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        clone: "{{ vm.template }}"
+        newid: "{{ vm.id }}"
+        name: "{{ vm.name }}"
+        node: "{{ proxmox_node }}"
+        full: true
+        state: present
+
+    - name: Configure VM on Proxmox
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        vmid: "{{ vm.id }}"
+        node: "{{ proxmox_node }}"
+        ciuser: "{{ vm.cloud_user }}"
+        cipassword: "{{ vm.cloud_password }}"
+        cores: "{{ vm.cores }}"
+        scsi: "{{ vm.scsi }}"
+        memory: "{{ vm.memory }}"
+        net:
+          net0: "virtio,bridge={{ vm.net_bridge }}"
+        ipconfig:
+          ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
+        update: true
+        update_unsafe: true
+
+    - name: Start VM
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        vmid: "{{ vm.id }}"
+        node: "{{ proxmox_node }}"
+        state: started
+
+    - name: Wait for SSH to become available on VM
+      ansible.builtin.wait_for:
+        host: "{{ vm.net_ip_address }}"
+        port: 22
+        delay: 10
+        timeout: 300
+
+  delegate_to: localhost

@@ -1,0 +1,7 @@
+---
+
+- name: Ensure LXC template is present
+  ansible.builtin.command: "pveam download local {{ lxc_template.name }}"
+  args:
+    creates: "/var/lib/vz/template/cache/{{ lxc_template.name }}"
+  changed_when: false

@@ -1,5 +1,10 @@
 ---
 
+- name: Gather only distribution facts
+  ansible.builtin.setup:
+    filter:
+      - distribution_release
+
 - name: Download GPG keys for repositories
   ansible.builtin.get_url:
     url: "{{ item.gpg_key }}"

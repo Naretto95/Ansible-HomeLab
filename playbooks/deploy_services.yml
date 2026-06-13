@@ -3,7 +3,8 @@
 - name: Deploy proxmox containers
   hosts: cluster
   roles:
-    - services/lxc_containers
+    - services/proxmox_templates
+    - services/proxmox_instances
     - services/terraform
     - services/user_management
 
