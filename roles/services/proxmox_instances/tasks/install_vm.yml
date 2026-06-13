@@ -77,6 +77,9 @@
         state: restarted
   
   delegate_to: "{{ vm.net_ip_address }}"
+  vars:
+    ansible_user: "{{ vm.cloud_user }}"
+    ansible_password: "{{ vm.cloud_password }}"
 
 - name: Make sure SSH Key is removed from VM
   community.proxmox.proxmox_kvm:
