@@ -3,7 +3,7 @@
 - name: Create users on VM
   user:
     name: "{{ virtual_machine_user.name }}"
-    password: "{{ virtual_machine_user.password ) }}"
+    password: "{{ virtual_machine_user.password }}"
     groups: "{{ 'sudo' if virtual_machine_user.sudo | default(false) else omit }}"
     append: true
     shell: /bin/bash

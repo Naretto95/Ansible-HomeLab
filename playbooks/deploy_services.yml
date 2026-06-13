@@ -1,6 +1,6 @@
 ---
 
-- name: Deploy proxmox containers
+- name: Deploy proxmox services
   hosts: cluster
   roles:
     - services/proxmox_templates
