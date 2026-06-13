@@ -25,7 +25,10 @@
         api_user: "{{ ansible_user }}@pam"
         api_password: "{{ ansible_password }}"
         clone: "{{ vm.template }}"
+        cores: "{{ vm.cores }}"
+        memory: "{{ vm.memory }}"
         newid: "{{ vm.id }}"
+        scsi: "{{ vm.scsi }}"
         name: "{{ vm.name }}"
         node: "{{ proxmox_node }}"
         net:

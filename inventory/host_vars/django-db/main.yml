@@ -18,7 +18,8 @@ virtual_machine:
   template: debian-13
   cores: 2
   memory: 4096
-  disk_size: 40
+  scsi:
+    scsi0: "local-lvm:40G"
   storage: "local-lvm"
   net_bridge: "vmbr0"
   net_ip_address: "{{ ansible_host }}"
