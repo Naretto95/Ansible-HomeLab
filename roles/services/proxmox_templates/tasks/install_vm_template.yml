@@ -25,6 +25,7 @@
       ansible.builtin.command: >
         qm create {{ vm_template.id }}
         --name {{ vm_template.name }}
+        --net0 virtio,bridge=vmbr0
       changed_when: false
 
     - name: Import disk into template
