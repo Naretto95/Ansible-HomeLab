@@ -53,7 +53,27 @@
 
   delegate_to: localhost
 
+- block:
 
+    - name: Enable SSH password authentication
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication\s+'
+        line: 'PasswordAuthentication yes'
+        backup: true
+    
+    - name: Ensure UsePAM is enabled
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?UsePAM\s+'
+        line: 'UsePAM yes'
+  
+  delegate_to: "{{ vm.net_ip_address }}"
+  vars:
+    ansible_user: "{{ vm.cloud_user }}"
+    ansible_password: "{{ vm.cloud_password }}"
+    ansible_become: true
+    ansible_become_password: "{{ vm.cloud_password }}"
 
 - block:
 
