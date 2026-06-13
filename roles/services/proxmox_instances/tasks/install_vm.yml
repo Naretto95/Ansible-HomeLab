@@ -28,6 +28,10 @@
         newid: "{{ vm.id }}"
         name: "{{ vm.name }}"
         node: "{{ proxmox_node }}"
+        net:
+          net0: "virtio,bridge={{ vm.net_bridge }}"
+        ipconfig:
+          ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
         state: present
 
     - name: Configure VM on Proxmox
@@ -37,10 +41,6 @@
         api_password: "{{ ansible_password }}"
         vmid: "{{ vm.id }}"
         node: "{{ proxmox_node }}"
-        net:
-          net0: "virtio,bridge={{ vm.net_bridge }}"
-        ipconfig:
-          ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
         ciuser: "{{ vm.cloud_user }}"
         cipassword: "{{ vm.cloud_password }}"
         cicustom: "user=local:snippets/{{ vm.name }}-user.yaml"
