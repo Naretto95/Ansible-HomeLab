@@ -6,11 +6,6 @@
     required_os_list: "{{ required_os if required_os is iterable and required_os is not string else [required_os] }}"
     states_list: "{{ states if states is iterable and states is not string else [states] }}"
 
-- debug:
-    msg:
-      host: "{{ inventory_hostname }}"
-      groups: "{{ group_names }}"
-
 - block:
 
     - name: Conditionally include os_detect role

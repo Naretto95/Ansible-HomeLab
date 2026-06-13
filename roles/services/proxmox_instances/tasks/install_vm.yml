@@ -56,14 +56,20 @@
 
   delegate_to: localhost
 
-- name: Create users on VM
-  vars:
-    ansible_user: "{{ vm.cloud_user }}"
-    ansible_password: "{{ vm.cloud_password }}"
-  include_role:
-    name: services/user_management
-    apply:
-      delegate_to: "{{ vm.name }}"
+- name: Enable SSH password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication\s+'
+    line: 'PasswordAuthentication yes'
+    backup: true
+  notify: Restart ssh
+
+- name: Ensure UsePAM is enabled
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?UsePAM\s+'
+    line: 'UsePAM yes'
+  notify: Restart ssh
 
 - name: Make sure SSH Key is removed from VM
   community.proxmox.proxmox_kvm:
