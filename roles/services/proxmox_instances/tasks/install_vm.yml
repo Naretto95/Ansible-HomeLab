@@ -85,7 +85,7 @@
     api_password: "{{ ansible_password }}"
     vmid: "{{ vm.id }}"
     node: "{{ proxmox_node }}"
-    sshkeys: ""
+    sshkeys: null
     update: true
     update_unsafe: true
   delegate_to: localhost
