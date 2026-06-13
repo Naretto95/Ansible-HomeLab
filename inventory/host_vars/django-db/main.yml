@@ -25,6 +25,5 @@ virtual_machine:
   net_ip_address: "{{ ansible_host }}"
   net_subnet: 24
   net_gateway: "{{ net_gateway }}"
-  cloud_init: true
   cloud_user: "{{ ansible_user }}"
   cloud_password: "{{ ansible_password }}"
