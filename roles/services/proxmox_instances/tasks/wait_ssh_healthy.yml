@@ -1,8 +1,0 @@
----
-
-- name: Wait for SSH to become available on VM
-  ansible.builtin.wait_for:
-    host: "{{ ip_address }}"
-    port: 22
-    delay: 10
-    timeout: 300
