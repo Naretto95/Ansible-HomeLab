@@ -67,6 +67,11 @@
         path: /etc/ssh/sshd_config
         regexp: '^#?UsePAM\s+'
         line: 'UsePAM yes'
+
+    - name: Restart SSH service
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
   
   delegate_to: "{{ vm.net_ip_address }}"
   vars:
@@ -77,6 +82,10 @@
 
 - block:
 
+    - include_tasks: wait_ssh_healthy.yml
+      vars:
+        ip_address: "{{ vm.net_ip_address }}"
+
     - name: Make sure SSH Key is removed from VM
       community.proxmox.proxmox_kvm:
         api_host: "{{ ansible_host }}"
@@ -85,18 +94,5 @@
         vmid: "{{ vm.id }}"
         node: "{{ proxmox_node }}"
         delete: "sshkeys"
-
-    - name: Reboot VM via Proxmox
-      community.proxmox.proxmox_kvm:
-        api_host: "{{ ansible_host }}"
-        api_user: "{{ ansible_user }}@pam"
-        api_password: "{{ ansible_password }}"
-        vmid: "{{ vm.id }}"
-        node: "{{ proxmox_node }}"
-        state: restarted
-
-    - include_tasks: wait_ssh_healthy.yml
-      vars:
-        ip_address: "{{ vm.net_ip_address }}"
 
   delegate_to: localhost

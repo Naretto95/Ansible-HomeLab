@@ -11,6 +11,7 @@
   hosts: services
   gather_facts: false
   roles:
+    - services/user_management
     - common/dns_setup
     - common/bootstrap
     - common/repositories
