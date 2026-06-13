@@ -59,6 +59,7 @@
 - name: Create users on VM
   include_role:
     name: services/user_management
+  delegate_to: "{{ vm.net_ip_address }}"
 
 - name: Make sure SSH Key is removed from VM
   community.proxmox.proxmox_kvm:
