@@ -56,30 +56,24 @@
 
   delegate_to: localhost
 
-- block:
 
-    - name: Enable SSH password authentication
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^#?PasswordAuthentication\s+'
-        line: 'PasswordAuthentication yes'
-        backup: true
-    
-    - name: Ensure UsePAM is enabled
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^#?UsePAM\s+'
-        line: 'UsePAM yes'
 
-    - name: Restart ssh
-      ansible.builtin.service:
-        name: ssh
-        state: restarted
-  
-  delegate_to: "{{ vm.net_ip_address }}"
-  vars:
-    ansible_user: "{{ vm.cloud_user }}"
-    ansible_password: "{{ vm.cloud_password }}"
-    ansible_become: true
-    ansible_become_password: "{{ vm.cloud_password }}"
+- name: Reboot VM via Proxmox
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ ansible_user }}@pam"
+    api_password: "{{ ansible_password }}"
+    vmid: "{{ vm.id }}"
+    node: "{{ proxmox_node }}"
+    state: restarted
+  delegate_to: localhost
 
+- name: Make sure SSH Key is removed from VM
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ ansible_user }}@pam"
+    api_password: "{{ ansible_password }}"
+    vmid: "{{ vm.id }}"
+    node: "{{ proxmox_node }}"
+    delete: "sshkeys"
+  delegate_to: localhost
