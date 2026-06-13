@@ -47,33 +47,57 @@
         node: "{{ proxmox_node }}"
         state: started
 
-    - name: Wait for SSH to become available on VM
-      ansible.builtin.wait_for:
-        host: "{{ vm.net_ip_address }}"
-        port: 22
-        delay: 10
-        timeout: 300
+    - include_tasks: wait_ssh_healthy.yml
+      vars:
+        ip_address: "{{ vm.net_ip_address }}"
 
   delegate_to: localhost
 
+- block:
 
+    - name: Enable SSH password authentication
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication\s+'
+        line: 'PasswordAuthentication yes'
+        backup: true
+    
+    - name: Ensure UsePAM is enabled
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?UsePAM\s+'
+        line: 'UsePAM yes'
+  
+  delegate_to: "{{ vm.net_ip_address }}"
+  vars:
+    ansible_user: "{{ vm.cloud_user }}"
+    ansible_password: "{{ vm.cloud_password }}"
+    ansible_become: true
+    ansible_become_password: "{{ vm.cloud_password }}"
 
-- name: Reboot VM via Proxmox
-  community.proxmox.proxmox_kvm:
-    api_host: "{{ ansible_host }}"
-    api_user: "{{ ansible_user }}@pam"
-    api_password: "{{ ansible_password }}"
-    vmid: "{{ vm.id }}"
-    node: "{{ proxmox_node }}"
-    state: restarted
-  delegate_to: localhost
+- block:
 
-- name: Make sure SSH Key is removed from VM
-  community.proxmox.proxmox_kvm:
-    api_host: "{{ ansible_host }}"
-    api_user: "{{ ansible_user }}@pam"
-    api_password: "{{ ansible_password }}"
-    vmid: "{{ vm.id }}"
-    node: "{{ proxmox_node }}"
-    delete: "sshkeys"
+    - name: Make sure SSH Key is removed from VM
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        vmid: "{{ vm.id }}"
+        node: "{{ proxmox_node }}"
+        delete: "sshkeys"
+      delegate_to: localhost
+
+    - name: Reboot VM via Proxmox
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        vmid: "{{ vm.id }}"
+        node: "{{ proxmox_node }}"
+        state: restarted
+
+    - include_tasks: wait_ssh_healthy.yml
+      vars:
+        ip_address: "{{ vm.net_ip_address }}"
+    
   delegate_to: localhost
