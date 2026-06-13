@@ -2,8 +2,8 @@
 
 - name: Gather services definitions from services
   set_fact:
-    lxc_containers: "{{ services | select('in', groups['lxc_containers']) | map('extract', hostvars, 'lxc_container') | select('defined') | list }}"
-    virtual_machines: "{{ services | select('in', groups['virtual_machines']) | map('extract', hostvars, 'virtual_machine') | select('defined') | list }}"
+    lxc_containers: "{{ groups['lxc_containers'] | map('extract', hostvars) | selectattr('target_host', 'equalto', inventory_hostname) | selectattr('lxc_container', 'defined') | map(attribute='lxc_container') | list }}"
+    virtual_machines: "{{ groups['virtual_machines'] | map('extract', hostvars) | selectattr('target_host', 'equalto', inventory_hostname) | selectattr('virtual_machine', 'defined') | map(attribute='virtual_machine') | list }}"
 
 - name: Stop role if no lxc_containers or virtual_machines
   meta: end_role

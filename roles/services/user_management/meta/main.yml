@@ -3,5 +3,5 @@
 dependencies:
   - role: common/role_guard
     vars:
-      required_group: "cluster"
-      required_os: "Proxmox"
+      required_group: "services"
+      required_os: "Debian"

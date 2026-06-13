@@ -1,6 +1,7 @@
 ---
 
 ansible_host: 192.168.1.96
+target_host: server2
 
 postgresql_db_name: django-db
 postgresql_db_user: "{{ ansible_user }}"
@@ -27,3 +28,7 @@ virtual_machine:
   net_gateway: "{{ net_gateway }}"
   cloud_user: "{{ ansible_user }}"
   cloud_password: "{{ ansible_password }}"
+  users:
+    - name: "{{ ansible_user }}"
+      password: "{{ ansible_password }}"
+      sudo: true
