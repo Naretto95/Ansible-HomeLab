@@ -80,6 +80,8 @@
   vars:
     ansible_user: "{{ vm.cloud_user }}"
     ansible_password: "{{ vm.cloud_password }}"
+    ansible_become: true
+    ansible_become_password: "{{ vm.cloud_password }}"
 
 - name: Make sure SSH Key is removed from VM
   community.proxmox.proxmox_kvm:
