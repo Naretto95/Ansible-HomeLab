@@ -47,7 +47,9 @@
         node: "{{ proxmox_node }}"
         state: started
 
-    - include_tasks: wait_vm_healthy.yml
+    - include_tasks: wait_ssh_healthy.yml
+      vars:
+        ip_address: "{{ vm.net_ip_address }}"
 
   delegate_to: localhost
 
@@ -65,11 +67,6 @@
         path: /etc/ssh/sshd_config
         regexp: '^#?UsePAM\s+'
         line: 'UsePAM yes'
-
-    - name: Restart SSH
-      ansible.builtin.service:
-        name: ssh
-        state: restarted
   
   delegate_to: "{{ vm.net_ip_address }}"
   vars:
@@ -89,5 +86,17 @@
         node: "{{ proxmox_node }}"
         delete: "sshkeys"
 
+    - name: Reboot VM via Proxmox
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ ansible_host }}"
+        api_user: "{{ ansible_user }}@pam"
+        api_password: "{{ ansible_password }}"
+        vmid: "{{ vm.id }}"
+        node: "{{ proxmox_node }}"
+        state: restarted
+
+    - include_tasks: wait_ssh_healthy.yml
+      vars:
+        ip_address: "{{ vm.net_ip_address }}"
 
   delegate_to: localhost
