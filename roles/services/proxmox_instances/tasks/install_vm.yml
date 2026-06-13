@@ -83,22 +83,3 @@
     ansible_become: true
     ansible_become_password: "{{ vm.cloud_password }}"
 
-- name: Reboot VM via Proxmox
-  community.proxmox.proxmox_kvm:
-    api_host: "{{ ansible_host }}"
-    api_user: "{{ ansible_user }}@pam"
-    api_password: "{{ ansible_password }}"
-    vmid: "{{ vm.id }}"
-    node: "{{ proxmox_node }}"
-    state: restarted
-  delegate_to: localhost
-
-- name: Make sure SSH Key is removed from VM
-  community.proxmox.proxmox_kvm:
-    api_host: "{{ ansible_host }}"
-    api_user: "{{ ansible_user }}@pam"
-    api_password: "{{ ansible_password }}"
-    vmid: "{{ vm.id }}"
-    node: "{{ proxmox_node }}"
-    delete: "sshkeys"
-  delegate_to: localhost
