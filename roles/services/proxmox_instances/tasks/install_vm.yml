@@ -91,6 +91,4 @@
     vmid: "{{ vm.id }}"
     node: "{{ proxmox_node }}"
     delete: "sshkeys"
-    update: true
-    update_unsafe: true
   delegate_to: localhost
