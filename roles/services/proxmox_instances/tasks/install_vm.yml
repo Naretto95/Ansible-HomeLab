@@ -57,13 +57,13 @@
   delegate_to: localhost
 
 - name: Create users on VM
+  vars:
+    ansible_user: "{{ vm.cloud_user }}"
+    ansible_password: "{{ vm.cloud_password }}"
   include_role:
     name: services/user_management
     apply:
       delegate_to: "{{ vm.net_ip_address }}"
-      vars:
-        ansible_user: "{{ vm.cloud_user }}"
-        ansible_password: "{{ vm.cloud_password }}"
 
 - name: Make sure SSH Key is removed from VM
   community.proxmox.proxmox_kvm:
