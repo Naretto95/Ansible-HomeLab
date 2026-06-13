@@ -10,7 +10,6 @@
     msg:
       host: "{{ inventory_hostname }}"
       groups: "{{ group_names }}"
-      delegated: "{{ ansible_delegated_vars.keys() | list }}"
 
 - block:
 
