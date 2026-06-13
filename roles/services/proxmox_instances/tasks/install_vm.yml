@@ -63,7 +63,7 @@
   include_role:
     name: services/user_management
     apply:
-      delegate_to: "{{ vm.name}}"
+      delegate_to: "{{ vm.name }}"
 
 - name: Make sure SSH Key is removed from VM
   community.proxmox.proxmox_kvm:
