@@ -2,8 +2,8 @@
 
 - name: Gather users definitions from host
   set_fact:
-    lxc_containers_users: "{{ (lxc_container | default({})).users }}"
-    virtual_machines_users: "{{ (virtual_machine | default({})).users }}"
+    lxc_containers_users: "{{ (lxc_container | default({})).get('users', []) }}"
+    virtual_machines_users: "{{ (virtual_machine | default({})).get('users', []) }}"
 
 - name: Stop role if no users in lxc_containers or virtual_machines
   meta: end_role
