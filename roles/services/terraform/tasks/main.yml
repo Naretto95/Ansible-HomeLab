@@ -20,10 +20,6 @@
     existing_vms: "{{ qm_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
     existing_lxcs: "{{ pct_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
 
-- name: Stop role if no lxc_containers or virtual_machines
-  meta: end_role
-  when: lxc_containers | length == 0 and virtual_machines | length == 0
-
 - name: Filter services that do not exist yet
   set_fact:
     virtual_machines: "{{ virtual_machines | rejectattr('id', 'in', existing_vms) | list }}"
@@ -33,6 +29,10 @@
   include_role: 
     name: services/proxmox_instances
   when: services_state == 'absent' or force_recreate
+
+- name: Stop role if no lxc_containers or virtual_machines
+  meta: end_role
+  when: lxc_containers | length == 0 and virtual_machines | length == 0
 
 - block:
 
