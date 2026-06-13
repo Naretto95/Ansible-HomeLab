@@ -25,16 +25,9 @@
         api_user: "{{ ansible_user }}@pam"
         api_password: "{{ ansible_password }}"
         clone: "{{ vm.template }}"
-        cores: "{{ vm.cores }}"
-        memory: "{{ vm.memory }}"
         newid: "{{ vm.id }}"
-        scsi: "{{ vm.scsi }}"
         name: "{{ vm.name }}"
         node: "{{ proxmox_node }}"
-        net:
-          net0: "virtio,bridge={{ vm.net_bridge }}"
-        ipconfig:
-          ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
         state: present
 
     - name: Configure VM on Proxmox
@@ -47,6 +40,13 @@
         ciuser: "{{ vm.cloud_user }}"
         cipassword: "{{ vm.cloud_password }}"
         cicustom: "user=local:snippets/{{ vm.name }}-user.yaml"
+        cores: "{{ vm.cores }}"
+        scsi: "{{ vm.scsi }}"
+        memory: "{{ vm.memory }}"
+        net:
+          net0: "virtio,bridge={{ vm.net_bridge }}"
+        ipconfig:
+          ipconfig0: "ip={{ vm.net_ip_address }}/{{ vm.net_subnet }},gw={{ vm.net_gateway }}"
         update: true
         update_unsafe: true
 
