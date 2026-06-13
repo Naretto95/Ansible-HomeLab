@@ -28,7 +28,7 @@
 
 - name: Fail if host is not in required groups
   ansible.builtin.fail:
-    msg: "Host must be in one of: {{ required_group_list }}"
+    msg: "Group {{ group_names }} not allowed. Host must be in one of: {{ required_group_list }}"
   when:
     - required_group_list | length > 0
     - (group_names | intersect(required_group_list)) | length == 0
