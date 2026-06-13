@@ -49,16 +49,12 @@
   meta: flush_handlers
 
 - name: Create database user
-  become: true
-  become_user: postgres
   community.postgresql.postgresql_user:
     name: "{{ postgresql_db_user }}"
     password: "{{ postgresql_db_password }}"
     state: present
 
 - name: Create database
-  become: true
-  become_user: postgres
   community.postgresql.postgresql_db:
     name: "{{ postgresql_db_name }}"
     owner: "{{ postgresql_db_user }}"
