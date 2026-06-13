@@ -1,23 +1,10 @@
 ---
 
-- name: Create cloud-init user config
-  copy:
-    dest: "/var/lib/vz/snippets/{{ vm.name }}-user.yaml"
-    content: |
-      #cloud-config
-      ssh_pwauth: true
-
-      write_files:
-        - path: /etc/ssh/sshd_config.d/99-password-auth.conf
-          content: |
-            PasswordAuthentication yes
-            KbdInteractiveAuthentication yes
-            UsePAM yes
-
-      runcmd:
-        - systemctl restart ssh || systemctl restart sshd
-
 - block:
+
+    - name: Ensure SSH keypair exists
+      include_role:
+        name: common/ssh_keypair
 
     - name: Create VM on Proxmox
       community.proxmox.proxmox_kvm:
@@ -40,6 +27,7 @@
         node: "{{ proxmox_node }}"
         ciuser: "{{ vm.cloud_user }}"
         cipassword: "{{ vm.cloud_password }}"
+        sshkeys: "{{ ssh_public_key }}"
         cores: "{{ vm.cores }}"
         scsi: "{{ vm.scsi }}"
         memory: "{{ vm.memory }}"
@@ -66,4 +54,20 @@
         delay: 10
         timeout: 300
 
+  delegate_to: localhost
+
+- name: Create users on VM
+  include_role:
+    name: services/user_management
+
+- name: Make sure SSH Key is removed from VM
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ ansible_user }}@pam"
+    api_password: "{{ ansible_password }}"
+    vmid: "{{ vm.id }}"
+    node: "{{ proxmox_node }}"
+    sshkeys: ""
+    update: true
+    update_unsafe: true
   delegate_to: localhost

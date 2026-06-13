@@ -6,12 +6,12 @@
     - services/proxmox_templates
     - services/proxmox_instances
     - services/terraform
-    - services/user_management
 
 - name: Bootstrap service nodes (DNS, repos, packages)
   hosts: services
   gather_facts: false
   roles:
+    - services/user_management
     - common/dns_setup
     - common/bootstrap
     - common/repositories

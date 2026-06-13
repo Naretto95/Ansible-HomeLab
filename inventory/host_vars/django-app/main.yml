@@ -1,6 +1,7 @@
 ---
 
 ansible_host: 192.168.1.95
+target_host: server2
 
 lxc_container:
   name: django-app

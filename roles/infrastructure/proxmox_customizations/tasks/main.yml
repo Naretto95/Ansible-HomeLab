@@ -39,15 +39,3 @@
           // Start after page load  
           setTimeout(watchAndRemoveDialog, 100);  
       </script>
-
-- name: Enable snippets on local storage
-  ansible.builtin.replace:
-    path: /etc/pve/storage.cfg
-    regexp: 'content iso,vztmpl,backup$'
-    replace: 'content iso,vztmpl,backup,snippets'
-
-- name: Ensure snippets directory exists
-  ansible.builtin.file:
-    path: /var/lib/vz/snippets
-    state: directory
-    mode: "0755"
