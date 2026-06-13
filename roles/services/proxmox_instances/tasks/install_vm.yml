@@ -1,21 +1,21 @@
 ---
 
-# - name: Create cloud-init user config
-#   copy:
-#     dest: "/var/lib/vz/snippets/{{ vm.name }}-user.yaml"
-#     content: |
-#       #cloud-config
-#       ssh_pwauth: true
+- name: Create cloud-init user config
+  copy:
+    dest: "/var/lib/vz/snippets/{{ vm.name }}-user.yaml"
+    content: |
+      #cloud-config
+      ssh_pwauth: true
 
-#       write_files:
-#         - path: /etc/ssh/sshd_config.d/99-password-auth.conf
-#           content: |
-#             PasswordAuthentication yes
-#             KbdInteractiveAuthentication yes
-#             UsePAM yes
+      write_files:
+        - path: /etc/ssh/sshd_config.d/99-password-auth.conf
+          content: |
+            PasswordAuthentication yes
+            KbdInteractiveAuthentication yes
+            UsePAM yes
 
-#       runcmd:
-#         - systemctl restart ssh || systemctl restart sshd
+      runcmd:
+        - systemctl restart ssh || systemctl restart sshd
 
 - block:
 
