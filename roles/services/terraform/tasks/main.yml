@@ -5,10 +5,6 @@
     lxc_containers: "{{ groups['lxc_containers'] | map('extract', hostvars) | selectattr('target_host', 'equalto', inventory_hostname) | selectattr('lxc_container', 'defined') | map(attribute='lxc_container') | list }}"
     virtual_machines: "{{ groups['virtual_machines'] | map('extract', hostvars) | selectattr('target_host', 'equalto', inventory_hostname) | selectattr('virtual_machine', 'defined') | map(attribute='virtual_machine') | list }}"
 
-- name: Stop role if no lxc_containers or virtual_machines
-  meta: end_role
-  when: lxc_containers | length == 0 and virtual_machines | length == 0
-
 - name: Get existing Proxmox VMs
   ansible.builtin.command: qm list
   register: qm_list
@@ -23,6 +19,10 @@
   set_fact:
     existing_vms: "{{ qm_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
     existing_lxcs: "{{ pct_list.stdout_lines[1:] | map('split') | map('first') | map('int') | list }}"
+
+- name: Stop role if no lxc_containers or virtual_machines
+  meta: end_role
+  when: lxc_containers | length == 0 and virtual_machines | length == 0
 
 - name: Filter services that do not exist yet
   set_fact:
