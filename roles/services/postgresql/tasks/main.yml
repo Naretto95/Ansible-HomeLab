@@ -11,7 +11,7 @@
 
 - name: Ensure PostgreSQL is running
   service:
-    name: psotgresql
+    name: postgresql
     state: started
     enabled: true
 
