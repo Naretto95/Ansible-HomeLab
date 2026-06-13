@@ -7,3 +7,9 @@ postgresql_db_password: change_me
 postgresql_listen_addresses: "*"
 
 postgresql_allowed_networks: []
+
+postgresql_packages:
+  - postgresql
+  - postgresql-contrib
+  - python3-psycopg2
+  - acl
