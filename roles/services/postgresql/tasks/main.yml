@@ -1,14 +1,5 @@
 ---
 
-- name: Install PostgreSQL packages
-  apt:
-    name:
-      - postgresql
-      - postgresql-contrib
-      - python3-psycopg2
-    state: present
-    update_cache: true
-
 - name: Ensure PostgreSQL is running
   service:
     name: postgresql

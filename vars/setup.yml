@@ -70,6 +70,7 @@ docker_images:
       - unzip
     pip_packages:
       - ansible
+      - passlib
       - proxmoxer
       - requests
     terraform:
