@@ -15,6 +15,16 @@
     state: started
     enabled: true
 
+- name: Get installed PostgreSQL version
+  ansible.builtin.shell: |
+    ls /etc/postgresql
+  register: pg_versions
+  changed_when: false
+
+- name: Set PostgreSQL version fact
+  ansible.builtin.set_fact:
+    postgresql_version: "{{ pg_versions.stdout_lines | sort | last }}"
+
 - name: Configure listen_addresses
   lineinfile:
     path: /etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
