@@ -19,7 +19,7 @@ virtual_machine:
   cores: 2
   memory: 4096
   scsi:
-    scsi0:  "local-lvm:40,size=40G"
+    scsi1:  "local-lvm:40,size=40G"
   storage: "local-lvm"
   net_bridge: "vmbr0"
   net_ip_address: "{{ ansible_host }}"
