@@ -20,21 +20,18 @@ for key in "${!VAR_FILES[@]}"; do
   echo "[INFO] Initialized ${FILE}"
 done
 
-for VAR_NAME in  $(compgen -e); do
+while IFS='=' read -r name value; do
   for group in "${VAR_GROUPS[@]}"; do
     prefix="${group}_"
-    if [[ "${VAR_NAME}" == "${prefix}"* ]]; then
-      var_key="${VAR_NAME#"${prefix}"}"
-      value="${!VAR_NAME}"
 
-      if [[ -n "${value}" ]]; then
-        FILE="${VAR_FILES[$group]}"
-        echo "${var_key}: ${value}" >> "${FILE}"
-        echo "[INFO] Wrote ${var_key} to ${FILE}"
-      fi
+    if [[ "$name" == ${prefix}* ]]; then
+      key="${name#${prefix}}"
+      file="${VAR_FILES[$group]}"
 
+      echo "${key}: ${value}" >> "$file"
+      echo "[INFO] Wrote ${key} to ${file}"
     fi
   done
-done
+done < "$ENV_FILE"
 
 echo "[INFO] Private vars files updated successfully"
