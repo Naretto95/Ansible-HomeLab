@@ -26,9 +26,10 @@ lxc_container:
       password: "{{ ansible_password }}"
       sudo: true
 
-github_repositories:
+django_app_dir: /opt/{{ django_app_name }}
 
-  - repo: "Naretto95/OtterVault"
-    dest: "/opt/ottervault"
+github_repositories:
+  - repo: "Naretto95/{{ django_app_name }}"
+    dest: "{{ django_app_dir }}"
     version: "main"
     token: "{{ github_token }}"
