@@ -1,4 +1,5 @@
 ---
+
 django_app_name: app_name
 django_app_dir: /opt/{{ django_app_name }}
 django_secret_key: django-key
