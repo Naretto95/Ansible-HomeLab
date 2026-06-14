@@ -1,0 +1,5 @@
+---
+
+dependencies:
+  - role: common/packages
+    packages: "{{ github_packages }}"
