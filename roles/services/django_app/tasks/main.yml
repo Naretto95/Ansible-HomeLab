@@ -24,7 +24,7 @@
 
   when: runtime_file is defined and runtime_file.content is defined
 
-- name: Set Django database URL and domain
+- name: Set Django database host and domain
   ansible.builtin.set_fact:
     django_database_host: "{{ hostvars['django-db']['ansible_host'] }}"
     django_domain: "{{ django_app_name }}.{{ domain }}"
