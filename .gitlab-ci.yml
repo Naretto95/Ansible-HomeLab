@@ -11,8 +11,8 @@ default:
     - ansible
     - automation
   before_script:
-    - cat "$ENV_FILE"
     - source "$ENV_FILE"
+    - echo "$all_domain"
     - chmod -R o-w .
     - chmod +x ./scripts/setup_vars.sh
     - ./scripts/setup_vars.sh
