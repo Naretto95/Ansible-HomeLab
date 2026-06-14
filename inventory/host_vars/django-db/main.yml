@@ -3,10 +3,6 @@
 ansible_host: 192.168.1.96
 target_host: server2
 
-postgresql_db_name: django-db
-postgresql_db_user: "{{ ansible_user }}"
-postgresql_db_password: "{{ ansible_password }}"
-
 postgresql_listen_addresses: "*"
 
 # Allow only the Django application server

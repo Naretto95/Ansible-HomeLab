@@ -1,0 +1,6 @@
+---
+
+django_app_name: ottervault
+postgresql_db_name: "{{ django_app_name }}-db"
+postgresql_db_user: "{{ ansible_user }}"
+postgresql_db_password: "{{ ansible_password }}"
