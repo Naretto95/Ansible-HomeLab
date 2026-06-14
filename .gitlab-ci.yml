@@ -13,6 +13,7 @@ default:
   before_script:
     - source "$ENV_FILE"
     - echo "$all_domain"
+    - compgen -e
     - chmod -R o-w .
     - chmod +x ./scripts/setup_vars.sh
     - ./scripts/setup_vars.sh
