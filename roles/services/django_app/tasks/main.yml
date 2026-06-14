@@ -1,0 +1,87 @@
+---
+
+- name: Read runtime.txt
+  ansible.builtin.slurp:
+    src: "{{ app_dir }}/runtime.txt"
+  register: runtime_file
+  ignore_errors: true
+  failed_when: false
+
+- block:
+
+    - name: Set raw python version from runtime.txt
+      ansible.builtin.set_fact:
+        python_runtime: >-
+          {{ (runtime_file.content | b64decode).strip() }}
+
+    - name: Normalize python version (major.minor only)
+      ansible.builtin.set_fact:
+        python_version: >-
+          {{
+            (python_runtime.split('-')[1] if 'python-' in python_runtime else python_runtime)
+            .rsplit('.', 1)[0]
+          }}
+
+  when: runtime_file is defined and runtime_file.content is defined
+
+- name: Set Django database URL and domain
+  ansible.builtin.set_fact:
+    django_database_host: "{{ hostvars['django-db']['ansible_host'] }}"
+    django_domain: "{{ django_app_name }}.{{ domain }}"
+
+- name: Build python package list
+  ansible.builtin.set_fact:
+    django_packages:
+      - curl
+      - build-essential
+      - software-properties-common
+      - "python{{ python_version }}"
+      - "python{{ python_version }}-venv"
+      - "python{{ python_version }}-dev"
+
+- include_role:
+    name: common/packages
+  vars:
+    packages: "{{ django_packages }}"
+
+- name: Create virtualenv
+  ansible.builtin.command:
+    cmd: "python{{ python_version }} -m venv {{ venv_dir }}"
+    creates: "{{ venv_dir }}/bin/activate"
+
+# -------------------------
+# Install dependencies
+# -------------------------
+- name: Install Python dependencies
+  ansible.builtin.pip:
+    requirements: "{{ app_dir }}/requirements.txt"
+    virtualenv: "{{ venv_dir }}"
+
+# -------------------------
+# Environment file
+# -------------------------
+- name: Create .env file
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ app_dir }}/.env"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: "0600"
+
+# -------------------------
+# systemd service
+# -------------------------
+- name: Install systemd service
+  ansible.builtin.template:
+    src: gunicorn.service.j2
+    dest: "/etc/systemd/system/{{ app_name }}.service"
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable and start service
+  ansible.builtin.systemd:
+    name: "{{ app_name }}"
+    enabled: true
+    state: restarted

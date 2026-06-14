@@ -9,8 +9,9 @@ declare -A VAR_FILES
 VAR_FILES["cluster"]="${SCRIPT_DIR}/../inventory/group_vars/cluster/private_vars.yml"
 VAR_FILES["services"]="${SCRIPT_DIR}/../inventory/group_vars/services/private_vars.yml"
 VAR_FILES["all"]="${SCRIPT_DIR}/../inventory/group_vars/all/private_vars.yml"
+VAR_FILES["django-app"]="${SCRIPT_DIR}/../inventory/host_vars/django-app/private_vars.yml"
 
-VAR_GROUPS=("cluster" "services" "all")
+VAR_GROUPS=("cluster" "services" "all" "django-app")
 
 for key in "${!VAR_FILES[@]}"; do
   FILE="${VAR_FILES[$key]}"

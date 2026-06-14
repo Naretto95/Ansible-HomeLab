@@ -1,0 +1,13 @@
+---
+
+django_app_dir: /opt/app_name
+django_app_name: app_name
+django_secret_key: django-key
+django_api_key: api-key
+django_allowed_hosts: ['*']
+django_database_user: db_name
+django_database_password: change_me
+django_database_port: 5432
+django_email_host_password: email_password
+
+python_version: "3.11"
