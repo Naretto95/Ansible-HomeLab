@@ -1,0 +1,14 @@
+---
+
+- name: Clone or update GitHub repositories
+  ansible.builtin.git:
+    repo: >-
+      https://oauth2:{{ github_token }}@github.com/{{ item.repo }}.git
+    dest: "{{ item.dest }}"
+    version: "{{ item.version | default('HEAD') }}"
+    update: true
+    force: "{{ item.force | default(false) }}"
+  loop: "{{ github_repositories }}"
+  loop_control:
+    label: "{{ item.repo }}"
+  no_log: true
