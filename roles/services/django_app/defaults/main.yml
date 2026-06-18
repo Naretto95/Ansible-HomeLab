@@ -3,6 +3,7 @@
 domain: example.com
 django_app_name: app_name
 django_app_dir: /opt/{{ django_app_name }}
+venv_dir: "{{ django_app_dir }}/venv"
 django_domain: "{{ django_app_name }}.{{ domain }}"
 django_database_host: "{{ hostvars['django-db']['ansible_host'] }}"
 django_secret_key: django-key
