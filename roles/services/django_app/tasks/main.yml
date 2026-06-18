@@ -24,11 +24,6 @@
 
   when: runtime_file is defined and runtime_file.content is defined
 
-- name: Set Django database host and domain
-  ansible.builtin.set_fact:
-    django_database_host: "{{ hostvars['django-db']['ansible_host'] }}"
-    django_domain: "{{ django_app_name }}.{{ domain }}"
-
 - name: Build python package list
   ansible.builtin.set_fact:
     django_packages:
@@ -49,17 +44,11 @@
     cmd: "python{{ python_version }} -m venv {{ venv_dir }}"
     creates: "{{ venv_dir }}/bin/activate"
 
-# -------------------------
-# Install dependencies
-# -------------------------
 - name: Install Python dependencies
   ansible.builtin.pip:
     requirements: "{{ app_dir }}/requirements.txt"
     virtualenv: "{{ venv_dir }}"
 
-# -------------------------
-# Environment file
-# -------------------------
 - name: Create .env file
   ansible.builtin.template:
     src: env.j2
@@ -68,9 +57,6 @@
     group: "{{ app_user }}"
     mode: "0600"
 
-# -------------------------
-# systemd service
-# -------------------------
 - name: Install systemd service
   ansible.builtin.template:
     src: gunicorn.service.j2
