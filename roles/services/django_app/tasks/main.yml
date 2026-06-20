@@ -2,7 +2,7 @@
 
 - name: Read runtime.txt
   ansible.builtin.slurp:
-    src: "{{ app_dir }}/runtime.txt"
+    src: "{{ django_app_dir }}/runtime.txt"
   register: runtime_file
   ignore_errors: true
   failed_when: false
@@ -29,6 +29,7 @@
     django_packages:
       - curl
       - build-essential
+      - nginx
       - software-properties-common
       - "python{{ python_version }}"
       - "python{{ python_version }}-venv"
@@ -46,21 +47,21 @@
 
 - name: Install Python dependencies
   ansible.builtin.pip:
-    requirements: "{{ app_dir }}/requirements.txt"
+    requirements: "{{ django_app_dir }}/requirements.txt"
     virtualenv: "{{ venv_dir }}"
 
 - name: Create .env file
   ansible.builtin.template:
     src: env.j2
-    dest: "{{ app_dir }}/.env"
-    owner: "{{ app_user }}"
-    group: "{{ app_user }}"
+    dest: "{{ django_app_dir }}/.env"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     mode: "0600"
 
 - name: Install systemd service
   ansible.builtin.template:
     src: gunicorn.service.j2
-    dest: "/etc/systemd/system/{{ app_name }}.service"
+    dest: "/etc/systemd/system/{{ django_app_name }}.service"
 
 - name: Reload systemd
   ansible.builtin.systemd:
@@ -68,6 +69,31 @@
 
 - name: Enable and start service
   ansible.builtin.systemd:
-    name: "{{ app_name }}"
+    name: "{{ django_app_name }}"
+    enabled: true
+    state: restarted
+
+- name: Create nginx site config
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "/etc/nginx/sites-available/{{ django_app_name }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable nginx site
+  ansible.builtin.file:
+    src: "/etc/nginx/sites-available/{{ django_app_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ django_app_name }}"
+    state: link
+
+- name: Remove default nginx site
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Ensure nginx is running
+  ansible.builtin.systemd:
+    name: nginx
     enabled: true
     state: restarted
