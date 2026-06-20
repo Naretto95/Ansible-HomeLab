@@ -1,0 +1,35 @@
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name {{ django_domain }};
+
+    client_max_body_size 20M;
+
+    access_log /var/log/nginx/{{ app_name }}.access.log;
+    error_log  /var/log/nginx/{{ app_name }}.error.log;
+
+    location /static/ {
+        alias {{ django_app_dir }}/static/;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
+    location /media/ {
+        alias {{ django_app_dir }}/media/;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
+    location / {
+        proxy_pass http://unix:/run/{{ app_name }}.sock;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_connect_timeout 60;
+        proxy_send_timeout 60;
+        proxy_read_timeout 60;
+    }
+}

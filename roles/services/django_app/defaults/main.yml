@@ -1,17 +1,22 @@
 ---
 
 domain: example.com
+
 django_app_name: app_name
 django_app_dir: /opt/{{ django_app_name }}
-venv_dir: "{{ django_app_dir }}/venv"
+django_database_port: 5432
+django_email_host_password: email_password
 django_domain: "{{ django_app_name }}.{{ domain }}"
 django_database_host: "{{ hostvars['django-db']['ansible_host'] }}"
 django_secret_key: django-key
 django_api_key: api-key
+
+venv_dir: "{{ django_app_dir }}/venv"
+
 postgresql_db_name: "{{ django_app_name }}-db"
 postgresql_db_user: "{{ ansible_user }}"
 postgresql_db_password: "{{ ansible_password }}"
-django_database_port: 5432
-django_email_host_password: email_password
+
+gunicorn_workers: 3
 
 python_version: "3.11"

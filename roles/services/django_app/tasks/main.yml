@@ -29,6 +29,7 @@
     django_packages:
       - curl
       - build-essential
+      - nginx
       - software-properties-common
       - "python{{ python_version }}"
       - "python{{ python_version }}-venv"
@@ -69,5 +70,30 @@
 - name: Enable and start service
   ansible.builtin.systemd:
     name: "{{ app_name }}"
+    enabled: true
+    state: restarted
+
+- name: Create nginx site config
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "/etc/nginx/sites-available/{{ app_name }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable nginx site
+  ansible.builtin.file:
+    src: "/etc/nginx/sites-available/{{ app_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ app_name }}"
+    state: link
+
+- name: Remove default nginx site
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Ensure nginx is running
+  ansible.builtin.systemd:
+    name: nginx
     enabled: true
     state: restarted
