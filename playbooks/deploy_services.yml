@@ -26,3 +26,6 @@
 
     - role: services/postgresql
       when: inventory_hostname == 'django-db'
+
+    - role: services/django_app
+      when: inventory_hostname == 'django-app'
