@@ -28,6 +28,6 @@ lxc_container:
 
 github_repositories:
   - repo: "Naretto95/{{ django_app_name }}"
-    dest: "{{ django_app_dir }}"
+    dest: "/opt/{{ django_app_name }}"
     version: "main"
     token: "{{ github_token }}"
