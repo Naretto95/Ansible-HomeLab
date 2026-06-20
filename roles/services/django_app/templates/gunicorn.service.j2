@@ -1,5 +1,5 @@
 [Unit]
-Description=Gunicorn daemon for {{ app_name }}
+Description=Gunicorn daemon for {{ django_app_name }}
 After=network.target
 
 [Service]
@@ -11,8 +11,8 @@ EnvironmentFile={{ django_app_dir }}/.env
 
 ExecStart={{ venv_dir }}/bin/gunicorn \
     --workers {{ gunicorn_workers }} \
-    --bind unix:/run/{{ app_name }}.sock \
-    'config.wsgi:application'
+    --bind unix:/run/{{ django_app_name }}.sock \
+    {{ django_project_module }}.wsgi:application
 
 Restart=always
 RestartSec=5

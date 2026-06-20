@@ -3,7 +3,8 @@
 domain: example.com
 
 django_app_name: app_name
-django_app_dir: /opt/{{ django_app_name }}
+django_app_dir: "/opt/{{ django_app_name }}"
+django_project_module: "{{ django_app_name }}"
 django_database_port: 5432
 django_email_host_password: email_password
 django_domain: "{{ django_app_name }}.{{ domain }}"

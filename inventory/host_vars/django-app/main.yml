@@ -26,8 +26,6 @@ lxc_container:
       password: "{{ ansible_password }}"
       sudo: true
 
-django_app_dir: /opt/{{ django_app_name }}
-
 github_repositories:
   - repo: "Naretto95/{{ django_app_name }}"
     dest: "{{ django_app_dir }}"
