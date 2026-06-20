@@ -19,6 +19,7 @@ default:
 stages:
   - setup_infra
   - deploy_services
+  - deploy_django
 
 setup_infra:
   stage: setup_infra
@@ -36,4 +37,13 @@ deploy_services:
     - ansible-playbook -i inventory/hosts.ini playbooks/deploy_services.yml -v
   rules:
     - if: '$deploy_services == "true"'
+      when: on_success
+
+deploy_django:
+  stage: deploy_django
+  script:
+    - echo "[INFO] Starting Ansible playbook for django"
+    - ansible-playbook -i inventory/hosts.ini playbooks/deploy_django.yml -v
+  rules:
+    - if: '$deploy_django == "true"'
       when: on_success
