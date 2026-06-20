@@ -19,7 +19,6 @@ default:
 stages:
   - setup_infra
   - deploy_services
-  - deploy_django
 
 setup_infra:
   stage: setup_infra
