@@ -2,7 +2,7 @@
 
 - name: Read runtime.txt
   ansible.builtin.slurp:
-    src: "{{ app_dir }}/runtime.txt"
+    src: "{{ django_app_dir }}/runtime.txt"
   register: runtime_file
   ignore_errors: true
   failed_when: false
@@ -47,13 +47,13 @@
 
 - name: Install Python dependencies
   ansible.builtin.pip:
-    requirements: "{{ app_dir }}/requirements.txt"
+    requirements: "{{ django_app_dir }}/requirements.txt"
     virtualenv: "{{ venv_dir }}"
 
 - name: Create .env file
   ansible.builtin.template:
     src: env.j2
-    dest: "{{ app_dir }}/.env"
+    dest: "{{ django_app_dir }}/.env"
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
     mode: "0600"
