@@ -10,7 +10,7 @@ server {
     error_log  /var/log/nginx/{{ django_app_name }}.error.log;
 
     location /static/ {
-        alias {{ django_app_dir }}/static/;
+        alias {{ django_app_dir }}/staticfiles/;
         expires 30d;
         add_header Cache-Control "public";
     }
