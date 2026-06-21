@@ -3,6 +3,7 @@
 python_version: "3.11"
 python_repos:
   - filename: deadsnakes
+    types: ['deb']
     uris: https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu
     gpg_key: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x6A755776
     suites: jammy
