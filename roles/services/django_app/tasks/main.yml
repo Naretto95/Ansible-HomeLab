@@ -53,8 +53,8 @@
   ansible.builtin.template:
     src: .env.j2
     dest: "{{ django_app_dir }}/.env"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: root
+    group: root
     mode: "0600"
 
 - name: Run Django makemigrations
