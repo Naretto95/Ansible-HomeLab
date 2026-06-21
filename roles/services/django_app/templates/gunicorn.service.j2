@@ -3,8 +3,7 @@ Description=Gunicorn daemon for {{ django_app_name }}
 After=network.target
 
 [Service]
-User={{ ansible_user }}
-Group={{ ansible_user }}
+User=root
 WorkingDirectory={{ django_app_dir }}
 
 EnvironmentFile={{ django_app_dir }}/.env
