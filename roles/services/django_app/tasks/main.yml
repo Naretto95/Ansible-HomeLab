@@ -40,7 +40,7 @@
 - name: Create virtualenv
   ansible.builtin.command:
     cmd: "{{ python_binary.stdout }} -m venv {{ venv_dir }}"
-    creates: "{{ venv_dir }}/bin/activate"
+    creates: "{{ venv_dir }}/bin/python"
 
 - name: Install Python dependencies
   ansible.builtin.pip:
