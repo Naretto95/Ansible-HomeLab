@@ -20,7 +20,7 @@ for key in "${!VAR_FILES[@]}"; do
   echo "[INFO] Initialized ${FILE}"
 done
 
-while IFS='=' read -r name value; do
+while IFS='=' read -r name value || [[ -n "$name" ]]; do
   for group in "${VAR_GROUPS[@]}"; do
     prefix="${group}_"
 
