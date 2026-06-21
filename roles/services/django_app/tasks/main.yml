@@ -30,7 +30,6 @@
       - curl
       - build-essential
       - nginx
-      - software-properties-common
       - "python{{ python_version }}"
       - "python{{ python_version }}-venv"
       - "python{{ python_version }}-dev"
