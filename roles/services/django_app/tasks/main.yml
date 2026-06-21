@@ -41,7 +41,6 @@
   ansible.builtin.pip:
     virtualenv: "{{ venv_dir }}"
     virtualenv_command: "{{ python_binary.stdout }} -m venv"
-    name: pip
     state: present
 
 - name: Install Python dependencies
