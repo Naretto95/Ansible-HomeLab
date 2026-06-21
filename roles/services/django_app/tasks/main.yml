@@ -30,7 +30,7 @@
   changed_when: false
   
 - name: Catch python binary
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: |
       eval "$(pyenv init -)"
       echo $(pyenv shell {{ python_version }}; pyenv which python)
