@@ -1,0 +1,6 @@
+---
+
+python_version: "3.11"
+python_repos:
+  - repo: "ppa:deadsnakes/ppa"
+    filename: "deadsnakes"

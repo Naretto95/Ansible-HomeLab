@@ -1,0 +1,7 @@
+---
+
+wireguard_packages:
+  - wireguard
+  - qrencode
+  - iproute2
+  - iptables

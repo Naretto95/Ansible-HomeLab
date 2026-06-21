@@ -2,6 +2,7 @@
 
 - name: Add APT repositories
   apt_repository:
+    validate_certs: no
     repo: "{{ item.repo }}"
     filename: "{{ item.filename }}"
     state: "{{ repos_state }}"

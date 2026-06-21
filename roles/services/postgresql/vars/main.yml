@@ -1,0 +1,7 @@
+---
+
+postgresql_packages:
+  - postgresql
+  - postgresql-contrib
+  - python3-psycopg2
+  - acl

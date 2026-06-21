@@ -19,9 +19,3 @@ postgresql_db_user: "{{ ansible_user }}"
 postgresql_db_password: "{{ ansible_password }}"
 
 gunicorn_workers: 3
-
-python_version: "3.11"
-
-python_repos:
-  - repo: "ppa:deadsnakes/ppa"
-    filename: "deadsnakes"
