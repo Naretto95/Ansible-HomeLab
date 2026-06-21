@@ -6,11 +6,14 @@ django_app_name: app_name
 django_app_dir: "/opt/{{ django_app_name }}"
 django_project_module: "{{ django_app_name }}"
 django_database_port: 5432
-django_email_host_password: email_password
+django_email: test@gmail.com
+django_email_password: email_password
 django_domain: "{{ django_app_name }}.{{ domain }}"
 django_database_host: "{{ hostvars['django-db']['ansible_host'] }}"
 django_secret_key: django-key
 django_api_key: api-key
+django_superuser_username: "{{ ansible_user }}"
+django_superuser_password: "{{ ansible_password }}"
 
 venv_dir: "{{ django_app_dir }}/venv"
 
