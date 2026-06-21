@@ -21,3 +21,7 @@ postgresql_db_password: "{{ ansible_password }}"
 gunicorn_workers: 3
 
 python_version: "3.11"
+
+debian_repos:
+  - repo: "ppa:deadsnakes/ppa"
+    filename: "deadsnakes"

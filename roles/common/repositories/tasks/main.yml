@@ -13,6 +13,7 @@
   loop: "{{ debian_repos }}"
   when:
     - os_family in ["Debian", "Proxmox"]
+    - item.gpg_key is defined
 
 - name: Install packages
   include_tasks: debian.yml

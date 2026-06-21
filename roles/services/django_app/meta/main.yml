@@ -1,6 +1,7 @@
 ---
 
 dependencies:
+  - role: common/repositories
   - role: common/role_guard
     vars:
       required_group: "services"
