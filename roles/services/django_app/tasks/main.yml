@@ -53,9 +53,46 @@
   ansible.builtin.template:
     src: .env.j2
     dest: "{{ django_app_dir }}/.env"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: root
+    group: root
     mode: "0600"
+
+- name: Run Django makemigrations
+  ansible.builtin.command:
+    cmd: "{{ venv_dir }}/bin/python manage.py makemigrations"
+    chdir: "{{ django_app_dir }}"
+
+- name: Run Django migrate
+  ansible.builtin.command:
+    cmd: "{{ venv_dir }}/bin/python manage.py migrate"
+    chdir: "{{ django_app_dir }}"
+
+- name: Run Django collectstatic
+  ansible.builtin.command:
+    cmd: "{{ venv_dir }}/bin/python manage.py collectstatic --noinput"
+    chdir: "{{ django_app_dir }}"
+
+- name: Create Django superuser (if not exists)
+  ansible.builtin.shell: |
+    {{ venv_dir }}/bin/python manage.py shell << EOF
+    from django.contrib.auth import get_user_model
+
+    User = get_user_model()
+
+    username = "{{ django_superuser_username }}"
+    email = "{{ django_email }}"
+    password = "{{ django_superuser_password }}"
+
+    if not User.objects.filter(username=username).exists():
+        User.objects.create_superuser(username, email, password)
+        print("created")
+    else:
+        print("exists")
+    EOF
+  args:
+    chdir: "{{ django_app_dir }}"
+  register: superuser_result
+  changed_when: "'created' in superuser_result.stdout"
 
 - name: Install systemd service
   ansible.builtin.template:
