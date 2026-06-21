@@ -1,0 +1,7 @@
+---
+
+django_packages:
+  - curl
+  - build-essential
+  - nginx
+  - pyenv

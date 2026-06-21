@@ -1,0 +1,8 @@
+---
+
+- name: Add APT repository
+  apt_repository:
+    repo: "{{ repo.repo }}"
+    filename: "{{ repo.filename }}"
+    state: "{{ repos_state }}"
+    update_cache: true

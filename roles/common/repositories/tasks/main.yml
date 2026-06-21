@@ -10,17 +10,29 @@
     url: "{{ item.gpg_key }}"
     dest: "/usr/share/keyrings/{{ item.filename }}.gpg"
     mode: '0644'
-  loop: "{{ debian_repos }}"
+  loop: "{{ apt_repos + deb822_repos }}"
   when:
     - os_family in ["Debian", "Proxmox"]
     - item.gpg_key is defined
 
-- name: Install packages
-  include_tasks: debian.yml
-  when: 
-    - os_family == "Debian"
+- name: Install apt repositories
+  include_tasks: apt_repository.yml
+  loop: "{{ apt_repos }}"
+  loop_control:
+    loop_var: repo
 
-- name: Remove packages
-  include_tasks: proxmox.yml
+- name: Install deb822 repositories
+  include_tasks: deb822_repository.yml
+  loop: "{{ deb822_repos }}"
+  loop_control:
+    loop_var: repo
+
+- name: Remove Proxmox enterprise .sources file
+  ansible.builtin.file:
+    path: "/etc/apt/sources.list.d/{{ item }}"
+    state: absent
+  loop:
+    - pve-enterprise.sources
+    - ceph.sources
   when:
     - os_family == "Proxmox"

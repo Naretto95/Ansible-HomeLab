@@ -24,23 +24,22 @@
 
   when: runtime_file is defined and runtime_file.content is defined
 
-- name: Build python package list
-  ansible.builtin.set_fact:
-    django_packages:
-      - curl
-      - build-essential
-      - nginx
-      - "python{{ python_version }}"
-      - "python{{ python_version }}-venv"
-
-- include_role:
-    name: common/packages
-  vars:
-    packages: "{{ django_packages }}"
+- name: Install python {{ python_version }} with pyenv
+  ansible.builtin.command:
+    cmd: "pyenv install -s {{ python_version }}"
+  changed_when: false
+  
+- name: Catch python binary
+  ansible.builtin.command:
+    cmd: |
+      eval "$(pyenv init -)"
+      echo $(pyenv shell {{ python_version }}; pyenv which python)
+  register: python_binary
+  changed_when: false
 
 - name: Create virtualenv
   ansible.builtin.command:
-    cmd: "python{{ python_version }} -m venv {{ venv_dir }}"
+    cmd: "{{ python_binary.stdout }} -m venv {{ venv_dir }}"
     creates: "{{ venv_dir }}/bin/activate"
 
 - name: Install Python dependencies

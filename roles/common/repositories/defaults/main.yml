@@ -1,4 +1,5 @@
 ---
 
-debian_repos: []
+apt_repos: []
+deb822_repos: []
 repos_state: present
