@@ -6,7 +6,7 @@ target_host: server2
 lxc_container:
   name: django-app
   id: 101
-  template: "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
+  template: "debian-13-standard_13.1-2_amd64.tar.zst"
   memory: 2048
   swap: 512
   cores: 2
