@@ -3,5 +3,6 @@
 django_packages:
   - curl
   - build-essential
+  - python3-packaging
   - nginx
   - pyenv
