@@ -22,6 +22,6 @@ gunicorn_workers: 3
 
 python_version: "3.11"
 
-debian_repos:
+python_repos:
   - repo: "ppa:deadsnakes/ppa"
     filename: "deadsnakes"

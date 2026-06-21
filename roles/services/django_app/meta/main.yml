@@ -3,7 +3,7 @@
 dependencies:
   - role: common/repositories
     vars:
-      debian_repos: "{{ debian_repos }}"
+      debian_repos: "{{ python_repos }}"
   - role: common/role_guard
     vars:
       required_group: "services"
