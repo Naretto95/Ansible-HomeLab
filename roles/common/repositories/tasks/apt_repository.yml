@@ -6,14 +6,3 @@
     filename: "{{ repo.filename }}"
     state: "{{ repos_state }}"
     update_cache: true
-
-- name: Add APT repositories (deb822)
-  ansible.builtin.deb822_repository:
-    name: "{{ repo.name }}"
-    types: deb
-    uris: "{{ repo.uris }}"
-    suites: "{{ repo.suites }}"
-    components: "{{ repo.components }}"
-    signed_by: "{{ repo.signed_by}}"
-  when:
-    - repo.type is defined and repo.type == "deb822"
