@@ -3,10 +3,10 @@
 - name: Add APT repositories (deb822)
   ansible.builtin.deb822_repository:
     name: "{{ repo.filename }}"
-    types: "{{ item.types }}"
+    types: "{{ repo.types }}"
     uris: "{{ repo.uris }}"
     suites: "{{ repo.suites }}"
     enabled: true
     components: "{{ repo.components }}"
-    signed_by: "/usr/share/keyrings/{{ item.filename }}.gpg"
+    signed_by: "/usr/share/keyrings/{{ repo.filename }}.gpg"
     state: "{{ repos_state }}"
