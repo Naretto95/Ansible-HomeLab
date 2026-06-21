@@ -31,4 +31,8 @@
         vmid: "{{ container.id }}"
         state: started
 
+    - include_tasks: wait_ssh_healthy.yml
+      vars:
+        ip_address: "{{ container.net_ip_address }}"
+
   delegate_to: localhost
