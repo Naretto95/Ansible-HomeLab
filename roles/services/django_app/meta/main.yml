@@ -1,8 +1,9 @@
 ---
 
 dependencies:
-  - role: common/packages
-    packages: "{{ django_packages }}"
+  - role: common/repositories
+    vars:
+      debian_repos: "{{ python_repos }}"
   - role: common/role_guard
     vars:
       required_group: "services"
