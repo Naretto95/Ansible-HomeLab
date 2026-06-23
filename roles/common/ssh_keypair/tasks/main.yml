@@ -7,7 +7,7 @@
     mode: "0700"
 
 - name: Generate SSH keypair if missing (or forced)
-  command: >
+  ansible.builtin.command: >
     ssh-keygen -t {{ ssh_key_type }}
     -N ''
     -f {{ ssh_key_path }}

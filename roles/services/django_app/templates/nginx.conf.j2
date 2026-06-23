@@ -6,17 +6,8 @@ server {
 
     client_max_body_size 20M;
 
-    access_log /var/log/nginx/{{ django_app_name }}.access.log;
-    error_log  /var/log/nginx/{{ django_app_name }}.error.log;
-
     location /static/ {
         alias {{ django_app_dir }}/staticfiles/;
-        expires 30d;
-        add_header Cache-Control "public";
-    }
-
-    location /media/ {
-        alias {{ django_app_dir }}/media/;
         expires 30d;
         add_header Cache-Control "public";
     }
