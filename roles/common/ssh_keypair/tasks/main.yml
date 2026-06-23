@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure .ssh directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ ssh_key_path | dirname }}"
     state: directory
     mode: "0700"

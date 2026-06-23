@@ -2,7 +2,7 @@
 
 - name: Disable all MOTD scripts if folder exists
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     mode: '0644'
   loop: "{{ lookup('fileglob','/etc/update-motd.d/*', wantlist=True) }}"

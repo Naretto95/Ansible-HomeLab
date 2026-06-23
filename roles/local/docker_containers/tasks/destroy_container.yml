@@ -13,6 +13,6 @@
   when: container_dir.stat.isdir | default(false)
 
 - name: Remove container base folder
-  file:
+  ansible.builtin.file:
     path: "{{ base_directory }}/{{ container.name }}"
     state: absent

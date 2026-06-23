@@ -2,12 +2,12 @@
 - block:
 
     - name: Clear old Terraform files
-      file:
+      ansible.builtin.file:
         path: "/tmp/terraform/{{ ansible_host }}"
         state: absent
 
     - name: Ensure destination directory exists
-      file:
+      ansible.builtin.file:
         path: "/tmp/terraform/{{ ansible_host }}"
         state: directory
         mode: '0755'

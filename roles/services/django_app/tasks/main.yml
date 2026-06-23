@@ -58,7 +58,7 @@
     mode: "0600"
 
 - name: Create staticfiles directory
-  file:
+  ansible.builtin.file:
     path: "{{ django_static_root }}"
     state: directory
     mode: "0755"
@@ -137,7 +137,7 @@
         update_cache: true
 
     - name: Create mount directory
-      file:
+      ansible.builtin.file:
         path: "{{ django_static_root }}"
         state: directory
 

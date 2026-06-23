@@ -15,7 +15,7 @@ lxc_container:
   net_ip_address: "{{ ansible_host }}"
   net_subnet: 24
   net_gateway: "{{ net_gateway }}"
-  lxc_unprivileged: true
+  lxc_unprivileged: false
   start: true
   features:
     - nesting=1
