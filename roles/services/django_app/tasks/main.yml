@@ -74,6 +74,8 @@
   ansible.builtin.command: exportfs -ra
   changed_when: false
 
+- meta: flush_handlers
+
 - name: Run Django makemigrations
   ansible.builtin.command:
     cmd: "{{ venv_dir }}/bin/python manage.py makemigrations"
