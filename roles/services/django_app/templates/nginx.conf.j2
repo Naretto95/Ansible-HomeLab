@@ -7,7 +7,7 @@ server {
     client_max_body_size 20M;
 
     location /static/ {
-        alias {{ django_static_root }};
+        alias {{ remote_static_root }};
         expires 30d;
         add_header Cache-Control "public";
     }

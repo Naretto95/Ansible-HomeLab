@@ -57,25 +57,6 @@
     group: root
     mode: "0600"
 
-- name: Create staticfiles directory
-  ansible.builtin.file:
-    path: "{{ django_static_root }}"
-    state: directory
-    mode: "0755"
-
-- name: Configure NFS exports
-  lineinfile:
-    path: /etc/exports
-    line: "{{ django_static_root }} {{ hostvars['web']['ansible_host'] }}(rw,sync,no_subtree_check,no_root_squash)"
-    create: true
-  notify: Restart NFS server
-
-- name: Apply NFS exports
-  ansible.builtin.command: exportfs -ra
-  changed_when: false
-
-- meta: flush_handlers
-
 - name: Run Django makemigrations
   ansible.builtin.command:
     cmd: "{{ venv_dir }}/bin/python manage.py makemigrations"
@@ -130,32 +111,13 @@
 
 - block:
 
-    - name: Install NFS client
-      apt:
-        name: nfs-common
-        state: present
-        update_cache: true
-
-    - name: Create mount directory
-      ansible.builtin.file:
-        path: "{{ django_static_root }}"
-        state: directory
-
-    - name: Mount NFS share
-      mount:
-        path: "{{ django_static_root }}"
-        src: "{{ ansible_host }}:{{ django_static_root }}"
-        fstype: nfs
-        opts: defaults
-        state: mounted
-
-    - name: Ensure mount persists
-      mount:
-        path: "{{ django_static_root }}"
-        src: "{{ ansible_host }}:{{ django_static_root }}"
-        fstype: nfs
-        opts: defaults
-        state: present
+    - name: Sync Django staticfiles to Nginx server
+      ansible.posix.synchronize:
+        src: "{{ local_static_root }}"
+        dest: "{{ remote_static_root }}"
+        mode: push
+        delete: true
+        recursive: true
 
     - name: Create nginx site config
       ansible.builtin.template:
