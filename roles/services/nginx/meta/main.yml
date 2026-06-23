@@ -1,0 +1,9 @@
+---
+
+dependencies:
+  - role: common/packages
+    packages: "{{ nginx_packages }}"
+  - role: common/role_guard
+    vars:
+      required_group: "services"
+      required_os: "Debian"
