@@ -1,0 +1,27 @@
+---
+
+ansible_host: 192.168.1.97
+target_host: server2
+
+lxc_container:
+  name: nginx-web
+  id: 102
+  template: "debian-13-standard_13.1-2_amd64.tar.zst"
+  memory: 1024
+  swap: 512
+  cores: 2
+  rootfs: "local-lvm:8"
+  net_bridge: "vmbr0"
+  net_ip_address: "{{ ansible_host }}"
+  net_subnet: 24
+  net_gateway: "{{ net_gateway }}"
+  lxc_unprivileged: true
+  start: true
+  features:
+    - nesting=1
+    - keyctl=1
+  root_password: "{{ ansible_password }}"
+  users:
+    - name: "{{ ansible_user }}"
+      password: "{{ ansible_password }}"
+      sudo: true

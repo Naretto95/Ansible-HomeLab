@@ -10,7 +10,7 @@ EnvironmentFile={{ django_app_dir }}/.env
 
 ExecStart={{ venv_dir }}/bin/gunicorn \
     --workers {{ gunicorn_workers }} \
-    --bind unix:/run/{{ django_app_name }}.sock \
+    --bind 0.0.0.0:8000 \
     {{ django_project_module }}.wsgi:application
 
 Restart=always
