@@ -118,14 +118,15 @@
           - sshpass
         state: present
         update_cache: true
-    
-    - name: Ensure staticfiles directory exists on Nginx server
-      ansible.builtin.file:
-        path: "{{ remote_static_root }}"
-        state: directory
-        owner: www-data
-        group: www-data
-        mode: "0755"
+
+    - name: Allow user_svc to run rsync without password
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/user_svc-rsync
+        content: |
+          user_svc ALL=(root) NOPASSWD: /usr/bin/rsync
+        owner: root
+        group: root
+        mode: "0440"
 
     - name: Sync Django staticfiles to Nginx server
       ansible.posix.synchronize:
@@ -134,7 +135,7 @@
         mode: push
         delete: true
         recursive: true
-        rsync_path: "rsync"
+        rsync_path: "sudo rsync"
 
     - name: Create nginx site config
       ansible.builtin.template:
