@@ -18,8 +18,10 @@
   delegate_to: "{{ master_host }}"
 
 - name: Add master to known_hosts
-  ansible.builtin.shell: "ssh-keyscan -H {{ master_ip }} >> /root/.ssh/known_hosts"
-  changed_when: false
+  ansible.builtin.known_hosts:
+    name: "{{ master_ip }}"
+    key: "{{ lookup('pipe', 'ssh-keyscan -H ' + master_ip) }}"
+    path: "{{ ansible_env.HOME }}/.ssh/known_hosts"
 
 - name: Join cluster if not already joined
   ansible.builtin.command: pvecm add {{ master_ip }} --use_ssh 1
