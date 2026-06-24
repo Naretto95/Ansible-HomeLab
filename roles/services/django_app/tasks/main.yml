@@ -124,6 +124,7 @@
         dest: /etc/sudoers.d/user_svc-rsync
         content: |
           user_svc ALL=(root) NOPASSWD: /usr/bin/rsync
+          Defaults:user_svc !use_pty
         owner: root
         group: root
         mode: "0440"
@@ -135,7 +136,6 @@
         mode: push
         delete: true
         recursive: true
-        rsync_path: "sudo rsync"
 
     - name: Create nginx site config
       ansible.builtin.template:
