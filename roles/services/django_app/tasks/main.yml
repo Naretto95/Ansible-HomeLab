@@ -119,23 +119,24 @@
         state: present
         update_cache: true
 
-    - name: Allow user_svc to run rsync without password
+    - name: Allow {{ ansible_user }} to run rsync without password
       ansible.builtin.copy:
-        dest: /etc/sudoers.d/user_svc-rsync
+        dest: /etc/sudoers.d/{{ ansible_user }}-rsync
         content: |
-          user_svc ALL=(root) NOPASSWD: /usr/bin/rsync
-          Defaults:user_svc !use_pty
+          {{ ansible_user }} ALL=(root) NOPASSWD: /usr/bin/rsync, /usr/bin/rsync *, /usr/bin/sudo
+          Defaults:{{ ansible_user }} !use_pty
         owner: root
         group: root
         mode: "0440"
 
-    - name: Sync Django staticfiles to Nginx server
+    - name: Sync Django staticfiles
       ansible.posix.synchronize:
         src: "{{ local_static_root }}"
         dest: "{{ remote_static_root }}"
         mode: push
         delete: true
         recursive: true
+        rsync_path: "sudo rsync"
 
     - name: Create nginx site config
       ansible.builtin.template:
