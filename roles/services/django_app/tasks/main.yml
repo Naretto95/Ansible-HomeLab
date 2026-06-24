@@ -123,7 +123,7 @@
       ansible.builtin.copy:
         dest: /etc/sudoers.d/{{ ansible_user }}-rsync
         content: |
-          {{ ansible_user }} ALL=(root) NOPASSWD: /usr/bin/rsync
+          {{ ansible_user }} ALL= NOPASSWD:/usr/bin/rsync
         owner: root
         group: root
         mode: "0440"
