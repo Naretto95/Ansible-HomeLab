@@ -110,6 +110,7 @@
     state: restarted
 
 - name: Generate SSH key
+  become: false
   ansible.builtin.openssh_keypair:
     path: "{{ ansible_env.HOME }}/.ssh/id_rsa"
     type: ed25519
@@ -121,11 +122,10 @@
       ansible.builtin.apt:
         name:
           - rsync
-          - sshpass
         state: present
         update_cache: true
 
-    - name: Add public key
+    - name: Add public key to authorized_key for root
       authorized_key:
         user: root
         key: "{{ ssh_key.public_key }}"
@@ -137,7 +137,7 @@
         mode: push
         delete: true
         recursive: true
-        rsync_path: "sudo rsync"
+        rsync_path: "rsync"
 
     - name: Create nginx site config
       ansible.builtin.template:
