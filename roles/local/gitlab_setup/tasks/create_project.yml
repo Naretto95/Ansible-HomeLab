@@ -29,7 +29,7 @@
 
 - name: Generate SSH key for GitLab
   openssh_keypair:
-    path: "~/.ssh/gitlab_deploy_key"
+    path: "{{ ansible_env.HOME }}/.ssh/id_rsa"
     type: rsa
     size: 4096
     state: present

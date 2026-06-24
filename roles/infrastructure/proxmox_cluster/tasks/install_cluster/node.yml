@@ -7,7 +7,7 @@
 
 - name: Generate SSH key on joining node
   ansible.builtin.openssh_keypair:
-    path: /root/.ssh/id_rsa
+    path: "{{ ansible_env.HOME }}/.ssh/id_rsa"
     type: ed25519
   register: node_ssh_key
 
