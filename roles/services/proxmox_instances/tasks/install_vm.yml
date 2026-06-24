@@ -2,9 +2,11 @@
 
 - block:
 
-    - name: Ensure SSH keypair exists
-      include_role:
-        name: common/ssh_keypair
+    - name: Generate SSH key
+      ansible.builtin.openssh_keypair:
+        path: /root/.ssh/id_rsa
+        type: ed25519
+      register: ssh_key
 
     - name: Create VM on Proxmox
       community.proxmox.proxmox_kvm:
@@ -27,7 +29,7 @@
         node: "{{ proxmox_node }}"
         ciuser: "{{ vm.cloud_user }}"
         cipassword: "{{ vm.cloud_password }}"
-        sshkeys: "{{ ssh_public_key }}"
+        sshkeys: "{{ ssh_key.public_key }}"
         cores: "{{ vm.cores }}"
         scsi: "{{ vm.scsi }}"
         memory: "{{ vm.memory }}"
