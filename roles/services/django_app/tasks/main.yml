@@ -131,13 +131,13 @@
         key: "{{ ssh_key.public_key }}"
 
     - name: Sync Django staticfiles
+      become: false
       ansible.posix.synchronize:
         src: "{{ local_static_root }}"
         dest: "{{ remote_static_root }}"
         mode: push
         delete: true
         recursive: true
-        rsync_path: "rsync"
 
     - name: Create nginx site config
       ansible.builtin.template:
