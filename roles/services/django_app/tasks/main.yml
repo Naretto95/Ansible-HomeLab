@@ -122,6 +122,7 @@
       ansible.builtin.apt:
         name:
           - rsync
+          - sshpass
         state: present
         update_cache: true
 
@@ -135,7 +136,7 @@
       ansible.posix.synchronize:
         src: "{{ local_static_root }}"
         dest: "{{ remote_static_root }}"
-        mode: push
+        mode: pull
         delete: true
         recursive: true
 
