@@ -18,6 +18,8 @@ django_superuser_password: "{{ ansible_password }}"
 remote_static_root: "/var/www/{{ django_app_name }}/staticfiles/"
 local_static_root: "{{ django_app_dir }}/staticfiles/"
 
+nginx_user: www-data
+
 venv_dir: "{{ django_app_dir }}/venv"
 
 postgresql_db_name: "{{ django_app_name }}-db"

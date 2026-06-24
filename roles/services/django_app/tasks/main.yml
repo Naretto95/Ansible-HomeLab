@@ -119,7 +119,7 @@
         state: present
         update_cache: true
 
-    - name: Allow {{ ansible_user }} to run rsync without password
+    - name: Allow {{ ansible_user }} to run rsync without password temporary
       ansible.builtin.copy:
         dest: /etc/sudoers.d/{{ ansible_user }}-rsync
         content: |
@@ -132,8 +132,8 @@
       ansible.builtin.file:
         path: "{{ remote_static_root }}"
         state: directory
-        owner: www-data
-        group: www-data
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
         mode: "0755"
 
     - name: Sync Django staticfiles
@@ -163,5 +163,12 @@
       ansible.builtin.service:
         name: nginx
         state: reloaded
+
+  always:
+
+    - name: Remove temporary rsync sudo rule
+      ansible.builtin.file:
+        path: /etc/sudoers.d/{{ ansible_user }}-rsync
+        state: absent
 
   delegate_to: web
