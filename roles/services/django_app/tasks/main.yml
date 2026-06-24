@@ -111,6 +111,12 @@
 
 - block:
 
+    - name: Install rsync if needed
+      apt:
+        name: rsync
+        state: present
+        update_cache: true
+
     - name: Sync Django staticfiles to Nginx server
       ansible.posix.synchronize:
         src: "{{ local_static_root }}"

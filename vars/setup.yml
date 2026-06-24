@@ -68,7 +68,6 @@ docker_images:
       - git
       - openssh-client
       - unzip
-      - rsync
     pip_packages:
       - ansible
       - passlib
