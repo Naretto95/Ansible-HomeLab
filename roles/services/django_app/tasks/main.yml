@@ -123,8 +123,7 @@
       ansible.builtin.copy:
         dest: /etc/sudoers.d/{{ ansible_user }}-rsync
         content: |
-          {{ ansible_user }} ALL=(root) NOPASSWD: /usr/bin/rsync, /usr/bin/rsync *, /usr/bin/sudo
-          Defaults:{{ ansible_user }} !use_pty
+          {{ ansible_user }} ALL=(root) NOPASSWD: /usr/bin/rsync
         owner: root
         group: root
         mode: "0440"
@@ -136,6 +135,7 @@
         mode: push
         delete: true
         recursive: true
+        rsync_path: "rsync"
 
     - name: Create nginx site config
       ansible.builtin.template:
