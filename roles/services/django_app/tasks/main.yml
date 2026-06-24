@@ -119,15 +119,6 @@
         state: present
         update_cache: true
 
-    - name: Allow {{ ansible_user }} to run rsync without password temporary
-      ansible.builtin.copy:
-        dest: /etc/sudoers.d/{{ ansible_user }}-rsync
-        content: |
-          {{ ansible_user }} ALL= NOPASSWD:/usr/bin/rsync
-        owner: root
-        group: root
-        mode: "0440"
-
     - name: Ensure staticfiles directory exists
       ansible.builtin.file:
         path: "{{ remote_static_root }}"
@@ -163,12 +154,5 @@
       ansible.builtin.service:
         name: nginx
         state: reloaded
-
-  always:
-
-    - name: Remove temporary rsync sudo rule
-      ansible.builtin.file:
-        path: /etc/sudoers.d/{{ ansible_user }}-rsync
-        state: absent
 
   delegate_to: web
