@@ -109,13 +109,6 @@
     enabled: true
     state: restarted
 
-- name: Generate SSH key
-  become: false
-  ansible.builtin.openssh_keypair:
-    path: "{{ ansible_env.HOME }}/.ssh/id_rsa"
-    type: ed25519
-  register: ssh_key
-
 - block:
 
     - name: Install required packages
@@ -126,19 +119,23 @@
         state: present
         update_cache: true
 
-    - name: Add public key to authorized_key for root
-      authorized_key:
-        user: root
-        key: "{{ ssh_key.public_key }}"
+    - name: Allow {{ ansible_user }} to run rsync without password
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/{{ ansible_user }}-rsync
+        content: |
+          {{ ansible_user }} ALL= NOPASSWD:/usr/bin/rsync
+        owner: root
+        group: root
+        mode: "0440"
 
     - name: Sync Django staticfiles
-      become: false
       ansible.posix.synchronize:
         src: "{{ local_static_root }}"
         dest: "{{ remote_static_root }}"
         mode: pull
         delete: true
         recursive: true
+        rsync_path: "rsync"
 
     - name: Create nginx site config
       ansible.builtin.template:
