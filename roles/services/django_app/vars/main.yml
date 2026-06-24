@@ -5,4 +5,4 @@ django_packages:
   - build-essential
   - python3-packaging
   - pyenv
-  - nfs-kernel-server
+  - rsync

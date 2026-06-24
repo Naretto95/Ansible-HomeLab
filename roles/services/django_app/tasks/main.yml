@@ -136,6 +136,14 @@
         recursive: true
         rsync_path: "rsync"
 
+    - name: Normalize staticfiles ownership
+      ansible.builtin.file:
+        path: "{{ remote_static_root }}"
+        state: directory
+        recurse: true
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
+
     - name: Create nginx site config
       ansible.builtin.template:
         src: nginx.conf.j2
