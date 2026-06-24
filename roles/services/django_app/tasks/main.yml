@@ -123,7 +123,7 @@
       ansible.builtin.copy:
         dest: /etc/sudoers.d/user_svc-rsync
         content: |
-          user_svc ALL=(root) NOPASSWD: /usr/bin/rsync
+          user_svc ALL=(ALL) NOPASSWD: /usr/bin/rsync
         owner: root
         group: root
         mode: "0440"
@@ -135,7 +135,6 @@
         mode: push
         delete: true
         recursive: true
-      become: false
 
     - name: Create nginx site config
       ansible.builtin.template:
