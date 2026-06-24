@@ -111,19 +111,31 @@
 
 - block:
 
-    - name: Install rsync if needed
-      apt:
-        name: rsync
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - rsync
+          - sshpass
         state: present
         update_cache: true
 
-    - name: Sync Django staticfiles to Nginx server
+    - name: Allow {{ ansible_user }} to run rsync without password
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/{{ ansible_user }}-rsync
+        content: |
+          {{ ansible_user }} ALL= NOPASSWD:/usr/bin/rsync
+        owner: root
+        group: root
+        mode: "0440"
+
+    - name: Sync Django staticfiles
       ansible.posix.synchronize:
         src: "{{ local_static_root }}"
         dest: "{{ remote_static_root }}"
         mode: push
         delete: true
         recursive: true
+        rsync_path: "sudo rsync"
 
     - name: Create nginx site config
       ansible.builtin.template:
