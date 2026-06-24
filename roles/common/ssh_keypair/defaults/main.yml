@@ -1,4 +1,0 @@
----
-
-ssh_key_path: "{{ ansible_env.HOME }}/.ssh/id_ed25519"
-ssh_key_type: ed25519
