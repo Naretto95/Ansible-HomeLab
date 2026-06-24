@@ -127,6 +127,14 @@
         owner: root
         group: root
         mode: "0440"
+    
+    - name: Ensure staticfiles directory exists on Nginx server
+      ansible.builtin.file:
+        path: "{{ remote_static_root }}"
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: "0755"
 
     - name: Sync Django staticfiles to Nginx server
       ansible.posix.synchronize:
