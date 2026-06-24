@@ -1,12 +1,12 @@
 ---
 
 - name: Ensure container base folder exists
-  file:
+  ansible.builtin.file:
     path: "{{ base_directory }}/{{ container.name }}"
     state: directory
 
 - name: Create volume folders inside container folder
-  file:
+  ansible.builtin.file:
     path: "{{ base_directory }}/{{ container.name }}/{{ (item.split(':')[0] | basename) }}"
     state: directory
   loop: "{{ container.volumes | default([]) }}"

@@ -111,6 +111,20 @@
 
 - block:
 
+    - name: Install rsync if needed
+      apt:
+        name: rsync
+        state: present
+        update_cache: true
+
+    - name: Sync Django staticfiles to Nginx server
+      ansible.posix.synchronize:
+        src: "{{ local_static_root }}"
+        dest: "{{ remote_static_root }}"
+        mode: push
+        delete: true
+        recursive: true
+
     - name: Create nginx site config
       ansible.builtin.template:
         src: nginx.conf.j2
