@@ -28,8 +28,8 @@
     git_repo: "{{ project_create.json if project_info.json|length == 0 else project_info.json[0] }}"
 
 - name: Generate SSH key for GitLab
-  openssh_keypair:
-    path: "~/.ssh/gitlab_deploy_key"
+  ansible.builtin.openssh_keypair:
+    path: "{{ ansible_env.HOME }}/.ssh/id_rsa"
     type: rsa
     size: 4096
     state: present

@@ -4,7 +4,7 @@
 
     - name: Generate SSH key
       ansible.builtin.openssh_keypair:
-        path: ~/.ssh/id_rsa
+        path: "{{ ansible_env.HOME }}/.ssh/id_rsa"
         type: ed25519
       register: ssh_key
 
