@@ -111,9 +111,11 @@
 
 - block:
 
-    - name: Install rsync if needed
-      apt:
-        name: rsync
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - rsync
+          - sshpass
         state: present
         update_cache: true
 
