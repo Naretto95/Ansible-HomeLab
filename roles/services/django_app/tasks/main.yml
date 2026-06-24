@@ -122,7 +122,8 @@
     - name: Allow user_svc to run rsync without password
       ansible.builtin.copy:
         dest: /etc/sudoers.d/user_svc-rsync
-        content: "user_svc ALL=(root) NOPASSWD: /usr/bin/rsync\n"
+        content: |
+          user_svc ALL=(root) NOPASSWD: /usr/bin/rsync
         owner: root
         group: root
         mode: "0440"
@@ -134,6 +135,7 @@
         mode: push
         delete: true
         recursive: true
+      become: true
 
     - name: Create nginx site config
       ansible.builtin.template:
