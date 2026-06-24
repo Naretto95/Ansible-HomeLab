@@ -136,7 +136,6 @@
         mode: push
         delete: true
         recursive: true
-        rsync_path: "sudo rsync"
 
     - name: Create nginx site config
       ansible.builtin.template:
