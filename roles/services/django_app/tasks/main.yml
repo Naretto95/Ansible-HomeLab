@@ -126,6 +126,7 @@
         mode: push
         delete: true
         recursive: true
+      become: true
 
     - name: Create nginx site config
       ansible.builtin.template:
