@@ -33,12 +33,12 @@
     - name: Get Let's Encrypt certificate
       ansible.builtin.command: >
         certbot certonly --standalone
-        -d {{ django_domain }}
+        -d {{ ssl_domain }}
         --non-interactive
         --agree-tos
-        --email {{ django_email }}
+        --email {{ ssl_email }}
       args:
-        creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+        creates: /etc/letsencrypt/live/{{ ssl_domain }}/fullchain.pem
 
     - name: Start nginx
       ansible.builtin.service:

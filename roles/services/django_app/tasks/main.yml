@@ -122,6 +122,7 @@
         name: services/ssl_certbot
       vars:
         ssl_domain: "{{ django_domain | lower }}"
+        ssl_email: "{{ django_email }}"
 
     - name: Ensure staticfiles directory exists
       ansible.builtin.file:

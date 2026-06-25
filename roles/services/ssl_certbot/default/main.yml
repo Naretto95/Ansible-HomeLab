@@ -1,3 +1,4 @@
 ---
 
 ssl_domain: example.com
+ssl_email: test@gmail.com
