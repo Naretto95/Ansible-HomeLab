@@ -111,6 +111,11 @@
 
 - block:
 
+    - name: Stop nginx before certbot (standalone mode)
+      ansible.builtin.service:
+        name: nginx
+        state: stopped
+
     - name: Install required packages
       include_role: 
         name: common/packages
@@ -120,8 +125,6 @@
     - name: Get Let's Encrypt certificate
       ansible.builtin.command: >
         certbot certonly --standalone
-        --webroot
-        -w /var/www/html
         -d {{ django_domain }}
         --non-interactive
         --agree-tos
@@ -168,9 +171,9 @@
         dest: "/etc/nginx/sites-enabled/{{ django_app_name }}"
         state: link
 
-    - name: reload nginx
+    - name: Start nginx
       ansible.builtin.service:
         name: nginx
-        state: reloaded
+        state: started
 
   delegate_to: web
