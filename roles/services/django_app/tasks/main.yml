@@ -163,7 +163,7 @@
 
     - name: Get Let's Encrypt certificate
       ansible.builtin.command: >
-        certbot certonly
+        certbot certonly --standalone
         --webroot
         -w /var/www/html
         -d {{ django_domain }}
