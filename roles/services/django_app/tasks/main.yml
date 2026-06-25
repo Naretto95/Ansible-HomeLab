@@ -112,12 +112,9 @@
 - block:
 
     - name: Install required packages
-      ansible.builtin.apt:
-        name:
-          - rsync
-          - sshpass
-        state: present
-        update_cache: true
+      include_role: common/packages
+      vars:
+        packages: "{{ nginx_packages}}"
 
     - name: Ensure staticfiles directory exists
       ansible.builtin.file:
@@ -162,5 +159,17 @@
       ansible.builtin.service:
         name: nginx
         state: reloaded
+
+    - name: Get Let's Encrypt certificate
+      ansible.builtin.command: >
+        certbot certonly
+        --webroot
+        -w /var/www/html
+        -d {{ django_domain }}
+        --non-interactive
+        --agree-tos
+        --email {{ django_email }}
+      args:
+        creates: /etc/letsencrypt/live/{{ django_domain }}/fullchain.pem
 
   delegate_to: web
