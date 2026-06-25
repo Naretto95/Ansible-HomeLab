@@ -112,12 +112,17 @@
 - block:
 
     - name: Install required packages
-      ansible.builtin.apt:
-        name:
-          - rsync
-          - sshpass
-        state: present
-        update_cache: true
+      include_role: 
+        name: common/packages
+      vars:
+        packages: "{{ copy_packages }}"
+
+    - name: Install required certs
+      include_role: 
+        name: services/ssl_certbot
+      vars:
+        ssl_domain: "{{ django_domain | lower }}"
+        ssl_email: "{{ django_email }}"
 
     - name: Ensure staticfiles directory exists
       ansible.builtin.file:
@@ -158,7 +163,7 @@
         dest: "/etc/nginx/sites-enabled/{{ django_app_name }}"
         state: link
 
-    - name: reload nginx
+    - name: Start nginx
       ansible.builtin.service:
         name: nginx
         state: reloaded
