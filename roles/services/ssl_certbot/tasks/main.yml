@@ -54,4 +54,4 @@
 
   when: >
     (not le_cert.stat.exists) or
-    (not certbot_timer.stat.exists and not certbot_cron.stat.exists)
+    (certbot_timer.status.LoadState != 'loaded' and not certbot_cron.stat.exists)
