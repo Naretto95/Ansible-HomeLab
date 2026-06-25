@@ -1,0 +1,57 @@
+---
+
+- name: Check if Let's Encrypt certificate exists
+  ansible.builtin.stat:
+    path: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+  register: le_cert
+
+- name: Check if certbot systemd timer exists
+  ansible.builtin.systemd:
+    name: certbot.timer
+  register: certbot_timer
+  ignore_errors: true
+
+- name: Check if certbot cron exists
+  ansible.builtin.stat:
+    path: /etc/cron.d/certbot
+  register: certbot_cron
+
+- name: Install certificate and ensure scheduling if missing
+  block:
+
+    - name: Stop nginx before certbot (standalone mode)
+      ansible.builtin.service:
+        name: nginx
+        state: stopped
+
+    - name: Install required packages
+      include_role: 
+        name: common/packages
+      vars:
+        packages: "{{ certbot_packages }}"
+
+    - name: Get Let's Encrypt certificate
+      ansible.builtin.command: >
+        certbot certonly --standalone
+        -d {{ django_domain }}
+        --non-interactive
+        --agree-tos
+        --email {{ django_email }}
+      args:
+        creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+
+    - name: Start nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+
+    - name: Enable certbot systemd timer (if missing)
+      ansible.builtin.systemd:
+        name: certbot.timer
+        enabled: true
+        state: started
+      when: certbot_timer.status is not defined or certbot_timer.status.ActiveState is not defined
+
+  when: >
+    (not le_cert.stat.exists) or
+    (not certbot_timer.stat.exists and not certbot_cron.stat.exists)

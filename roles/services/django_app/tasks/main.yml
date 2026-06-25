@@ -111,26 +111,17 @@
 
 - block:
 
-    - name: Stop nginx before certbot (standalone mode)
-      ansible.builtin.service:
-        name: nginx
-        state: stopped
-
     - name: Install required packages
       include_role: 
         name: common/packages
       vars:
-        packages: "{{ nginx_packages}}"
+        packages: "{{ copy_packages }}"
 
-    - name: Get Let's Encrypt certificate
-      ansible.builtin.command: >
-        certbot certonly --standalone
-        -d {{ django_domain }}
-        --non-interactive
-        --agree-tos
-        --email {{ django_email }}
-      args:
-        creates: /etc/letsencrypt/live/{{ django_domain | lower }}/fullchain.pem
+    - name: Install required certs
+      include_role: 
+        name: services/ssl_certbot
+      vars:
+        domain: "{{ django_domain }}"
 
     - name: Ensure staticfiles directory exists
       ansible.builtin.file:
@@ -174,6 +165,6 @@
     - name: Start nginx
       ansible.builtin.service:
         name: nginx
-        state: started
+        state: reloaded
 
   delegate_to: web

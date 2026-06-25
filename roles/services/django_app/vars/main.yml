@@ -7,8 +7,6 @@ django_packages:
   - pyenv
   - rsync
 
-nginx_packages:
+copy_packages:
   - rsync
   - sshpass
-  - certbot
-  - python3-certbot-nginx
