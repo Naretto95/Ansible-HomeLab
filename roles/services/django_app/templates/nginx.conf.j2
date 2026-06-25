@@ -11,8 +11,8 @@ server {
     
     server_name {{ django_domain }};
 
-    ssl_certificate     /etc/letsencrypt/live/{{ django_domain }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ django_domain }}/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/{{ django_domain | lower }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ django_domain | lower }}/privkey.pem;
 
     client_max_body_size 20M;
 
