@@ -121,7 +121,7 @@
       include_role: 
         name: services/ssl_certbot
       vars:
-        ssl_domain: "{{ django_domain }}"
+        ssl_domain: "{{ django_domain | lower }}"
 
     - name: Ensure staticfiles directory exists
       ansible.builtin.file:
