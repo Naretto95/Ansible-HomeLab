@@ -2,7 +2,7 @@
 
 - name: Check if Let's Encrypt certificate exists
   ansible.builtin.stat:
-    path: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+    path: /etc/letsencrypt/live/{{ ssl_domain }}/fullchain.pem
   register: le_cert
 
 - name: Check if certbot systemd timer exists
