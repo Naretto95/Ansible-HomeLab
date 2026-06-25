@@ -130,7 +130,7 @@
         --agree-tos
         --email {{ django_email }}
       args:
-        creates: /etc/letsencrypt/live/{{ django_domain }}/fullchain.pem
+        creates: /etc/letsencrypt/live/{{ django_domain | lower }}/fullchain.pem
 
     - name: Ensure staticfiles directory exists
       ansible.builtin.file:
