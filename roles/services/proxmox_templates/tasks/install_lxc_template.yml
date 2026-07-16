@@ -54,3 +54,4 @@
     }}
   when:
     - installed_templates.files | length > 1
+  changed_when: false
