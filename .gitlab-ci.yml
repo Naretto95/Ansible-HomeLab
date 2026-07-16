@@ -24,7 +24,7 @@ setup_infra:
   stage: setup_infra
   script:
     - echo "[INFO] Starting Ansible playbook for infrastructure"
-    - ansible-playbook -i inventory/hosts.ini playbooks/setup_servers.yml -v
+    - ansible-playbook -i inventory/hosts.ini playbooks/setup_servers.yml -l "$ANSIBLE_LIMIT" -v
   rules:
     - if: '$setup_infra == "true"'
       when: on_success
@@ -33,7 +33,7 @@ deploy_services:
   stage: deploy_services
   script:
     - echo "[INFO] Starting Ansible playbook for services"
-    - ansible-playbook -i inventory/hosts.ini playbooks/deploy_services.yml -v --limit "$ANSIBLE_LIMIT"
+    - ansible-playbook -i inventory/hosts.ini playbooks/deploy_services.yml -l "$ANSIBLE_LIMIT" -v
   rules:
     - if: '$deploy_services == "true"'
       when: on_success
