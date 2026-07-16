@@ -1,5 +1,9 @@
 ---
 
+- name: Update template list
+  ansible.builtin.command: pveam update
+  changed_when: false
+
 - name: Ensure LXC template is present
   ansible.builtin.command: "pveam download local {{ lxc_template.name }}"
   args:
