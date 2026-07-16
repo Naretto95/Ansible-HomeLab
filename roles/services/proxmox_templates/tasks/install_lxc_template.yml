@@ -16,7 +16,7 @@
         available_templates.stdout_lines
         | map('split')
         | map('last')
-        | select('match', '^' + (lxc_template.name | regex_replace('\\*', '.*') | regex_replace('\\.', '\\.')) + '$')
+        | select('match', '^' + (lxc_template.name | replace('*', '.*')) + '$')
         | sort
         | last
       }}
