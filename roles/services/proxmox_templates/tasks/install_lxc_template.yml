@@ -4,8 +4,30 @@
   ansible.builtin.command: pveam update
   changed_when: false
 
+- name: Get available LXC templates
+  ansible.builtin.command: pveam available
+  register: available_templates
+  changed_when: false
+
+- name: Select latest matching LXC template
+  ansible.builtin.set_fact:
+    latest_lxc_template: >-
+      {{
+        available_templates.stdout_lines
+        | map('split')
+        | map('last')
+        | select('match', '^' + (lxc_template.name | regex_replace('\\*', '.*') | regex_replace('\\.', '\\.')) + '$')
+        | sort
+        | last
+      }}
+
+- name: Fail if no matching template exists
+  ansible.builtin.fail:
+    msg: "No template matching {{ lxc_template.name }} found"
+  when: latest_lxc_template is undefined or latest_lxc_template == ""
+
 - name: Ensure LXC template is present
-  ansible.builtin.command: "pveam download local {{ lxc_template.name }}"
-  args:
-    creates: "/var/lib/vz/template/cache/{{ lxc_template.name }}"
+  ansible.builtin.command:
+    cmd: "pveam download local {{ latest_lxc_template }}"
+    creates: "/var/lib/vz/template/cache/{{ latest_lxc_template }}"
   changed_when: false
