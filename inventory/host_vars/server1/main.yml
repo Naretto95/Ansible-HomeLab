@@ -13,3 +13,4 @@ vm_templates:
 
 lxc_templates:
   - name: debian-13-standard_*_amd64.tar.zst
+  - name: debian-12-standard_*_amd64.tar.zst
