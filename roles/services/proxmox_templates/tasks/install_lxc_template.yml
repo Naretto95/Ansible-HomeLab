@@ -1,7 +1,57 @@
 ---
 
+- name: Update template list
+  ansible.builtin.command: pveam update
+  changed_when: false
+
+- name: Get available LXC templates
+  ansible.builtin.command: pveam available
+  register: available_templates
+  changed_when: false
+
+- name: Select latest matching LXC template
+  ansible.builtin.set_fact:
+    latest_lxc_template: >-
+      {{
+        available_templates.stdout_lines
+        | map('split')
+        | map('last')
+        | select('match', '^' + (lxc_template.name | replace('*', '.*')) + '$')
+        | sort
+        | last
+      }}
+
+- name: Fail if no matching template exists
+  ansible.builtin.fail:
+    msg: "No template matching {{ lxc_template.name }} found"
+  when: latest_lxc_template is undefined or latest_lxc_template == ""
+
 - name: Ensure LXC template is present
-  ansible.builtin.command: "pveam download local {{ lxc_template.name }}"
-  args:
-    creates: "/var/lib/vz/template/cache/{{ lxc_template.name }}"
+  ansible.builtin.command:
+    cmd: "pveam download local {{ latest_lxc_template }}"
+    creates: "/var/lib/vz/template/cache/{{ latest_lxc_template }}"
+  changed_when: false
+
+- name: Find installed matching LXC templates
+  ansible.builtin.find:
+    paths: /var/lib/vz/template/cache
+    patterns: "{{ lxc_template.name }}"
+    use_regex: false
+    file_type: file
+  register: installed_templates
+
+- name: Remove old matching LXC templates
+  ansible.builtin.command:
+    cmd: "pveam remove local:vztmpl/{{ item }}"
+  loop: >-
+    {{
+      installed_templates.files
+      | map(attribute='path')
+      | map('basename')
+      | sort
+      | list
+      | difference([latest_lxc_template])
+    }}
+  when:
+    - installed_templates.files | length > 1
   changed_when: false

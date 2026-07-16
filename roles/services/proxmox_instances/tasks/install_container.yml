@@ -2,6 +2,26 @@
 
 - block:
 
+    - name: Find installed matching LXC template
+      ansible.builtin.find:
+        paths: /var/lib/vz/template/cache
+        patterns: "{{ container.template }}"
+        use_regex: false
+        file_type: file
+      register: templates
+      delegate_to: "{{ container.target_host }}"
+
+    - name: Select newest installed template
+      ansible.builtin.set_fact:
+        latest_template: >-
+          {{
+            templates.files
+            | map(attribute='path')
+            | map('basename')
+            | sort
+            | last
+          }}
+
     - name: Create LXC container on Proxmox
       community.proxmox.proxmox:
         api_user: "{{ ansible_user }}@pam"
@@ -10,7 +30,7 @@
         node: "{{ proxmox_node }}"
         vmid: "{{ container.id }}"
         hostname: "{{ container.name }}"
-        ostemplate: "local:vztmpl/{{ container.template }}"
+        ostemplate: "local:vztmpl/{{ latest_template }}"
         memory: "{{ container.memory }}"
         swap: "{{ container.swap }}"
         cores: "{{ container.cores }}"
