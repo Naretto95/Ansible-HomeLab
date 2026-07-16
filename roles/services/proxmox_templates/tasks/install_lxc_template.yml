@@ -31,3 +31,26 @@
     cmd: "pveam download local {{ latest_lxc_template }}"
     creates: "/var/lib/vz/template/cache/{{ latest_lxc_template }}"
   changed_when: false
+
+- name: Find installed matching LXC templates
+  ansible.builtin.find:
+    paths: /var/lib/vz/template/cache
+    patterns: "{{ lxc_template.name }}"
+    use_regex: false
+    file_type: file
+  register: installed_templates
+
+- name: Remove old matching LXC templates
+  ansible.builtin.command:
+    cmd: "pveam remove local:vztmpl/{{ item }}"
+  loop: >-
+    {{
+      installed_templates.files
+      | map(attribute='path')
+      | map('basename')
+      | sort
+      | list
+      | difference([latest_lxc_template])
+    }}
+  when:
+    - installed_templates.files | length > 1
