@@ -94,20 +94,30 @@
   register: superuser_result
   changed_when: "'created' in superuser_result.stdout"
 
-- name: Install systemd service
+- name: Install gunicorn systemd service
   ansible.builtin.template:
     src: gunicorn.service.j2
     dest: "/etc/systemd/system/{{ django_app_name }}.service"
+
+- name: Install systemd schedulers
+  include_tasks: create_systemd_schedulers.yml
+  loop: "{{ django_systemd_schedulers }}"
+  loop_control:
+    loop_var: scheduler
+  when: django_systemd_schedulers | length > 0
 
 - name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true
 
-- name: Enable and start service
+- name: Enable and start systemd services
   ansible.builtin.systemd:
-    name: "{{ django_app_name }}"
+    name: "{{ service }}"
     enabled: true
     state: restarted
+  loop: "{{ django_systemd_schedulers | map(attribute='name') | list + [django_app_name] }}"
+  loop_control:
+    loop_var: service
 
 - block:
 

@@ -16,6 +16,17 @@ django_superuser_username: "{{ ansible_user }}"
 django_superuser_password: "{{ ansible_password }}"
 django_cert_dir: "/etc/letsencrypt/live/{{ django_app_name }}/"
 
+django_systemd_schedulers:
+  - name: "django-app-scheduler"
+    description: "Django App Scheduler Service"
+    exec_start: "{{ venv_dir }}/bin/python manage.py run_scheduler"
+    user: "root"
+    group: "root"
+    timer:
+      description: "Django App Scheduler Timer"
+      on_calendar: "*:0/5"
+      persistent: true
+
 remote_static_root: "/var/www/{{ django_app_name }}/staticfiles/"
 local_static_root: "{{ django_app_dir }}/staticfiles/"
 
