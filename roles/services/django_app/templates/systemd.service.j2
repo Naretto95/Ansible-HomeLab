@@ -1,0 +1,15 @@
+[Unit]
+Description={{ scheduler.description }}
+After=network.target
+
+[Service]
+Type=simple
+User={{ scheduler.user }}
+Group={{ scheduler.group }}
+WorkingDirectory={{ django_app_dir }}
+ExecStart={{ scheduler.exec_start }}
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -26,6 +26,17 @@ lxc_container:
       password: "{{ ansible_password }}"
       sudo: true
 
+django_systemd_schedulers:
+  - name: "ottervault-cve-cpe-scheduler"
+    description: "Update Ottervault CPE/CVE Service"
+    exec_start: "{{ venv_dir }}/bin/python manage.py update_db"
+    user: "root"
+    group: "root"
+    timer:
+      description: "Update Ottervault CPE/CVE Timer"
+      on_calendar: "04:00"
+      persistent: true
+
 github_repositories:
   - repo: "Naretto95/{{ django_app_name }}"
     dest: "/opt/{{ django_app_name }}"
