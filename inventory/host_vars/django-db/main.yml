@@ -13,10 +13,10 @@ virtual_machine:
   name: django-db
   id: 102
   template: debian-13
-  cores: 2
-  memory: 4096
+  cores: 4
+  memory: 8192
   scsi:
-    scsi1:  "local-lvm:40,size=40G"
+    scsi1:  "local-lvm:50,size=50G"
   storage: "local-lvm"
   net_bridge: "vmbr0"
   net_ip_address: "{{ ansible_host }}"
@@ -28,3 +28,20 @@ virtual_machine:
     - name: "{{ ansible_user }}"
       password: "{{ ansible_password }}"
       sudo: true
+  storage_disks:
+    - device: /dev/sda
+      label: gpt
+      partitions:
+        - number: 1
+          name: postgres
+          size: 100%
+          vg: vg_postgres
+          lvs:
+            - name: lv_pgdata
+              size: 45G
+              filesystem: ext4
+              mount: /var/lib/postgresql
+            - name: lv_logs
+              size: 5G
+              filesystem: ext4
+              mount: /var/log

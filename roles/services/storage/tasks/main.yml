@@ -1,0 +1,81 @@
+---
+
+- name: Stop role if virtual_machine.storage_disks is not defined or empty
+  meta: end_role
+  when: virtual_machine is not defined or virtual_machine.storage_disks is not defined or virtual_machine.storage_disks | length == 0
+
+- name: Set storage_disks fact
+  set_fact:
+    storage_disks: "{{ virtual_machine.storage_disks }}"
+
+- name: Create partition tables
+  community.general.parted:
+    device: "{{ item.device }}"
+    label: "{{ item.label | default('gpt') }}"
+    state: present
+  loop: "{{ storage_disks }}"
+
+- name: Create partitions
+  community.general.parted:
+    device: "{{ disk.device }}"
+    number: "{{ part.number }}"
+    part_start: "{{ part.start | default('1MiB') }}"
+    part_end: "{{ part.size }}"
+    flags:
+      - lvm
+    state: present
+  loop: "{{ storage_disks | subelements('partitions', skip_missing=True) }}"
+  loop_control:
+    loop_var: disk_part
+  vars:
+    disk: "{{ disk_part.0 }}"
+    part: "{{ disk_part.1 }}"
+
+- name: Create volume groups
+  community.general.lvg:
+    vg: "{{ part.vg }}"
+    pvs: "{{ disk.device }}{{ part.number }}"
+  loop: "{{ storage_disks | subelements('partitions', skip_missing=True) }}"
+  loop_control:
+    loop_var: disk_part
+  vars:
+    disk: "{{ disk_part.0 }}"
+    part: "{{ disk_part.1 }}"
+
+- name: Create logical volumes
+  community.general.lvol:
+    vg: "{{ part.vg }}"
+    lv: "{{ lv.name }}"
+    size: "{{ lv.size }}"
+    state: present
+  loop: "{{ storage_disks | subelements('partitions', skip_missing=True) | subelements('1.lvs', skip_missing=True) }}"
+  loop_control:
+    loop_var: storage_lv
+  vars:
+    part: "{{ storage_lv.0.1 }}"
+    lv: "{{ storage_lv.1 }}"
+
+- name: Create filesystems
+  community.general.filesystem:
+    fstype: "{{ lv.filesystem }}"
+    dev: "/dev/{{ part.vg }}/{{ lv.name }}"
+  loop: "{{ storage_disks | subelements('partitions', skip_missing=True) | subelements('1.lvs', skip_missing=True) }}"
+  loop_control:
+    loop_var: storage_lv
+  vars:
+    part: "{{ storage_lv.0.1 }}"
+    lv: "{{ storage_lv.1 }}"
+
+- name: Mount logical volumes
+  ansible.posix.mount:
+    path: "{{ lv.mount }}"
+    src: "/dev/{{ part.vg }}/{{ lv.name }}"
+    fstype: "{{ lv.filesystem }}"
+    opts: defaults
+    state: mounted
+  loop: "{{ storage_disks | subelements('partitions', skip_missing=True) | subelements('1.lvs', skip_missing=True) }}"
+  loop_control:
+    loop_var: storage_lv
+  vars:
+    part: "{{ storage_lv.0.1 }}"
+    lv: "{{ storage_lv.1 }}"
