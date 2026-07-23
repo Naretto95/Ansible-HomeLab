@@ -8,16 +8,10 @@
   set_fact:
     storage_disks: "{{ virtual_machine.storage_disks }}"
 
-- name: Create partition tables
-  community.general.parted:
-    device: "{{ item.device }}"
-    label: "{{ item.label | default('gpt') }}"
-    state: present
-  loop: "{{ storage_disks }}"
-
 - name: Create partitions
   community.general.parted:
     device: "{{ disk.device }}"
+    label: "{{ disk.label | default('gpt') }}"
     number: "{{ part.number }}"
     part_start: "{{ part.start | default('1MiB') }}"
     part_end: "{{ part.size }}"
