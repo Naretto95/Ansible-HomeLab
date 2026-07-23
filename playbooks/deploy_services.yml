@@ -16,6 +16,7 @@
     - common/bootstrap
     - common/repositories
     - common/packages
+    - services/storage
     - services/github_repositories
 
 - name: Deploy proxmox services specific configuration

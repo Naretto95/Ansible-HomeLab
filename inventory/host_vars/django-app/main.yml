@@ -1,15 +1,15 @@
 ---
 
 ansible_host: 192.168.1.95
-target_host: server2
+target_host: server1
 
 lxc_container:
   name: django-app
   id: 101
   template: "debian-13-standard_*_amd64.tar.zst"
-  memory: 2048
+  memory: 4096
   swap: 512
-  cores: 2
+  cores: 4
   rootfs: "local-lvm:10"
   net_bridge: "vmbr0"
   net_ip_address: "{{ ansible_host }}"

@@ -1,0 +1,21 @@
+---
+
+- name: Create logical volume
+  community.general.lvol:
+    vg: "{{ part.vg }}"
+    lv: "{{ lv.name }}"
+    size: "{{ lv.size }}"
+    state: present
+
+- name: Create filesystem
+  community.general.filesystem:
+    fstype: "{{ lv.filesystem }}"
+    dev: "/dev/{{ part.vg }}/{{ lv.name }}"
+
+- name: Mount logical volume
+  ansible.posix.mount:
+    path: "{{ lv.mount }}"
+    src: "/dev/{{ part.vg }}/{{ lv.name }}"
+    fstype: "{{ lv.filesystem }}"
+    opts: defaults
+    state: mounted

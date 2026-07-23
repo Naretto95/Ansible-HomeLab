@@ -1,0 +1,27 @@
+---
+
+- name: Stop role if virtual_machine.storage_disks is not defined or empty
+  meta: end_role
+  when: virtual_machine is not defined or virtual_machine.storage_disks is not defined or virtual_machine.storage_disks | length == 0
+
+- name: Set storage_disks fact
+  set_fact:
+    storage_disks: "{{ virtual_machine.storage_disks }}"
+
+- name: Create partitions, volume groups
+  include_tasks: create_partition.yml
+  loop: "{{ storage_disks | subelements('partitions', skip_missing=True) }}"
+  loop_control:
+    loop_var: disk_part
+  vars:
+    disk: "{{ disk_part.0 }}"
+    part: "{{ disk_part.1 }}"
+
+- name: Create logical volumes
+  include_tasks: create_logical_volume.yml
+  loop: "{{ storage_disks | map(attribute='partitions') | flatten | subelements('lvs', skip_missing=True) }}"
+  loop_control:
+    loop_var: partition_lv
+  vars:
+    part: "{{ partition_lv.0 }}"
+    lv: "{{ partition_lv.1 }}"
