@@ -42,6 +42,6 @@ virtual_machine:
               filesystem: ext4
               mount: /var/lib/postgresql
             - name: lv_logs
-              size: 5G
+              size: 99%FREE
               filesystem: ext4
               mount: /var/log
