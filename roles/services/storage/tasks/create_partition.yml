@@ -3,6 +3,7 @@
 - name: Create partition
   community.general.parted:
     device: "{{ disk.device }}"
+    name: "{{ part.name }}"
     label: "{{ disk.label | default('gpt') }}"
     number: "{{ part.number }}"
     part_start: "{{ part.start | default('1MiB') }}"
