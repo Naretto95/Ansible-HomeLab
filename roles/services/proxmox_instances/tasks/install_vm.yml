@@ -13,7 +13,7 @@
         api_host: "{{ ansible_host }}"
         api_user: "{{ ansible_user }}@pam"
         api_password: "{{ ansible_password }}"
-        clone: "{{ vm_templates | selectattr('name', 'equalto', vm.template) | map(attribute='id') | first }}"
+        clone: "{{ vm.template }}"
         newid: "{{ vm.id }}"
         name: "{{ vm.name }}"
         node: "{{ proxmox_node }}"
