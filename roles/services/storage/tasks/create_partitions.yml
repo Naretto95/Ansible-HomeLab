@@ -1,0 +1,17 @@
+---
+
+- name: Create partition
+  community.general.parted:
+    device: "{{ disk.device }}"
+    label: "{{ disk.label | default('gpt') }}"
+    number: "{{ part.number }}"
+    part_start: "{{ part.start | default('1MiB') }}"
+    part_end: "{{ part.size }}"
+    flags:
+      - lvm
+    state: present
+
+- name: Create volume group
+  community.general.lvg:
+    vg: "{{ part.vg }}"
+    pvs: "{{ disk.device }}{{ part.number }}"
