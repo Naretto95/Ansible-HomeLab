@@ -9,7 +9,7 @@
     storage_disks: "{{ virtual_machine.storage_disks }}"
 
 - name: Create partitions, volume groups
-  include_tasks: create_partitions.yml
+  include_tasks: create_partition.yml
   loop: "{{ storage_disks | subelements('partitions', skip_missing=True) }}"
   loop_control:
     loop_var: disk_part
