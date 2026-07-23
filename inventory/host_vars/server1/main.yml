@@ -6,10 +6,10 @@ proxmox_node: "pve2"
 unmount_gpu: true
 gpu_device_id: '0000:01:00.0'
 
-vm_templates:
-  - image_url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
-    name: debian-13
-    id: 123
+# vm_templates:
+#   - image_url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+#     name: debian-13
+#     id: 123
 
 lxc_templates:
   - name: debian-13-standard_*_amd64.tar.zst
