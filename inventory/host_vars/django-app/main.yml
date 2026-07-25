@@ -1,6 +1,6 @@
 ---
 
-ansible_host: 192.168.1.95
+ansible_host: "{{ lan_prefix }}.1.95"
 target_host: server1
 
 lxc_container:
