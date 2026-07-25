@@ -102,19 +102,36 @@ Customize deployments through:
 4. Test thoroughly
 5. Submit a pull request
 
-## 💡 Pipeline Variables
+## 💡 Pipeline Environment Variables
 
-| Variable Name               | Description |
-|-----------------------------|-------------|
-| `all_domain`                | The main domain used for all deployed services. |
-| `deploy_services`           | Boolean flag (`true`/`false`) to control whether service deployment should run. |
-| `services_ansible_user`     | Username for services authentication. |
-| `services_ansible_password` | Password for services authentication. |
-| `cluster_ansible_user`      | Username for cluster management (e.g., Kubernetes/Ansible). |
-| `cluster_ansible_password`  | Password for cluster management. |
-| `setup_infra`               | Boolean flag (`true`/`false`) to control whether infrastructure setup should run. |
+The pipeline reads deployment variables from an external `ENV_FILE` provided at runtime.
 
-> 🔒 **Note:** All passwords and sensitive credentials are stored securely in GitLab CI/CD as protected variables and are not stored in the repository.
+Each variable is automatically extracted and written into the appropriate Ansible `private_vars.yml` file based on its prefix:
+
+| Prefix | Target Ansible Variables File |
+|--------|-------------------------------|
+| `all_` | `inventory/group_vars/all/private_vars.yml` |
+| `cluster_` | `inventory/group_vars/cluster/private_vars.yml` |
+| `services_` | `inventory/group_vars/services/private_vars.yml` |
+| `django-app_` | `inventory/host_vars/django-app/private_vars.yml` |
+
+### Example `ENV_FILE`
+
+```env
+all_lan_prefix=143.8 (first 2 digits)
+all_domain=example.com
+
+services_ansible_user=service
+services_ansible_password=<secret>
+services_github_token=<secret>
+
+cluster_ansible_user=cluster
+cluster_ansible_password=<secret>
+
+django-app_django_secret_key=<secret>
+django-app_django_api_key=<secret>
+django-app_django_email_password=<secret>
+django-app_django_email=<email>
 
 ## License
 
