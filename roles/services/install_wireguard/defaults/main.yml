@@ -11,12 +11,12 @@ wireguard_clients:
     ip: 10.10.0.10/32
     allowed_ips:
       - 10.10.0.0/24
-      - 192.168.1.0/24
+      - "{{ lan_prefix }}.1.0/24"
   - name: "Phone"
     ip: 10.10.0.11/32
     allowed_ips:
       - 10.10.0.0/24
-      - 192.168.1.0/24
+      - "{{ lan_prefix }}.1.0/24"
     qr: true
   - name: "Full_Access"
     ip: 10.10.0.12/32

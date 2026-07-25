@@ -1,13 +1,13 @@
 ---
 
-ansible_host: 192.168.1.96
+ansible_host: "{{ lan_prefix }}.1.96"
 target_host: server2
 
 postgresql_listen_addresses: "*"
 
 # Allow only the Django application server
 postgresql_allowed_networks:
-  - "192.168.1.95/32"
+  - "{{ lan_prefix }}.1.95/32"
 
 virtual_machine:
   name: django-db
