@@ -94,6 +94,22 @@
   register: superuser_result
   changed_when: "'created' in superuser_result.stdout"
 
+- name: Update Django site domain
+  ansible.builtin.shell: |
+    {{ venv_dir }}/bin/python manage.py shell << EOF
+    from django.contrib.sites.models import Site
+
+    site = Site.objects.get(id=1)
+    site.domain = "{{ domain }}"
+    site.name = "{{ domain }}"
+    site.save()
+    print("updated")
+    EOF
+  args:
+    chdir: "{{ django_app_dir }}"
+  register: site_result
+  changed_when: "'updated' in site_result.stdout"
+
 - name: Install gunicorn systemd service
   ansible.builtin.template:
     src: gunicorn.service.j2
