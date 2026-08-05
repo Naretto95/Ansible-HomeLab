@@ -29,7 +29,7 @@ virtual_machine:
       password: "{{ ansible_password }}"
       sudo: true
   storage_disks:
-    - device: /dev/sda
+    - device: /dev/sdb
       label: gpt
       partitions:
         - number: 1
