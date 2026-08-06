@@ -1,11 +1,16 @@
 ---
 
+- name: Gather LVM facts
+  ansible.builtin.setup:
+    filter: ansible_lvm
+
 - name: Create logical volume
   community.general.lvol:
     vg: "{{ part.vg }}"
     lv: "{{ lv.name }}"
     size: "{{ lv.size }}"
     state: present
+  when: lv.name not in ansible_lvm.lvs
 
 - name: Create filesystem
   community.general.filesystem:
