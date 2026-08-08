@@ -110,6 +110,14 @@
   register: site_result
   changed_when: "'updated' in site_result.stdout"
 
+- name: Create Django cache table
+  ansible.builtin.command: "{{ venv_dir }}/bin/python manage.py createcachetable"
+  args:
+    chdir: "{{ django_app_dir }}"
+  register: cache_table_result
+  changed_when: "'already exists' not in cache_table_result.stdout"
+  when: cache_table | bool
+
 - name: Install gunicorn systemd service
   ansible.builtin.template:
     src: gunicorn.service.j2

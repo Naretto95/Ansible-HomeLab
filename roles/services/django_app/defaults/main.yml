@@ -41,3 +41,8 @@ postgresql_db_password: "{{ ansible_password }}"
 gunicorn_workers: 3
 
 python_version: "3.11"
+
+hcaptcha_sitekey: "hcaptcha_sitekey"
+hcaptcha_key: "hcaptcha_key"
+
+cache_table: true
