@@ -1,11 +1,16 @@
 ---
 
+# Interface
 wireguard_port: 51820
 wireguard_interface: wg0
 wireguard_network: 10.10.0.0/24
+wireguard_ip: 10.10.0.1/32
+
+# Domain / endpoint
 domain: example.com
 wireguard_endpoint: vpn.{{ domain }}
-wireguard_ip: 10.10.0.1/32
+
+# Clients
 wireguard_clients:
   - name: "PC"
     ip: 10.10.0.10/32

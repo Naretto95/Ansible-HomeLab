@@ -1,6 +1,10 @@
 ---
 
 base_directory: "{{ ansible_env.HOME }}"
+
+# GitLab
 gitlab_token_name: "homelab-token"
 gitlab_token: "MySecretToken123!"
+
+# Docker
 docker_images: []

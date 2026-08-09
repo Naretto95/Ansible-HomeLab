@@ -1,21 +1,48 @@
 ---
 
-domain: example.com
-
+# Application
 django_app_name: app_name
 django_app_dir: "/opt/{{ django_app_name }}"
 django_project_module: "{{ django_app_name }}"
-django_database_port: 5432
-django_email: test@gmail.com
-django_email_password: email_password
+django_cert_dir: "/etc/letsencrypt/live/{{ django_app_name }}/"
+python_version: "3.11"
+venv_dir: "{{ django_app_dir }}/venv"
+cache_table: true
+
+# Domain
+domain: example.com
 django_domain: "{{ django_app_name }}.{{ domain }}"
-django_database_host: "{{ hostvars['django-db']['ansible_host'] }}"
+
+# Secrets / API keys
 django_secret_key: django-key
 django_api_key: api-key
+
+# Superuser
 django_superuser_username: "{{ ansible_user }}"
 django_superuser_password: "{{ ansible_password }}"
-django_cert_dir: "/etc/letsencrypt/live/{{ django_app_name }}/"
 
+# Email
+django_email: test@gmail.com
+django_email_password: email_password
+
+# hCaptcha
+hcaptcha_sitekey: "hcaptcha_sitekey"
+hcaptcha_secret: "hcaptcha_key"
+
+# Database
+django_database_host: "{{ hostvars['django-db']['ansible_host'] }}"
+django_database_port: 5432
+postgresql_db_name: "{{ django_app_name }}-db"
+postgresql_db_user: "{{ ansible_user }}"
+postgresql_db_password: "{{ ansible_password }}"
+
+# Web server
+nginx_user: www-data
+gunicorn_workers: 3
+remote_static_root: "/var/www/{{ django_app_name }}/staticfiles/"
+local_static_root: "{{ django_app_dir }}/staticfiles/"
+
+# Scheduler
 django_systemd_schedulers:
   - name: "django-app-scheduler"
     description: "Django App Scheduler Service"
@@ -26,23 +53,3 @@ django_systemd_schedulers:
       description: "Django App Scheduler Timer"
       on_calendar: "*:0/5"
       persistent: true
-
-remote_static_root: "/var/www/{{ django_app_name }}/staticfiles/"
-local_static_root: "{{ django_app_dir }}/staticfiles/"
-
-nginx_user: www-data
-
-venv_dir: "{{ django_app_dir }}/venv"
-
-postgresql_db_name: "{{ django_app_name }}-db"
-postgresql_db_user: "{{ ansible_user }}"
-postgresql_db_password: "{{ ansible_password }}"
-
-gunicorn_workers: 3
-
-python_version: "3.11"
-
-hcaptcha_sitekey: "hcaptcha_sitekey"
-hcaptcha_key: "hcaptcha_key"
-
-cache_table: true

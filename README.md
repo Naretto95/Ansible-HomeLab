@@ -115,23 +115,7 @@ Each variable is automatically extracted and written into the appropriate Ansibl
 | `services_` | `inventory/group_vars/services/private_vars.yml` |
 | `django-app_` | `inventory/host_vars/django-app/private_vars.yml` |
 
-### Example `ENV_FILE`
-
-```env
-all_lan_prefix=143.8 (first 2 digits)
-all_domain=example.com
-
-services_ansible_user=service
-services_ansible_password=<secret>
-services_github_token=<secret>
-
-cluster_ansible_user=cluster
-cluster_ansible_password=<secret>
-
-django-app_django_secret_key=<secret>
-django-app_django_api_key=<secret>
-django-app_django_email_password=<secret>
-django-app_django_email=<email>
+See [.env.example](.env.example) for the full list of expected variables and their prefixes.
 
 ## License
 
