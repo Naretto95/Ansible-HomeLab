@@ -8,21 +8,33 @@
   failed_when: false
 
 - block:
-
     - name: Set raw python version from runtime.txt
       ansible.builtin.set_fact:
         python_runtime: >-
           {{ (runtime_file.content | b64decode).strip() }}
 
-    - name: Normalize python version (major.minor only)
+    - name: Normalize python version
       ansible.builtin.set_fact:
         python_version: >-
-          {{
-            (python_runtime.split('-')[1] if 'python-' in python_runtime else python_runtime)
-            .rsplit('.', 1)[0]
-          }}
+          {{ python_runtime.split('python-', 1)[1] if 'python-' in python_runtime else python_runtime }}
 
   when: runtime_file is defined and runtime_file.content is defined
+
+- name: Install/update pyenv via git to pick up latest available Python versions
+  include_role:
+    name: services/github_repositories
+  vars:
+    github_repositories:
+      - repo: pyenv/pyenv
+        dest: "{{ pyenv_install_dir }}"
+        version: master
+        force: true
+
+- name: Symlink pyenv onto PATH system-wide
+  ansible.builtin.file:
+    src: "{{ pyenv_install_dir }}/bin/pyenv"
+    dest: /usr/local/bin/pyenv
+    state: link
 
 - name: Install python {{ python_version }} with pyenv
   ansible.builtin.command:

@@ -9,6 +9,9 @@ python_version: "3.11"
 venv_dir: "{{ django_app_dir }}/venv"
 cache_table: true
 
+# pyenv
+pyenv_install_dir: /opt/pyenv
+
 # Domain
 domain: example.com
 django_domain: "{{ django_app_name }}.{{ domain }}"
