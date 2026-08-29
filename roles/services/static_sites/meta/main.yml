@@ -5,3 +5,4 @@ dependencies:
     vars:
       required_group: "services"
       required_os: "Debian"
+  - role: services/nginx
