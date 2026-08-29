@@ -25,6 +25,9 @@
     - role: services/nginx
       when: inventory_hostname == 'web'
 
+    - role: services/static_sites
+      when: inventory_hostname == 'web'
+
     - role: services/install_wireguard
       when: inventory_hostname == 'wireguard'
 

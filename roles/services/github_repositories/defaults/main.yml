@@ -1,5 +1,4 @@
 ---
 
 github_repositories: []
-github_packages: 
-  - git
+github_token: ""

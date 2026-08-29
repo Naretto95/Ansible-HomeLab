@@ -1,0 +1,23 @@
+server {
+    listen 80;
+    server_name {{ site.domain }};
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+
+    server_name {{ site.domain }};
+
+    ssl_certificate     /etc/letsencrypt/live/{{ site.domain | lower }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ site.domain | lower }}/privkey.pem;
+
+    root {{ site.root }};
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}

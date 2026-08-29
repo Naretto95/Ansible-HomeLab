@@ -25,3 +25,14 @@ lxc_container:
     - name: "{{ ansible_user }}"
       password: "{{ ansible_password }}"
       sudo: true
+
+github_repositories:
+  - repo: "Naretto95/Otteran"
+    dest: "/opt/otteran"
+    version: "main"
+    token: "{{ github_token }}"
+
+static_sites:
+  - name: otteran
+    domain: "{{ domain }}"
+    root: "/opt/otteran"

@@ -1,0 +1,39 @@
+---
+
+- name: Get Let's Encrypt certificate for each static site
+  include_role:
+    name: services/ssl_certbot
+  vars:
+    ssl_domain: "{{ item.domain | lower }}"
+    ssl_email: "{{ item.email | default('') }}"
+  loop: "{{ static_sites }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Deploy static site nginx config
+  ansible.builtin.template:
+    src: static_site.conf.j2
+    dest: "/etc/nginx/sites-available/{{ item.name }}"
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    site: "{{ item }}"
+  loop: "{{ static_sites }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Enable static site nginx config
+  ansible.builtin.file:
+    src: "/etc/nginx/sites-available/{{ item.name }}"
+    dest: "/etc/nginx/sites-enabled/{{ item.name }}"
+    state: link
+  loop: "{{ static_sites }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Reload nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+  when: static_sites | length > 0

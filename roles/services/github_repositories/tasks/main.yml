@@ -3,7 +3,7 @@
 - name: Clone or update GitHub repositories
   ansible.builtin.git:
     repo: >-
-      https://oauth2:{{ github_token }}@github.com/{{ item.repo }}.git
+      https://oauth2:{{ item.token | default(github_token) }}@github.com/{{ item.repo }}.git
     dest: "{{ item.dest }}"
     version: "{{ item.version | default('HEAD') }}"
     update: true
