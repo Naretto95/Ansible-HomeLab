@@ -33,7 +33,7 @@ github_repositories:
 
   - repo: "Naretto95/Resume"
     dest: "/opt/resume"
-    version: "main"
+    version: "master"
 
 static_sites:
   - name: otteran
