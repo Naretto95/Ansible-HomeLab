@@ -30,9 +30,16 @@ github_repositories:
   - repo: "Naretto95/Otteran"
     dest: "/opt/otteran"
     version: "main"
-    token: "{{ github_token }}"
+
+  - repo: "Naretto95/Resume"
+    dest: "/opt/resume"
+    version: "main"
 
 static_sites:
   - name: otteran
     domain: "{{ domain }}"
     root: "/opt/otteran"
+
+  - name: resume
+    domain: "cv.{{ domain }}"
+    root: "/opt/resume"
