@@ -41,3 +41,6 @@ github_repositories:
   - repo: "Naretto95/{{ django_app_name }}"
     dest: "/opt/{{ django_app_name }}"
     version: "main"
+
+django_project_module: "{{ django_app_name }}"
+django_settings_module: "{{ django_project_module }}.prod_settings"

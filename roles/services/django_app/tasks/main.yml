@@ -71,22 +71,28 @@
 
 - name: Run Django makemigrations
   ansible.builtin.command:
-    cmd: "{{ venv_dir }}/bin/python manage.py makemigrations"
+    cmd: >-
+      {{ venv_dir }}/bin/python manage.py makemigrations
+      {{ '--settings=' + django_settings_module if django_settings_module else '' }}
     chdir: "{{ django_app_dir }}"
 
 - name: Run Django migrate
   ansible.builtin.command:
-    cmd: "{{ venv_dir }}/bin/python manage.py migrate"
+    cmd: >-
+      {{ venv_dir }}/bin/python manage.py migrate
+      {{ '--settings=' + django_settings_module if django_settings_module else '' }}
     chdir: "{{ django_app_dir }}"
 
 - name: Run Django collectstatic
   ansible.builtin.command:
-    cmd: "{{ venv_dir }}/bin/python manage.py collectstatic --noinput"
+    cmd: >-
+      {{ venv_dir }}/bin/python manage.py collectstatic --noinput
+      {{ '--settings=' + django_settings_module if django_settings_module else '' }}
     chdir: "{{ django_app_dir }}"
 
 - name: Create Django superuser (if not exists)
   ansible.builtin.shell: |
-    {{ venv_dir }}/bin/python manage.py shell << EOF
+    {{ venv_dir }}/bin/python manage.py shell {{ '--settings=' + django_settings_module if django_settings_module else '' }} << EOF
     from django.contrib.auth import get_user_model
 
     User = get_user_model()
@@ -108,7 +114,7 @@
 
 - name: Update Django site domain
   ansible.builtin.shell: |
-    {{ venv_dir }}/bin/python manage.py shell << EOF
+    {{ venv_dir }}/bin/python manage.py shell {{ '--settings=' + django_settings_module if django_settings_module else '' }} << EOF
     from django.contrib.sites.models import Site
 
     site = Site.objects.get(id=1)
@@ -123,7 +129,9 @@
   changed_when: "'updated' in site_result.stdout"
 
 - name: Create Django cache table
-  ansible.builtin.command: "{{ venv_dir }}/bin/python manage.py createcachetable"
+  ansible.builtin.command: >-
+    {{ venv_dir }}/bin/python manage.py createcachetable
+    {{ '--settings=' + django_settings_module if django_settings_module else '' }}
   args:
     chdir: "{{ django_app_dir }}"
   register: cache_table_result

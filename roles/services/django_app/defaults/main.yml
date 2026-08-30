@@ -8,6 +8,7 @@ django_cert_dir: "/etc/letsencrypt/live/{{ django_app_name }}/"
 python_version: "3.11"
 venv_dir: "{{ django_app_dir }}/venv"
 cache_table: true
+django_settings_module: ""
 
 # pyenv
 pyenv_install_dir: /opt/pyenv
