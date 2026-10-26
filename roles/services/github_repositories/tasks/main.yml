@@ -2,12 +2,17 @@
 
 - name: Clone or update GitHub repositories
   ansible.builtin.git:
-    repo: >-
-      https://oauth2:{{ item.token | default(github_token) }}@github.com/{{ item.repo }}.git
+    repo: "https://github.com/{{ item.repo }}.git"
     dest: "{{ item.dest }}"
     version: "{{ item.version | default('HEAD') }}"
     update: true
     force: "{{ item.force | default(false) }}"
+  environment: >-
+    {{ {
+      'GIT_CONFIG_COUNT': '1',
+      'GIT_CONFIG_KEY_0': 'http.https://github.com/.extraheader',
+      'GIT_CONFIG_VALUE_0': 'AUTHORIZATION: basic ' ~ (('x-access-token:' ~ (item.token | default(github_token))) | b64encode)
+    } if (item.token | default(github_token)) else {} }}
   loop: "{{ github_repositories }}"
   loop_control:
     label: "{{ item.repo }}"
